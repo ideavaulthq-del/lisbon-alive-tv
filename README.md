@@ -1,5 +1,6 @@
-# LISBON ALIVE™ MASTER CONTROL 4.1
+LISBON ALIVE™ MASTER CONTROL 4.3
 
-Inclui EUROPA EM ALERTA™ e consulta manual de RSS via allorigins.win. Fontes externas podem falhar. Notícias nunca são automaticamente verificadas ou publicadas.
-
-Publicação: substituir index.html no GitHub Pages. Tecla M: painel; tecla E: Europa.
+Substituir index.html no GitHub Pages. Preserva a base 4.2.
+Novidades: relógio de segundos Lisboa, grafismo última hora com confirmação, lista de notícias confirmadas, pré-visualização textual, teste local.
+Teclas: M modo OBS, E Europa em Alerta, R modo OBS adicional.
+RSS depende de proxy externo e pode falhar. Não há verificação factual automática nem emissão automática de notícias.
