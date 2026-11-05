@@ -1,3 +1,5 @@
-LISBON ALIVE™ MASTER CONTROL 4.0 — EUROPA EM ALERTA™
+# LISBON ALIVE™ MASTER CONTROL 4.1
 
-Abrir index.html no navegador ou publicar no GitHub Pages. A grelha e os programas originais 3.9 são preservados. Tecla M mostra/oculta painel; tecla E abre Europa em Alerta. Os botões editoriais são modelos de demonstração e não notícias atualizadas automaticamente. Verificar fontes antes da emissão.
+Inclui EUROPA EM ALERTA™ e consulta manual de RSS via allorigins.win. Fontes externas podem falhar. Notícias nunca são automaticamente verificadas ou publicadas.
+
+Publicação: substituir index.html no GitHub Pages. Tecla M: painel; tecla E: Europa.
