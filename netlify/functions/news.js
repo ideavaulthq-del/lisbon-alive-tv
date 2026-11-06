@@ -19,10 +19,10 @@ const nightRelevant=item=>{
 };
 // Dedicated heritage filter: require a heritage subject in the headline, not merely "história" as a generic phrase.
 const heritageRelevant=item=>{
- const norm=value=>String(value||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase();
+ const norm=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
  const title=norm(item.title),source=norm(item.source);
- const local=/\\b(lisboa|lisbon|alfama|belem|chiado|bairro alto|marvila|alcantara|ajuda|graca|castelo de sao jorge|mosteiro dos jeronimos|museu nacional)\\b/.test(title)||/agenda cultural de lisboa/.test(source);
- const heritage=/\\b(patrimonio|patrimonial|monumento|monumentos|museu|museus|exposicao|exposicoes|galeria|galerias|arqueologia|arqueologico|restauro|restauracao|azulejos|arquivo|arquivos|arquitetura|arquitectura|edificio historico|edificios historicos|visita guiada|visitas guiadas|colecao|colecoes|acervo|palacio|palacios|castelo|mosteiro|convento)\\b/.test(title);
+ const local=/\b(lisboa|lisbon|alfama|belem|chiado|bairro alto|marvila|alcantara|ajuda|graca|castelo de sao jorge|mosteiro dos jeronimos|museu nacional)\b/.test(title)||/agenda cultural de lisboa/.test(source);
+ const heritage=/\b(patrimonio|patrimonial|monumento|monumentos|museu|museus|exposicao|exposicoes|galeria|galerias|arqueologia|arqueologico|restauro|restauracao|azulejos|arquivo|arquivos|arquitetura|arquitectura|edificio historico|edificios historicos|visita guiada|visitas guiadas|colecao|colecoes|acervo|palacio|palacios|castelo|mosteiro|convento)\b/.test(title);
  return local&&heritage;
 };
 const field=(item,name)=>decode((item.match(new RegExp('<'+name+'(?:\\s[^>]*)?>([\\s\\S]*?)<\\/'+name+'>','i'))||[])[1]||'');
