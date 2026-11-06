@@ -17,6 +17,14 @@ const nightRelevant=item=>{
  const cultural=/\b(patrimonio|historico|historia|monumento|monumentos|cultura|cultural|agenda|concerto|concertos|musica|musical|teatro|cinema|festival|festivais|exposicao|exposicoes|espetaculo|espetaculos|museu|museus|arte|artes|galeria|livro|livros|danca|palco|bilhete|bilhetes|evento|eventos)\b/.test(title)||/agenda cultural de lisboa/.test(source);
  return local&&cultural;
 };
+// Dedicated heritage filter: require a heritage subject in the headline, not merely "história" as a generic phrase.
+const heritageRelevant=item=>{
+ const norm=value=>String(value||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase();
+ const title=norm(item.title),source=norm(item.source);
+ const local=/\\b(lisboa|lisbon|alfama|belem|chiado|bairro alto|marvila|alcantara|ajuda|graca|castelo de sao jorge|mosteiro dos jeronimos|museu nacional)\\b/.test(title)||/agenda cultural de lisboa/.test(source);
+ const heritage=/\\b(patrimonio|patrimonial|monumento|monumentos|museu|museus|exposicao|exposicoes|galeria|galerias|arqueologia|arqueologico|restauro|restauracao|azulejos|arquivo|arquivos|arquitetura|arquitectura|edificio historico|edificios historicos|visita guiada|visitas guiadas|colecao|colecoes|acervo|palacio|palacios|castelo|mosteiro|convento)\\b/.test(title);
+ return local&&heritage;
+};
 const field=(item,name)=>decode((item.match(new RegExp('<'+name+'(?:\\s[^>]*)?>([\\s\\S]*?)<\\/'+name+'>','i'))||[])[1]||'');
 exports.handler=async event=>{
  const group=event.queryStringParameters?.group;
@@ -34,7 +42,7 @@ exports.handler=async event=>{
     const parsed=[...xml.matchAll(new RegExp('<item(?:\\s[^>]*)?>([\\s\\S]*?)<\\/item>','gi'))].slice(0,40).map(m=>{
      const x=m[1],date=field(x,'pubDate'),link=field(x,'link'),stamp=Date.parse(date);
      return {title:field(x,'title').slice(0,230),source:(field(x,'source')||new URL(url).hostname).slice(0,90),date,url:link,stamp};
-    }).filter(x=>x.title&&/^https:\/\//.test(x.url)&&Number.isFinite(x.stamp)&&x.stamp<=now+300000&&now-x.stamp<=48*3600000&&(!['noite','patrimonio'].includes(group)||nightRelevant(x))).slice(0,12).map(({stamp,...rest})=>rest);
+    }).filter(x=>x.title&&/^https:\/\//.test(x.url)&&Number.isFinite(x.stamp)&&x.stamp<=now+300000&&now-x.stamp<=48*3600000&&(group==='noite'?nightRelevant(x):group==='patrimonio'?heritageRelevant(x):true)).slice(0,12).map(({stamp,...rest})=>rest);
     if(parsed.length){items=parsed;usedSource=new URL(url).hostname;break}
    }catch(e){console.warn('RSS source unavailable',new URL(url).hostname,e.message)}
   }
