@@ -237,4 +237,41 @@ redraw();setInterval(update,1000);document.addEventListener('visibilitychange',u
  document.getElementById('ernestoPreview').onclick=()=>{preview={mode:'ernesto',started:Date.now(),day:document.getElementById('ernestoDay').value==='auto'?localTime().day:Number(document.getElementById('ernestoDay').value)};overlay.dataset.key='';update();stage.scrollIntoView({behavior:'smooth'})};document.getElementById('cyberPreview').onclick=()=>{preview={mode:'cyber',started:Date.now(),day:0};overlay.dataset.key='';update();stage.scrollIntoView({behavior:'smooth'})};document.getElementById('ernestoStop').onclick=()=>{preview=null;hide();overlay.dataset.key='';update()};setInterval(update,250);update();
 })();
 </script>
+
+<!-- PORTUGAL COMBUSTÍVEIS™ 3.0 | Módulo televisivo integrado -->
+<style>
+#fuelTV90{position:fixed;inset:0;width:100vw;height:100vh;z-index:9000;background:#06172f;display:none;border:0}
+#fuelTV90.active{display:block}
+#fuelPanel90{max-width:1250px;margin:18px auto;padding:20px;border:1px solid #477cae;border-radius:14px;background:#0b2948;color:#f3f8ff}
+#fuelPanel90 button,#fuelPanel90 a{display:inline-block;margin:6px 7px 6px 0;padding:11px 14px;border:1px solid #6197c5;border-radius:8px;background:#174c7a;color:#fff;font:600 14px system-ui;text-decoration:none;cursor:pointer}
+#fuelPanel90 p{line-height:1.5;color:#c9ddf3}
+.broadcast-mode #fuelPanel90{display:none}
+</style>
+<section id="fuelPanel90" aria-label="Módulo Portugal Combustíveis">
+<h2>⛽ PORTUGAL COMBUSTÍVEIS™ 3.0 | LISBON ALIVE™</h2>
+<p>Rubrica automática às 08h00 e 18h00 (hora de Lisboa), durante 5 minutos. Sobreposição temporária sem alterar os 48 blocos da grelha. Valores de um posto de referência, nunca médias nacionais.</p>
+<button id="fuelPreview90" type="button">▶ Pré-visualizar emissão</button>
+<button id="fuelStop90" type="button">■ Terminar pré-visualização</button>
+<a href="combustiveis/index.html" target="_blank" rel="noopener">Abrir painel de combustíveis</a>
+<a href="combustiveis/tv.html" target="_blank" rel="noopener">Abrir TV isolada</a>
+<p id="fuelStatus90" role="status">A iniciar módulo…</p>
+</section>
+<iframe id="fuelTV90" title="Portugal Combustíveis, emissão televisiva" src="about:blank" allow="fullscreen"></iframe>
+<script>
+(()=>{'use strict';
+const frame=document.getElementById('fuelTV90');
+const status=document.getElementById('fuelStatus90');
+let preview=false,loaded=false;
+const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Lisbon',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
+function currentMinutes(){const p=parts.formatToParts(new Date());return Number(p.find(x=>x.type==='hour').value)*60+Number(p.find(x=>x.type==='minute').value)}
+function tick(){const m=currentMinutes();const scheduled=(m>=480&&m<485)||(m>=1080&&m<1085);const on=preview||scheduled;
+if(on&&!loaded){frame.src='combustiveis/tv.html';loaded=true}
+frame.classList.toggle('active',on);
+if(status)status.textContent=preview?'Pré-visualização ativa.':scheduled?'Rubrica automática em emissão.':'Em espera. Próximas janelas: 08h00 e 18h00, hora de Lisboa.';
+}
+document.getElementById('fuelPreview90').addEventListener('click',()=>{preview=true;tick()});
+document.getElementById('fuelStop90').addEventListener('click',()=>{preview=false;tick()});
+setInterval(tick,1000);tick();
+})();
+</script>
 </body></html>
