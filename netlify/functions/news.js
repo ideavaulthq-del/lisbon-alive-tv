@@ -2,7 +2,8 @@
 const FEEDS = Object.freeze({
  lisboa:'https://news.google.com/rss/search?q=Lisboa+Portugal&hl=pt-PT&gl=PT&ceid=PT:pt-150',
  portugal:'https://news.google.com/rss/search?q=Portugal&hl=pt-PT&gl=PT&ceid=PT:pt-150',
- europa:'https://www.europarl.europa.eu/rss/doc/press-releases/pt.xml'
+ europa:'https://www.europarl.europa.eu/rss/doc/press-releases/pt.xml',
+ noite:'https://news.google.com/rss/search?q=Lisboa+(agenda+cultural+OR+concertos+OR+exposi%C3%A7%C3%B5es+OR+teatro)+when%3A2d&hl=pt-PT&gl=PT&ceid=PT:pt-150'
 });
 const EUROPE_FALLBACK='https://news.google.com/rss/search?q=Uni%C3%A3o+Europeia+Parlamento+Europeu&hl=pt-PT&gl=PT&ceid=PT:pt-150';
 const decode=s=>s.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g,'$1').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&#(\d+);/g,(_,n)=>String.fromCodePoint(Number(n))).replace(/<[^>]*>/g,'').trim();
