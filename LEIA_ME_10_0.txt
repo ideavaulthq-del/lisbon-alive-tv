@@ -1,0 +1,1 @@
+LISBON ALIVE 10.0: METEO MUNDO removido da programação e da lista de seleção; o seu bloco foi preenchido por LISBOA AO VIVO, mantendo os 48 horários e índices dos restantes programas. Integração meteorológica eliminada. Qualidade do ar modelada é um módulo distinto e permanece. CSS, viewer.html e schedule.json sem alterações.

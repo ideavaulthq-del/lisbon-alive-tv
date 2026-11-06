@@ -1,0 +1,5 @@
+LISBON ALIVE 9.8 | Mobilidade operacional Carris Metropolitana
+Sem alterações ao CSS, HTML estrutural, viewer.html ou schedule.json.
+A fonte externa pode estar indisponível ou bloquear pedidos CORS. Não se inventam dados.
+Contagem de posições não indica atrasos nem trânsito.
+Teste em servidor HTTPS com acesso à internet.

@@ -1,0 +1,5 @@
+LISBON ALIVE 9.9 | QUALIDADE DO AR DE LISBOA
+Apenas lógica JS no index.html. CSS, estrutura visual, viewer.html e schedule.json sem alterações.
+Fonte: Open-Meteo Air Quality API, dados modelados. Atualização a cada 30 min; expiração em 75 min.
+Requer HTTPS e ligação de rede. Não é câmara ao vivo nem medição direta de estação.
+Não publicado.
