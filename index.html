@@ -93,7 +93,7 @@ function liveEditorial(p,i){const f=liveFeedFor(i);if(!f){return {...p,headline:
 async function refreshLiveFeed(group){
  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),12000);
  try{
-  const response=await fetch('/.netlify/functions/news?group='+encodeURIComponent(group),{signal:controller.signal,cache:'no-store'});
+  const response=await fetch((location.hostname==='ideavaulthq-del.github.io'?'https://lisboalivetv.netlify.app':'')+'/.netlify/functions/news?group='+encodeURIComponent(group),{signal:controller.signal,cache:'no-store'});
   if(!response.ok)throw Error('HTTP '+response.status);
   const payload=await response.json();
   if(!Array.isArray(payload.items))throw Error('Formato inválido');
