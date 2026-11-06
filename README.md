@@ -43,3 +43,7 @@ Esta versão acrescenta ao repositório a grelha pública partilhável (`schedul
 
 ## 8.3 · Comandante Ernesto 3D
 O episódio de sexta-feira (Frango Assado) utiliza seis imagens WebP locais em `assets/ernesto/`, sem dependências externas. Os restantes dias continuam com SVG provisórios. O conteúdo é humorístico e a emissão permanece uma demonstração local até publicação.
+
+
+## 8.5 · COMANDANTE ERNESTO (visual da grelha)
+A rubrica utiliza a identidade azul/vermelho/branco da programação existente, com imagem ampliada. Não altera os horários nem os controlos da grelha. Pré-visualização em index.html, canal de espectadores em viewer.html. As imagens de sexta-feira são incorporadas no HTML; as restantes cenas continuam provisórias. O agendamento é local ao navegador, dependente da hora do dispositivo, não é uma emissão em servidor.
