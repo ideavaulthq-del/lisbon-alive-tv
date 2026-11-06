@@ -20,7 +20,7 @@ exports.handler=async event=>{
     if(!response.ok)throw Error('upstream '+response.status);
     const xml=await response.text();
     if(xml.length>1500000)throw Error('feed too large');
-    const parsed=[...xml.matchAll(/<item(?:\\s[^>]*)?>([\\s\\S]*?)<\\/item>/gi)].slice(0,40).map(m=>{
+    const parsed=[...xml.matchAll(new RegExp('<item(?:\\s[^>]*)?>([\\s\\S]*?)<\\/item>','gi'))].slice(0,40).map(m=>{
      const x=m[1],date=field(x,'pubDate'),link=field(x,'link'),stamp=Date.parse(date);
      return {title:field(x,'title').slice(0,230),source:(field(x,'source')||new URL(url).hostname).slice(0,90),date,url:link,stamp};
     }).filter(x=>x.title&&/^https:\/\//.test(x.url)&&Number.isFinite(x.stamp)&&x.stamp<=now+300000&&now-x.stamp<=48*3600000).slice(0,12).map(({stamp,...rest})=>rest);
