@@ -9,7 +9,7 @@ const decode=s=>s.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g,'$1').replace(/&amp;/g,'
 const field=(item,name)=>decode((item.match(new RegExp('<'+name+'(?:\\s[^>]*)?>([\\s\\S]*?)<\\/'+name+'>','i'))||[])[1]||'');
 exports.handler=async event=>{
  const group=event.queryStringParameters?.group;
- if(!Object.hasOwn(FEEDS,group))return {statusCode:400,body:'Invalid group'};
+ if(!Object.hasOwn(FEEDS,group))return {statusCode:400,headers:{'Access-Control-Allow-Origin':'https://ideavaulthq-del.github.io'},body:'Invalid group'};
  try{
   const sources=group==='europa'?[FEEDS.europa,EUROPE_FALLBACK]:[FEEDS[group]];
   let items=[],usedSource=null;
@@ -28,6 +28,6 @@ exports.handler=async event=>{
    }catch(e){console.warn('RSS source unavailable',new URL(url).hostname,e.message)}
   }
   if(!items.length)throw Error('No recent RSS items');
-  return {statusCode:200,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'public, max-age=120'},body:JSON.stringify({group,items,checkedAt:new Date().toISOString(),editorialStatus:'unverified-rss',feedHost:usedSource})};
- }catch(e){return {statusCode:503,headers:{'Content-Type':'application/json','Cache-Control':'no-store'},body:JSON.stringify({error:'Source unavailable',items:[]})}}
+  return {statusCode:200,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'public, max-age=120','Access-Control-Allow-Origin':'https://ideavaulthq-del.github.io'},body:JSON.stringify({group,items,checkedAt:new Date().toISOString(),editorialStatus:'unverified-rss',feedHost:usedSource})};
+ }catch(e){return {statusCode:503,headers:{'Content-Type':'application/json','Cache-Control':'no-store','Access-Control-Allow-Origin':'https://ideavaulthq-del.github.io'},body:JSON.stringify({error:'Source unavailable',items:[]})}}
 };
