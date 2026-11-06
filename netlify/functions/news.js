@@ -3,7 +3,8 @@ const FEEDS = Object.freeze({
  lisboa:'https://news.google.com/rss/search?q=Lisboa+Portugal&hl=pt-PT&gl=PT&ceid=PT:pt-150',
  portugal:'https://news.google.com/rss/search?q=Portugal&hl=pt-PT&gl=PT&ceid=PT:pt-150',
  europa:'https://www.europarl.europa.eu/rss/doc/press-releases/pt.xml',
- noite:'https://news.google.com/rss/search?q=Lisboa+(agenda+cultural+OR+concertos+OR+exposi%C3%A7%C3%B5es+OR+teatro)+when%3A2d&hl=pt-PT&gl=PT&ceid=PT:pt-150'
+ noite:'https://news.google.com/rss/search?q=Lisboa+(agenda+cultural+OR+concertos+OR+exposi%C3%A7%C3%B5es+OR+teatro)+when%3A2d&hl=pt-PT&gl=PT&ceid=PT:pt-150',
+ patrimonio:'https://news.google.com/rss/search?q=Lisboa+(patrim%C3%B3nio+OR+museus+OR+monumentos+OR+hist%C3%B3ria+OR+exposi%C3%A7%C3%B5es)+when%3A2d&hl=pt-PT&gl=PT&ceid=PT:pt-150'
 });
 const EUROPE_FALLBACK='https://news.google.com/rss/search?q=Uni%C3%A3o+Europeia+Parlamento+Europeu&hl=pt-PT&gl=PT&ceid=PT:pt-150';
 const decode=s=>s.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g,'$1').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&#(\d+);/g,(_,n)=>String.fromCodePoint(Number(n))).replace(/<[^>]*>/g,'').trim();
@@ -33,7 +34,7 @@ exports.handler=async event=>{
     const parsed=[...xml.matchAll(new RegExp('<item(?:\\s[^>]*)?>([\\s\\S]*?)<\\/item>','gi'))].slice(0,40).map(m=>{
      const x=m[1],date=field(x,'pubDate'),link=field(x,'link'),stamp=Date.parse(date);
      return {title:field(x,'title').slice(0,230),source:(field(x,'source')||new URL(url).hostname).slice(0,90),date,url:link,stamp};
-    }).filter(x=>x.title&&/^https:\/\//.test(x.url)&&Number.isFinite(x.stamp)&&x.stamp<=now+300000&&now-x.stamp<=48*3600000&&(group!=='noite'||nightRelevant(x))).slice(0,12).map(({stamp,...rest})=>rest);
+    }).filter(x=>x.title&&/^https:\/\//.test(x.url)&&Number.isFinite(x.stamp)&&x.stamp<=now+300000&&now-x.stamp<=48*3600000&&(!['noite','patrimonio'].includes(group)||nightRelevant(x))).slice(0,12).map(({stamp,...rest})=>rest);
     if(parsed.length){items=parsed;usedSource=new URL(url).hostname;break}
    }catch(e){console.warn('RSS source unavailable',new URL(url).hostname,e.message)}
   }
