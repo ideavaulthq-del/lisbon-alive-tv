@@ -29,7 +29,7 @@ const programmes=[
 ['EUROPA EM ALERTA™','TOMATE NEWS 24™ · EUROPA','Europa · notícias atuais','Títulos RSS externos, sujeitos a verificação editorial.','EUROPA · NATO · ECONOMIA · PORTUGAL','news']];
 const KEY='lisbonAlive39Edits';let edits={};try{edits=JSON.parse(localStorage.getItem(KEY)||localStorage.getItem('lisbonAlive38Edits')||localStorage.getItem('lisbonAlive37Edits')||'{}')}catch{};let selected=-1,automatic=true,cameraAuto=true,shotIndex=0,alertOn=false;const sel=$('programSelect');programmes.forEach((p,i)=>{const o=document.createElement('option');o.value=i;o.textContent=String(i+1).padStart(2,'0')+' · '+p[0];sel.appendChild(o)});
 function data(i){let p=programmes[i],e=edits[i]||{};return {name:p[0],category:e.category??p[1],headline:e.headline??p[2],description:e.description??p[3],ticker:e.ticker??p[4],scene:p[5],facts:e.facts??news}}
-function render(i){if(i<0||i>=programmes.length)return;let changed=i!==selected;selected=i;sel.value=String(i);let p=data(i);if(p.scene==='news'||i===8)p=liveEditorial(p,i);if(i===3)p=liveMobility(p);if(i===0)p=liveAir(p);$('programme').textContent=p.name;$('subtitle').textContent=p.category;$('tag').textContent=p.category;$('eyebrow').textContent=p.category;$('headline').textContent=p.headline;$('description').textContent=p.description;$('facts').textContent=p.facts;$('ticker').textContent=(p.ticker+'  •  ').repeat(4);for(let k of ['headline','category','description','facts','ticker'])$('edit'+k[0].toUpperCase()+k.slice(1)).value=p[k];const ed=edits[i]||{};const editorial=ed.editorial==='verified'&&String(ed.source||'').trim()&&String(ed.verifiedAt||'').trim();$('watermark').textContent=i===0?(airState&&Date.now()-airState.loaded<75*60*1000?'DADOS MODELO · OPEN-METEO AIR QUALITY · CENÁRIO DIGITAL':'QUALIDADE DO AR INDISPONÍVEL · CENÁRIO DIGITAL'):(p.scene==='news'||i===8)?(liveFeedFor(i)?'TÍTULOS DE FONTE EXTERNA · NÃO VERIFICADOS PELA REDAÇÃO':(editorial?'VERIFICAÇÃO DECLARADA PELO OPERADOR · '+ed.source:'FONTE EM TEMPO REAL INDISPONÍVEL · SEM NOTÍCIAS CONFIRMADAS')):'CENÁRIO DIGITAL · VISUALIZAÇÃO ILUSTRATIVA';$('editEditorial').value=ed.editorial||'demo';$('editSource').value=ed.source||'';if(changed){setShot(0);$('flash').classList.add('on');setTimeout(()=>$('flash').classList.remove('on'),160)}}
+function render(i){if(i<0||i>=programmes.length)return;let changed=i!==selected;selected=i;sel.value=String(i);let p=data(i);if(p.scene==='news'||i===8||i===2||i===6)p=liveEditorial(p,i);if(i===3)p=liveMobility(p);if(i===0)p=liveAir(p);$('programme').textContent=p.name;$('subtitle').textContent=p.category;$('tag').textContent=p.category;$('eyebrow').textContent=p.category;$('headline').textContent=p.headline;$('description').textContent=p.description;$('facts').textContent=p.facts;$('ticker').textContent=(p.ticker+'  •  ').repeat(4);for(let k of ['headline','category','description','facts','ticker'])$('edit'+k[0].toUpperCase()+k.slice(1)).value=p[k];const ed=edits[i]||{};const editorial=ed.editorial==='verified'&&String(ed.source||'').trim()&&String(ed.verifiedAt||'').trim();$('watermark').textContent=i===0?(airState&&Date.now()-airState.loaded<75*60*1000?'DADOS MODELO · OPEN-METEO AIR QUALITY · CENÁRIO DIGITAL':'QUALIDADE DO AR INDISPONÍVEL · CENÁRIO DIGITAL'):(p.scene==='news'||i===8||i===2||i===6)?(liveFeedFor(i)?'TÍTULOS DE FONTE EXTERNA · NÃO VERIFICADOS PELA REDAÇÃO':(editorial?'VERIFICAÇÃO DECLARADA PELO OPERADOR · '+ed.source:'FONTE EM TEMPO REAL INDISPONÍVEL · SEM NOTÍCIAS CONFIRMADAS')):'CENÁRIO DIGITAL · VISUALIZAÇÃO ILUSTRATIVA';$('editEditorial').value=ed.editorial||'demo';$('editSource').value=ed.source||'';if(changed){setShot(0);$('flash').classList.add('on');setTimeout(()=>$('flash').classList.remove('on'),160)}}
 // LISBON ALIVE 9.9: qualidade do ar de Lisboa (modelos Open-Meteo).
 // Dados modelados, não medições de estação nem imagens em direto.
 let airState=null;
@@ -85,8 +85,9 @@ const liveSources={
   europa:'https://news.google.com/rss/search?q=Europa+Uni%C3%A3o+Europeia&hl=pt-PT&gl=PT&ceid=PT:pt-150'
 };
 liveSources.noite='https://news.google.com/rss/search?q=Lisboa+agenda+cultural&hl=pt-PT&gl=PT&ceid=PT:pt-150';
+liveSources.patrimonio='https://news.google.com/rss/search?q=Lisboa+patrimonio+museus&hl=pt-PT&gl=PT&ceid=PT:pt-150';
 const liveFeeds={};
-function feedGroup(i){return i===11?'europa':i===8?'noite':i===1?'lisboa':'portugal'}
+function feedGroup(i){return i===11?'europa':i===8?'noite':(i===2||i===6)?'patrimonio':i===1?'lisboa':'portugal'}
 function liveFeedFor(i){const f=liveFeeds[feedGroup(i)];return f&&f.items.length&&Date.now()-f.loaded<20*60*1000?f:null}
 function liveEditorial(p,i){const f=liveFeedFor(i);if(!f){return {...p,headline:'A aguardar atualização de fontes',description:'Não foi possível confirmar títulos atuais. A emissão mantém a programação automática.',facts:'Fonte RSS indisponível ou sem atualização recente. Não apresentar dados antigos como atuais.',ticker:'FONTES EXTERNAS INDISPONÍVEIS · SEM INFORMAÇÃO CONFIRMADA'}}
  const elapsed=Math.floor(Date.now()/25000);const item=f.items[elapsed%f.items.length];return {...p,headline:item.title,description:'Título publicado por '+item.source+' · '+(item.date||'data não indicada')+'. Consulte a publicação original para contexto.',facts:'FONTE: '+item.source+'\nPUBLICAÇÃO: '+(item.date||'não indicada')+'\nAGREGAÇÃO AUTOMÁTICA · SEM VERIFICAÇÃO EDITORIAL',ticker:f.items.slice(0,5).map(x=>x.title).join(' · ')};
@@ -103,11 +104,11 @@ async function refreshLiveFeed(group){
   liveFeeds[group]={items,loaded:Date.now()};
  }catch(err){console.warn('Notícias indisponíveis',group,err);delete liveFeeds[group]}
  finally{clearTimeout(timeout)}
- if(selected>=0&&(programmes[selected][5]==='news'||selected===8))render(selected);
+ if(selected>=0&&(programmes[selected][5]==='news'||selected===8||selected===2||selected===6))render(selected);
 }
 function refreshAllLive(){Object.keys(liveSources).forEach(refreshLiveFeed)}
 refreshAllLive();setInterval(refreshAllLive,5*60*1000);
-setInterval(()=>{if(selected>=0&&(programmes[selected][5]==='news'||selected===8))render(selected)},25000);
+setInterval(()=>{if(selected>=0&&(programmes[selected][5]==='news'||selected===8||selected===2||selected===6))render(selected)},25000);
 const shots=['wide','medium','detail','drift'];const shotNames=['PANORÂMICA','PLANO MÉDIO','APROXIMAÇÃO','MOVIMENTO LENTO'];
 function setShot(i){shotIndex=(i+shots.length)%shots.length;const st=$('stage');shots.forEach(k=>st.classList.remove('cam-'+k));st.classList.add('cam-'+shots[shotIndex]);$('cameraStatus').textContent='CÂMARA · '+shotNames[shotIndex]}
 $('camera').onclick=()=>{cameraAuto=!cameraAuto;$('camera').textContent='Câmara: '+(cameraAuto?'AUTO':'MANUAL')};
