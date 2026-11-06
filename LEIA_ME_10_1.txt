@@ -1,0 +1,7 @@
+LISBON ALIVE 10.1 REAL CONTENT ENGINE
+
+Visual e grelha preservados. Alteração funcional: feeds automáticos consultados pela Netlify Function /.netlify/functions/news.
+Publicar a pasta inteira no Netlify com build de funções (repositório Git recomendado). Abrir index.html por file:// NÃO executa funções.
+Títulos RSS são informação externa NÃO verificada editorialmente. Apenas publicações datadas nas últimas 48h. Em falha, mostra indisponibilidade.
+Os restantes programas continuam com cenários digitais e textos ilustrativos; esta versão NÃO os converte em transmissões reais.
+Não foram alterados CSS, viewer.html nem schedule.json.
