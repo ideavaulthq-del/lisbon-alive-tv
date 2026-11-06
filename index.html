@@ -41,11 +41,12 @@ const reflections=[
 ];
 function liveReflection(p,i){
  if(edits[i]&&['headline','description','facts','ticker'].some(k=>Object.hasOwn(edits[i],k)))return p;
- const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Lisbon',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
- const key=Number(today.replace(/\\D/g,''));
+ const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Lisbon',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+ const year=parts.find(p=>p.type==='year').value,month=parts.find(p=>p.type==='month').value,day=parts.find(p=>p.type==='day').value;
+ const key=Number(year+month+day);
  const index=(key+(i===9?3:0))%reflections.length;
  const item=reflections[index];
- return {...p,headline:item[0],description:item[1],facts:'REFLEXÃO ORIGINAL · LISBON ALIVE™\\nTexto de caráter contemplativo, sem pretensão noticiosa.\\nEdição automática diária · Hora de Lisboa.',ticker:'FÉ EM LISBOA · REFLEXÃO ORIGINAL · '+item[0]};
+ return {...p,headline:item[0],description:item[1],facts:'REFLEXÃO ORIGINAL · LISBON ALIVE™\nTexto de caráter contemplativo, sem pretensão noticiosa.\nEdição automática diária · Hora de Lisboa.',ticker:'FÉ EM LISBOA · REFLEXÃO ORIGINAL · '+item[0]};
 }
 function render(i){if(i<0||i>=programmes.length)return;let changed=i!==selected;selected=i;sel.value=String(i);let p=data(i);if(p.scene==='news'||i===8||i===2||i===6)p=liveEditorial(p,i);if(i===3)p=liveMobility(p);if(i===0)p=liveAir(p);if(i===5||i===9)p=liveReflection(p,i);$('programme').textContent=p.name;$('subtitle').textContent=p.category;$('tag').textContent=p.category;$('eyebrow').textContent=p.category;$('headline').textContent=p.headline;$('description').textContent=p.description;$('facts').textContent=p.facts;$('ticker').textContent=(p.ticker+'  •  ').repeat(4);for(let k of ['headline','category','description','facts','ticker'])$('edit'+k[0].toUpperCase()+k.slice(1)).value=p[k];const ed=edits[i]||{};const editorial=ed.editorial==='verified'&&String(ed.source||'').trim()&&String(ed.verifiedAt||'').trim();$('watermark').textContent=i===0?(airState&&Date.now()-airState.loaded<75*60*1000?'DADOS MODELO · OPEN-METEO AIR QUALITY · CENÁRIO DIGITAL':'QUALIDADE DO AR INDISPONÍVEL · CENÁRIO DIGITAL'):(p.scene==='news'||i===8||i===2||i===6)?(liveFeedFor(i)?'TÍTULOS DE FONTE EXTERNA · NÃO VERIFICADOS PELA REDAÇÃO':(editorial?'VERIFICAÇÃO DECLARADA PELO OPERADOR · '+ed.source:'FONTE EM TEMPO REAL INDISPONÍVEL · SEM NOTÍCIAS CONFIRMADAS')):(i===5||i===9?'REFLEXÃO ORIGINAL · CENÁRIO DIGITAL':'CENÁRIO DIGITAL · VISUALIZAÇÃO ILUSTRATIVA');$('editEditorial').value=ed.editorial||'demo';$('editSource').value=ed.source||'';if(changed){setShot(0);$('flash').classList.add('on');setTimeout(()=>$('flash').classList.remove('on'),160)}}
 // LISBON ALIVE 9.9: qualidade do ar de Lisboa (modelos Open-Meteo).
