@@ -1,0 +1,10 @@
+LISBON ALIVE 9.2 - integração funcional conservadora
+
+Base: LISBON_ALIVE_9_1_COMBUSTIVEIS_ATUALIZADO.zip
+Nenhum CSS, layout, menu, bloco de programação, horário ou ficheiro de imagem foi alterado.
+Combustíveis: 08:00 e 18:00 (Europe/Lisbon), 5 minutos.
+Comandante Ernesto: 12:30 e 19:30 (Europe/Lisbon), 60 segundos.
+Correção: a pré-visualização de combustíveis termina automaticamente ao fim de 5 minutos e o iframe recarrega ao iniciar uma nova emissão, para atualizar os dados.
+A transmissão automática exige que a página esteja aberta. Não há servidor de streaming.
+Os valores de combustível devem ser confirmados nas fontes antes de divulgação.
+Testes: integridade do ZIP e verificação estática. Teste em navegador ainda necessário.

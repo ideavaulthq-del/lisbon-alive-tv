@@ -261,16 +261,22 @@ redraw();setInterval(update,1000);document.addEventListener('visibilitychange',u
 (()=>{'use strict';
 const frame=document.getElementById('fuelTV90');
 const status=document.getElementById('fuelStatus90');
-let preview=false,loaded=false;
+let previewUntil=0,loaded=false,wasOn=false;
 const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Lisbon',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
 function currentMinutes(){const p=parts.formatToParts(new Date());return Number(p.find(x=>x.type==='hour').value)*60+Number(p.find(x=>x.type==='minute').value)}
-function tick(){const m=currentMinutes();const scheduled=(m>=480&&m<485)||(m>=1080&&m<1085);const on=preview||scheduled;
-if(on&&!loaded){frame.src='combustiveis/tv.html';loaded=true}
-frame.classList.toggle('active',on);
-if(status)status.textContent=preview?'Pré-visualização ativa.':scheduled?'Rubrica automática em emissão.':'Em espera. Próximas janelas: 08h00 e 18h00, hora de Lisboa.';
+function tick(){
+ const m=currentMinutes();
+ const scheduled=(m>=480&&m<485)||(m>=1080&&m<1085);
+ const preview=Date.now()<previewUntil;
+ const on=preview||scheduled;
+ // Recarrega os dados do módulo apenas no início de cada emissão, sem tocar no grafismo.
+ if(on&&!wasOn){frame.src='combustiveis/tv.html';loaded=true}
+ frame.classList.toggle('active',on);
+ wasOn=on;
+ if(status)status.textContent=preview?'Pré-visualização ativa (máximo 5 minutos).':scheduled?'Rubrica automática em emissão.':'Em espera. Próximas janelas: 08h00 e 18h00, hora de Lisboa.';
 }
-document.getElementById('fuelPreview90').addEventListener('click',()=>{preview=true;tick()});
-document.getElementById('fuelStop90').addEventListener('click',()=>{preview=false;tick()});
+document.getElementById('fuelPreview90').addEventListener('click',()=>{previewUntil=Date.now()+5*60*1000;tick()});
+document.getElementById('fuelStop90').addEventListener('click',()=>{previewUntil=0;tick()});
 setInterval(tick,1000);tick();
 })();
 </script>
