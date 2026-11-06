@@ -48,7 +48,26 @@ function liveReflection(p,i){
  const item=reflections[index];
  return {...p,headline:item[0],description:item[1],facts:'REFLEXÃO ORIGINAL · LISBON ALIVE™\nTexto de caráter contemplativo, sem pretensão noticiosa.\nEdição automática diária · Hora de Lisboa.',ticker:'FÉ EM LISBOA · REFLEXÃO ORIGINAL · '+item[0]};
 }
-function render(i){if(i<0||i>=programmes.length)return;let changed=i!==selected;selected=i;sel.value=String(i);let p=data(i);if(p.scene==='news'||i===8||i===2||i===6)p=liveEditorial(p,i);if(i===3)p=liveMobility(p);if(i===0)p=liveAir(p);if(i===5||i===9)p=liveReflection(p,i);$('programme').textContent=p.name;$('subtitle').textContent=p.category;$('tag').textContent=p.category;$('eyebrow').textContent=p.category;$('headline').textContent=p.headline;$('description').textContent=p.description;$('facts').textContent=p.facts;$('ticker').textContent=(p.ticker+'  •  ').repeat(4);for(let k of ['headline','category','description','facts','ticker'])$('edit'+k[0].toUpperCase()+k.slice(1)).value=p[k];const ed=edits[i]||{};const editorial=ed.editorial==='verified'&&String(ed.source||'').trim()&&String(ed.verifiedAt||'').trim();$('watermark').textContent=i===0?(airState&&Date.now()-airState.loaded<75*60*1000?'DADOS MODELO · OPEN-METEO AIR QUALITY · CENÁRIO DIGITAL':'QUALIDADE DO AR INDISPONÍVEL · CENÁRIO DIGITAL'):(p.scene==='news'||i===8||i===2||i===6)?(liveFeedFor(i)?'TÍTULOS DE FONTE EXTERNA · NÃO VERIFICADOS PELA REDAÇÃO':(editorial?'VERIFICAÇÃO DECLARADA PELO OPERADOR · '+ed.source:'FONTE EM TEMPO REAL INDISPONÍVEL · SEM NOTÍCIAS CONFIRMADAS')):(i===5||i===9?'REFLEXÃO ORIGINAL · CENÁRIO DIGITAL':'CENÁRIO DIGITAL · VISUALIZAÇÃO ILUSTRATIVA');$('editEditorial').value=ed.editorial||'demo';$('editSource').value=ed.source||'';if(changed){setShot(0);$('flash').classList.add('on');setTimeout(()=>$('flash').classList.remove('on'),160)}}
+// LISBOA 24 HORAS: cápsulas culturais originais e intemporais, sem simular acontecimentos ao vivo.
+const overnightCapsules=[
+ ['Lisboa ao nascer do dia','Entre as colinas e o Tejo, a cidade revela diferentes ritmos. Este cenário é uma representação digital, não uma câmara em direto.'],
+ ['A memória dos bairros','Alfama, Graça e Mouraria guardam ruas estreitas e histórias de muitas gerações.'],
+ ['O Tejo e a cidade','O rio Tejo marca a paisagem de Lisboa e acompanha a sua história marítima e urbana.'],
+ ['Praças e encontros','As praças de Lisboa são espaços de passagem, convívio e memória coletiva.'],
+ ['A luz de Lisboa','A paisagem da capital muda com a luz do dia, das fachadas aos miradouros.'],
+ ['A cidade que descansa','Durante a madrugada, Lisboa abranda o ritmo. Este programa apresenta uma viagem visual ilustrativa.'],
+ ['Património à descoberta','Museus, monumentos e bairros históricos convidam a conhecer a diversidade cultural da capital.']
+];
+function liveOvernight(p,i){
+ if(edits[i]&&['headline','description','facts','ticker'].some(k=>Object.hasOwn(edits[i],k)))return p;
+ const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Lisbon',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date());
+ const val=t=>parts.find(x=>x.type===t).value;
+ const day=Number(val('year')+val('month')+val('day'));
+ const slot=Number(val('hour'))*2+Math.floor(Number(val('minute'))/30);
+ const item=overnightCapsules[(day+slot)%overnightCapsules.length];
+ return {...p,headline:item[0],description:item[1],facts:'CÁPSULA CULTURAL ORIGINAL · LISBON ALIVE™\nCenário digital ilustrativo. Não é uma transmissão de câmara ao vivo.\nConteúdo intemporal · Rotação automática a cada 30 minutos.',ticker:'LISBOA 24 HORAS · CULTURA E CIDADE · '+item[0]};
+}
+function render(i){if(i<0||i>=programmes.length)return;let changed=i!==selected;selected=i;sel.value=String(i);let p=data(i);if(p.scene==='news'||i===8||i===2||i===6)p=liveEditorial(p,i);if(i===3)p=liveMobility(p);if(i===0)p=liveAir(p);if(i===5||i===9)p=liveReflection(p,i);if(i===10)p=liveOvernight(p,i);$('programme').textContent=p.name;$('subtitle').textContent=p.category;$('tag').textContent=p.category;$('eyebrow').textContent=p.category;$('headline').textContent=p.headline;$('description').textContent=p.description;$('facts').textContent=p.facts;$('ticker').textContent=(p.ticker+'  •  ').repeat(4);for(let k of ['headline','category','description','facts','ticker'])$('edit'+k[0].toUpperCase()+k.slice(1)).value=p[k];const ed=edits[i]||{};const editorial=ed.editorial==='verified'&&String(ed.source||'').trim()&&String(ed.verifiedAt||'').trim();$('watermark').textContent=i===0?(airState&&Date.now()-airState.loaded<75*60*1000?'DADOS MODELO · OPEN-METEO AIR QUALITY · CENÁRIO DIGITAL':'QUALIDADE DO AR INDISPONÍVEL · CENÁRIO DIGITAL'):(p.scene==='news'||i===8||i===2||i===6)?(liveFeedFor(i)?'TÍTULOS DE FONTE EXTERNA · NÃO VERIFICADOS PELA REDAÇÃO':(editorial?'VERIFICAÇÃO DECLARADA PELO OPERADOR · '+ed.source:'FONTE EM TEMPO REAL INDISPONÍVEL · SEM NOTÍCIAS CONFIRMADAS')):(i===5||i===9?'REFLEXÃO ORIGINAL · CENÁRIO DIGITAL':'CENÁRIO DIGITAL · VISUALIZAÇÃO ILUSTRATIVA');$('editEditorial').value=ed.editorial||'demo';$('editSource').value=ed.source||'';if(changed){setShot(0);$('flash').classList.add('on');setTimeout(()=>$('flash').classList.remove('on'),160)}}
 // LISBON ALIVE 9.9: qualidade do ar de Lisboa (modelos Open-Meteo).
 // Dados modelados, não medições de estação nem imagens em direto.
 let airState=null;
