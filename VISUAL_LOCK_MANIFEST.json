@@ -1,0 +1,12 @@
+{
+  "version": "9.5",
+  "sha256": {
+    "netlify.toml": "27e9b5117232bb88e7760eece75ad13e9819397d233110a645cb5f15c466a49c",
+    "index.html": "b398e36357d3bf01f6f3f07e1c3355c9c391409cce558bf299d5812f5fadd1c3",
+    "tomate-europe-alert-1920x1080.html": "8040297a7ef2c4929effcf7127dcc62c96d83a92732239c828444f5aa23f78c6",
+    "sexta-em-alerta.html": "bf210baf111aedbf883608f999a044aa7683550fa6d3294ca0e10979127d0e4f",
+    "viewer.html": "6ef177b8bab6e5eb8ed457052fb18d4b1618c1f856c766bec4166e154ec59e11",
+    "schedule.json": "d657b3bb17ac2f6a67373ecaa60cf2d7b8e95f97750cae1e06cc25c2d995dbac",
+    "_headers": "3af6b15204e8744d839d86be6b88ddf1f6cf1f767f26a9bf2a2c924e9d0b7fe1"
+  }
+}

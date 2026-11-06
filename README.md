@@ -27,27 +27,6 @@ Esta versão acrescenta ao repositório a grelha pública partilhável (`schedul
 - A edição dos textos de programas em `localStorage` não é partilhada. `schedule.json` partilha apenas os índices dos programas e não altera os textos editoriais.
 - Os cabeçalhos de segurança existentes são preservados; qualquer incorporação de fontes externas exigirá revisão adicional.
 
-## Módulos integrados (demonstração)
+## Versão 9.5
 
-- COMANDANTE ERNESTO™: 12h30 e 19h30, primeiros 60 segundos; seis cenas de 10 segundos, com ilustrações SVG estáticas geradas no próprio navegador. Não são fotografias nem imagens 3D renderizadas.
-- CYBER ALERT PORTUGAL™: pré-visualização educativa de 60 segundos no painel; não entra automaticamente na grelha.
-- Não há alterações aos 48 blocos da grelha publicada. A rubrica sobrepõe-se à emissão durante o primeiro minuto e regressa ao programa normal.
-- Para testar, abrir index.html e clicar nos botões de pré-visualização. Para publicar, substituir o projeto no alojamento.
-
-## Atualização 8.2
-- Seis cenas SVG visualmente distintas por episódio, com acessórios, cores e expressões variáveis.
-- Seletor de episódio semanal para pré-visualização no painel.
-- Programação automática às 12h30 e 19h30, hora de Lisboa, preservada.
-- As imagens são ilustrações vetoriais locais, não renders 3D.
-
-
-## 8.3 · Comandante Ernesto 3D
-O episódio de sexta-feira (Frango Assado) utiliza seis imagens WebP locais em `assets/ernesto/`, sem dependências externas. Os restantes dias continuam com SVG provisórios. O conteúdo é humorístico e a emissão permanece uma demonstração local até publicação.
-
-
-## 8.5 · COMANDANTE ERNESTO (visual da grelha)
-A rubrica utiliza a identidade azul/vermelho/branco da programação existente, com imagem ampliada. Não altera os horários nem os controlos da grelha. Pré-visualização em index.html, canal de espectadores em viewer.html. As imagens de sexta-feira são incorporadas no HTML; as restantes cenas continuam provisórias. O agendamento é local ao navegador, dependente da hora do dispositivo, não é uma emissão em servidor.
-
-
-## LISBON ALIVE™ 9.1 · Integração com versão mais recente enviada
-Módulo PORTUGAL COMBUSTÍVEIS™ 3.0 integrado no ficheiro principal enviado em 6 de novembro. A grelha original e os restantes ficheiros do ZIP recebido foram preservados. Edições automáticas 08:00–08:05 e 18:00–18:05 (Europe/Lisbon). Consultas DGEG experimentais; não confundir preço de um posto com média nacional.
+Removidos os módulos COMANDANTE ERNESTO™, CYBER ALERT PORTUGAL™ e COMBUSTÍVEIS. A grelha `schedule.json`, o visual original e os restantes programas permanecem inalterados.
