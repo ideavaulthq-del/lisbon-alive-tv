@@ -14,7 +14,7 @@ const nightRelevant=item=>{
  const norm=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
  const title=norm(item.title),source=norm(item.source);
  const local=/\b(lisboa|lisbon|alfama|belem|chiado|bairro alto|parque das nacoes|campo pequeno|marvila|alcantara|benfica|avenida da liberdade)\b/.test(title)||/agenda cultural de lisboa/.test(source);
- const cultural=/\b(cultura|cultural|agenda|concerto|concertos|musica|musical|teatro|cinema|festival|festivais|exposicao|exposicoes|espetaculo|espetaculos|museu|museus|arte|artes|galeria|livro|livros|danca|palco|bilhete|bilhetes|evento|eventos)\b/.test(title)||/agenda cultural de lisboa/.test(source);
+ const cultural=/\b(patrimonio|historico|historia|monumento|monumentos|cultura|cultural|agenda|concerto|concertos|musica|musical|teatro|cinema|festival|festivais|exposicao|exposicoes|espetaculo|espetaculos|museu|museus|arte|artes|galeria|livro|livros|danca|palco|bilhete|bilhetes|evento|eventos)\b/.test(title)||/agenda cultural de lisboa/.test(source);
  return local&&cultural;
 };
 const field=(item,name)=>decode((item.match(new RegExp('<'+name+'(?:\\s[^>]*)?>([\\s\\S]*?)<\\/'+name+'>','i'))||[])[1]||'');
