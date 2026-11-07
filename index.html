@@ -283,7 +283,7 @@ function update(){const {t,slot,idx,next,remaining}=current();document.querySele
 el('enable60').onclick=()=>{automatic=true;autoUI();tick();update();el('notice60').textContent='Grelha automática ligada.'};el('restore60').onclick=()=>{if(!confirm('Repor os 48 blocos de origem?'))return;grid=original.slice();try{localStorage.removeItem(key)}catch{}redraw();tick()};el('preview60').onclick=()=>{const {idx}=current();automatic=false;autoUI();render(idx);el('stage').scrollIntoView({behavior:'smooth'})};el('export60').onclick=()=>{const b=new Blob([JSON.stringify({version:'6.0',timezone:'Europe/Lisbon',durationMinutes:30,slots:grid.map((program,i)=>({start:two(Math.floor(i/2))+':'+(i%2?'30':'00'),program,show:programmes[program][0]}))},null,2)],{type:'application/json'});const a=document.createElement('a'),u=URL.createObjectURL(b);a.href=u;a.download='lisbon-alive-grelha-6-0.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1500)};
 function validPublished(data){return data&&data.timezone==='Europe/Lisbon'&&Array.isArray(data.programs)&&data.programs.length===48&&data.programs.every(n=>Number.isInteger(n)&&n>=0&&n<programmes.length)}
 async function loadPublished(){try{const r=await fetch('schedule.json?ts='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);const d=await r.json();if(!validPublished(d))throw Error('Formato de grelha inválido');if(isPublic){grid=d.programs.slice();redraw();tick();}else{el('publish80status').textContent='Grelha publicada encontrada: '+(d.publishedAt||'sem data')+'. Para atualizar o site, exporta e publica novo schedule.json.'}}catch(e){if(!isPublic)el('publish80status').textContent='Ainda sem grelha publicada no servidor. '+e.message;}}
-if(isPublic){loadPublished();setInterval(loadPublished,60000)}else{loadPublished();el('publish80').onclick=()=>{const payload={version:'8.0',timezone:'Europe/Lisbon',publishedAt:new Date().toISOString(),programs:grid.slice()};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='schedule.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1500);el('publish80status').textContent='Ficheiro schedule.json exportado. Substitui-o no alojamento para publicar a grelha a todos os espectadores.'};el('import80').onchange=async ev=>{const file=ev.target.files?.[0];if(!file)return;try{const d=JSON.parse(await file.text());if(!validPublished(d))throw Error('Ficheiro inválido');grid=d.programs.slice();localStorage.setItem(key,JSON.stringify(grid));redraw();tick();el('publish80status').textContent='Grelha importada no editor. Exporta schedule.json e publica para partilhar.'}catch(e){el('publish80status').textContent='Erro: '+e.message}ev.target.value=''}}
+if(isPublic){loadPublished();setInterval(loadPublished,60000)}else{loadPublished();if(el('publish80'))el('publish80').onclick=()=>{const payload={version:'8.0',timezone:'Europe/Lisbon',publishedAt:new Date().toISOString(),programs:grid.slice()};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='schedule.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1500);el('publish80status').textContent='Ficheiro schedule.json exportado. Substitui-o no alojamento para publicar a grelha a todos os espectadores.'};if(el('import80'))el('import80').onchange=async ev=>{const file=ev.target.files?.[0];if(!file)return;try{const d=JSON.parse(await file.text());if(!validPublished(d))throw Error('Ficheiro inválido');grid=d.programs.slice();localStorage.setItem(key,JSON.stringify(grid));redraw();tick();el('publish80status').textContent='Grelha importada no editor. Exporta schedule.json e publica para partilhar.'}catch(e){el('publish80status').textContent='Erro: '+e.message}ev.target.value=''}}
 redraw();setInterval(update,1000);document.addEventListener('visibilitychange',update);
 })();
 </script>
@@ -317,13 +317,15 @@ function clock(){const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/L
 function update(){
  const t=clock(),seconds=t.minute*60+t.second,remaining=1800-(seconds%1800);
  const auto=$('auto')?.textContent.includes('ON');
- const active=!!auto&&(preview||remaining<=45);
+ const active=preview|| (!!auto&&remaining<=45);
  if(active){
   const elapsed=preview?(Math.floor(Date.now()/1000)%45):45-remaining;
   const phase=elapsed<5?'ident':elapsed<35?'ad':'next';
   const slotKey=t.year+'-'+t.month+'-'+t.day+'-'+t.hour+'-'+Math.floor(t.minute/30);
   const enabled=campaigns.filter(c=>c.enabled);
-  const selected=enabled.length?enabled[(t.day*48+t.hour*2+Math.floor(t.minute/30))%enabled.length]:defaultCampaign;
+  const requested=preview?params.get('adCampaign'):null;
+  const previewSelected=requested?campaigns.find(c=>c.id===requested):null;
+  const selected=previewSelected||(enabled.length?enabled[(t.day*48+t.hour*2+Math.floor(t.minute/30))%enabled.length]:defaultCampaign);
   const nextHour=t.minute>=30?(t.hour+1)%24:t.hour;
   const nextIndex=typeof scheduleIndex==='function'?scheduleIndex(nextHour):0;
   const next=typeof programmes!=='undefined'?programmes[nextIndex]?.[0]||'PRÓXIMO PROGRAMA':'PRÓXIMO PROGRAMA';
@@ -332,7 +334,7 @@ function update(){
   const phaseKey=slotKey+'|'+phase+'|'+selected.id;
   if(lastPhase!==phaseKey){
    const display=phase==='ident'?{head:'INTERVALO PUBLICITÁRIO',copy:'LISBON ALIVE™ · Voltamos já a seguir.',status:'SEPARADOR · 5 SEGUNDOS'}:phase==='ad'?(selected.type==='pk'?pkText(selected):selected.type==='social'?socialText(selected):{head:selected.headline||selected.name,copy:selected.copy||'Uma produção LISBON ALIVE™.',status:'AUTOPROMOÇÃO · '+selected.name}):{head:'A SEGUIR',copy:next,status:'CONTINUIDADE · 10 SEGUNDOS'};
-   $('cbKicker').textContent=phase==='ad'?'MENSAGEM COMERCIAL':phase==='next'?'CONTINUIDADE DE EMISSÃO':'LISBON ALIVE™';
+   $('cbKicker').textContent=phase==='ad'?(selected.type==='social'?'MENSAGEM DE SERVIÇO PÚBLICO':selected.type==='pk'?'PROMOÇÃO · BATALHA LIVE':'MENSAGEM COMERCIAL'):phase==='next'?'CONTINUIDADE DE EMISSÃO':'LISBON ALIVE™';
    $('cbHeadline').textContent=display.head;$('cbCopy').textContent=display.copy;$('cbStatus').textContent=display.status;
    $('cbNext').textContent='A SEGUIR · '+next;lastPhase=phaseKey;lastCampaign=selected;
   }
