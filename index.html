@@ -303,7 +303,11 @@ const screen=document.getElementById('commercialBreak');if(!screen)return;
 const $=id=>document.getElementById(id),params=new URLSearchParams(location.search);
 const preview=params.get('adPreview')==='1',campaignKey='lisbonAliveAdCampaigns20',logKey='lisbonAliveAdReport20';
 const defaultCampaign={id:'official-promo',name:'LISBON ALIVE™ | Promo oficial',format:'html',duration:30,headline:'PORTUGAL NO ECRÃ',copy:'Lisboa, cultura, informação e histórias. LISBON ALIVE™.',enabled:true,mediaName:''};
-let campaigns=[defaultCampaign],shown=false,lastPhase='',lastImpression='',lastCampaign=defaultCampaign;
+const pkCampaign={id:'pk-promo-demo',name:'LISBON ALIVE™ | PK PROMO (demonstração)',format:'html',duration:30,headline:'BATALHA LIVE · VS',copy:'Exemplo de anúncio. Criadores e horário fictícios.',enabled:false,type:'pk',creatorA:'CRIADOR A',creatorB:'CRIADOR B',handleA:'@criadorA',handleB:'@criadorB',eventAt:'2026-11-14T21:00:00+00:00',mediaName:''};
+function fmtTime(iso,zone){try{return new Intl.DateTimeFormat('pt-PT',{timeZone:zone,hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date(iso))}catch{return '--:--'}}
+function pkText(c){const a=c.creatorA||'CRIADOR A',b=c.creatorB||'CRIADOR B';return {head:a+'  VS  '+b,copy:'🇵🇹 '+fmtTime(c.eventAt,'Europe/Lisbon')+' PORTUGAL   |   🇧🇷 '+fmtTime(c.eventAt,'America/Sao_Paulo')+' BRASÍLIA · '+(c.handleA||'')+' / '+(c.handleB||''),status:'PUBLICIDADE · BATALHA TIKTOK · '+c.name}}
+
+let campaigns=[defaultCampaign,pkCampaign],shown=false,lastPhase='',lastImpression='',lastCampaign=defaultCampaign;
 function safeLoad(){try{const stored=JSON.parse(localStorage.getItem(campaignKey)||'null');if(Array.isArray(stored)&&stored.length){campaigns=stored.filter(x=>x&&typeof x.id==='string'&&typeof x.name==='string'&&x.format==='html'&&x.duration===30).slice(0,30);if(!campaigns.length)campaigns=[defaultCampaign]}}catch(e){console.warn('Campanhas locais indisponíveis',e)}}
 safeLoad();
 function report(event){try{const data=JSON.parse(localStorage.getItem(logKey)||'[]');const rows=Array.isArray(data)?data:[];rows.push(event);localStorage.setItem(logKey,JSON.stringify(rows.slice(-500)))}catch(e){console.warn('Relatório local indisponível',e)}}
@@ -325,7 +329,7 @@ function update(){
   if(phase==='ad'&&lastImpression!==impressionKey&&!preview){report({at:new Date().toISOString(),campaignId:selected.id,campaignName:selected.name,slot:slotKey,type:'display-start'});lastImpression=impressionKey}
   const phaseKey=slotKey+'|'+phase+'|'+selected.id;
   if(lastPhase!==phaseKey){
-   const display=phase==='ident'?{head:'INTERVALO PUBLICITÁRIO',copy:'LISBON ALIVE™ · Voltamos já a seguir.',status:'SEPARADOR · 5 SEGUNDOS'}:phase==='ad'?{head:selected.headline||selected.name,copy:selected.copy||'Uma produção LISBON ALIVE™.',status:'AUTOPROMOÇÃO · '+selected.name}:{head:'A SEGUIR',copy:next,status:'CONTINUIDADE · 10 SEGUNDOS'};
+   const display=phase==='ident'?{head:'INTERVALO PUBLICITÁRIO',copy:'LISBON ALIVE™ · Voltamos já a seguir.',status:'SEPARADOR · 5 SEGUNDOS'}:phase==='ad'?(selected.type==='pk'?pkText(selected):{head:selected.headline||selected.name,copy:selected.copy||'Uma produção LISBON ALIVE™.',status:'AUTOPROMOÇÃO · '+selected.name}):{head:'A SEGUIR',copy:next,status:'CONTINUIDADE · 10 SEGUNDOS'};
    $('cbKicker').textContent=phase==='ad'?'MENSAGEM COMERCIAL':phase==='next'?'CONTINUIDADE DE EMISSÃO':'LISBON ALIVE™';
    $('cbHeadline').textContent=display.head;$('cbCopy').textContent=display.copy;$('cbStatus').textContent=display.status;
    $('cbNext').textContent='A SEGUIR · '+next;lastPhase=phaseKey;lastCampaign=selected;
@@ -360,6 +364,21 @@ update();setInterval(update,250);
 <label><input id="adEnabled20" type="checkbox" checked style="width:auto"> Campanha ativa</label>
 <p><button id="adSave20">Guardar campanha</button><button id="adPreview20">Pré-visualizar intervalo</button><button id="adExport20">Exportar campanhas JSON</button><button id="adImport20">Importar campanhas JSON</button><input id="adImportFile20" type="file" accept=".json,application/json" hidden></p>
 <p id="adStatus20" class="ad-note" role="status">Gestor preparado.</p>
+
+<fieldset style="border:1px solid #4976a2;border-radius:9px;margin:14px 0;padding:12px">
+<legend>🇵🇹🇧🇷 PK PROMO · Batalhas TikTok</legend>
+<p class="ad-note">Exemplo fictício, desativado por defeito. Introduz dados autorizados e uma data real antes de ativar.</p>
+<div class="ad-grid">
+<div><label for="pkA20">Criador A</label><input id="pkA20" value="CRIADOR A"></div>
+<div><label for="pkB20">Criador B</label><input id="pkB20" value="CRIADOR B"></div>
+<div><label for="pkHandleA20">TikTok A</label><input id="pkHandleA20" value="@criadorA"></div>
+<div><label for="pkHandleB20">TikTok B</label><input id="pkHandleB20" value="@criadorB"></div>
+<div><label for="pkDate20">Data e hora em Portugal (Lisboa)</label><input id="pkDate20" type="datetime-local" value="2026-11-14T21:00"></div>
+<div><label>Horários calculados</label><p id="pkTimes20" role="status"></p></div>
+</div>
+<label><input type="checkbox" id="pkEnabled20" style="width:auto"> Ativar campanha PK (apenas com autorização)</label>
+<button id="pkSave20">Guardar campanha PK</button>
+</fieldset>
 <h3>Campanhas locais</h3><pre id="adList20"></pre>
 <h3>Relatório de exibições neste navegador</h3>
 <p class="ad-note">Conta inícios de anúncios programados neste navegador. Não mede espectadores, impressões verificadas no TikTok/YouTube nem visualização completa. O OBS pode ter armazenamento isolado.</p>
@@ -377,6 +396,11 @@ $('adImportFile20').onchange=async()=>{try{const file=$('adImportFile20').files[
 $('adReport20').onclick=refresh;
 $('adCsv20').onclick=()=>{const rows=api.getReport(),quote=x=>'"'+String(x??'').replace(/"/g,'""')+'"';download(['data_utc,campanha_id,campanha,bloco,tipo',...rows.map(x=>[x.at,x.campaignId,x.campaignName,x.slot,x.type].map(quote).join(','))].join('\r\n'),'lisbon-alive-relatorio.csv','text/csv;charset=utf-8')};
 $('adClear20').onclick=()=>{if(confirm('Apagar os registos locais de exibições?')){api.clearReport();refresh()}};
+
+function pkIso(){const raw=$('pkDate20').value;if(!raw)return '';const [date,time]=raw.split('T');if(!date||!time)return '';const target=date+' '+time;const base=new Date(raw+':00Z');if(!Number.isFinite(base.getTime()))return '';for(let delta=-2;delta<=2;delta++){const candidate=new Date(base.getTime()+delta*3600000);const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Lisbon',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(candidate);const v=t=>parts.find(p=>p.type===t)?.value;const formatted=v('year')+'-'+v('month')+'-'+v('day')+' '+v('hour')+':'+v('minute');if(formatted===target)return candidate.toISOString()}return ''}
+function updatePkTimes(){const iso=pkIso();$('pkTimes20').textContent=iso?'🇵🇹 '+new Intl.DateTimeFormat('pt-PT',{timeZone:'Europe/Lisbon',hour:'2-digit',minute:'2-digit'}).format(new Date(iso))+'  |  🇧🇷 '+new Intl.DateTimeFormat('pt-PT',{timeZone:'America/Sao_Paulo',hour:'2-digit',minute:'2-digit'}).format(new Date(iso)):'Escolhe uma data e hora válida'}
+$('pkDate20').addEventListener('input',updatePkTimes);updatePkTimes();
+$('pkSave20').onclick=()=>{try{const iso=pkIso();if(!iso)throw Error('Data inválida ou hora inexistente na mudança de horário');const a=$('pkA20').value.trim(),b=$('pkB20').value.trim();if(!a||!b)throw Error('Indica os dois criadores');const c=api.getCampaigns(),obj={id:'pk-promo-demo',name:'LISBON ALIVE™ | PK PROMO',format:'html',duration:30,headline:'BATALHA LIVE · VS',copy:'',enabled:$('pkEnabled20').checked,type:'pk',creatorA:a,creatorB:b,handleA:$('pkHandleA20').value.trim(),handleB:$('pkHandleB20').value.trim(),eventAt:iso,mediaName:''};const i=c.findIndex(x=>x.id===obj.id);if(i<0)c.push(obj);else c[i]=obj;api.save(c);status('Campanha PK guardada. Horários calculados para Lisboa e Brasília.');refresh()}catch(e){status('Erro: '+e.message)}};
 refresh();
 })();
 </script></body></html>
