@@ -299,44 +299,84 @@ redraw();setInterval(update,1000);document.addEventListener('visibilitychange',u
 
 <script id="commercialBreakEngine">
 (()=>{'use strict';
-const screen=document.getElementById('commercialBreak');
-if(!screen)return;
-const $=id=>document.getElementById(id);
-const preview=new URLSearchParams(location.search).get('adPreview')==='1';
-const slots=[
- {head:'PORTUGAL NO ECRÃ',copy:'Notícias, cultura e a vida da cidade. LISBON ALIVE™.',status:'AUTOPROMOÇÃO · LISBON ALIVE™'},
- {head:'LISBOA 24 HORAS',copy:'Uma cidade, muitas histórias. Descubra a nossa programação cultural.',status:'AUTOPROMOÇÃO · LISBON ALIVE™'},
- {head:'A SUA MARCA AQUI',copy:'Espaço reservado para futuros anunciantes. Sem patrocínio contratado.',status:'ESPAÇO COMERCIAL DISPONÍVEL · NÃO PATROCINADO'}
-];
-let visible=false,lastSlot=-1;
-function clock(){
- const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Lisbon',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(new Date());
- const val=t=>Number(parts.find(x=>x.type===t).value);
- return {year:val('year'),month:val('month'),day:val('day'),hour:val('hour'),minute:val('minute'),second:val('second')};
-}
+const screen=document.getElementById('commercialBreak');if(!screen)return;
+const $=id=>document.getElementById(id),params=new URLSearchParams(location.search);
+const preview=params.get('adPreview')==='1',campaignKey='lisbonAliveAdCampaigns20',logKey='lisbonAliveAdReport20';
+const defaultCampaign={id:'official-promo',name:'LISBON ALIVE™ | Promo oficial',format:'html',duration:30,headline:'PORTUGAL NO ECRÃ',copy:'Lisboa, cultura, informação e histórias. LISBON ALIVE™.',enabled:true,mediaName:''};
+let campaigns=[defaultCampaign],shown=false,lastPhase='',lastImpression='',lastCampaign=defaultCampaign;
+function safeLoad(){try{const stored=JSON.parse(localStorage.getItem(campaignKey)||'null');if(Array.isArray(stored)&&stored.length){campaigns=stored.filter(x=>x&&typeof x.id==='string'&&typeof x.name==='string'&&x.format==='html'&&x.duration===30).slice(0,30);if(!campaigns.length)campaigns=[defaultCampaign]}}catch(e){console.warn('Campanhas locais indisponíveis',e)}}
+safeLoad();
+function report(event){try{const data=JSON.parse(localStorage.getItem(logKey)||'[]');const rows=Array.isArray(data)?data:[];rows.push(event);localStorage.setItem(logKey,JSON.stringify(rows.slice(-500)))}catch(e){console.warn('Relatório local indisponível',e)}}
+function clock(){const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Lisbon',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(new Date());const n=t=>Number(parts.find(x=>x.type===t).value);return {year:n('year'),month:n('month'),day:n('day'),hour:n('hour'),minute:n('minute'),second:n('second')}}
 function update(){
- const t=clock(),remaining=(59-t.minute)*60+(60-t.second);
+ const t=clock(),seconds=t.minute*60+t.second,remaining=1800-(seconds%1800);
  const auto=$('auto')?.textContent.includes('ON');
- const active=auto&&(preview||remaining<=45);
+ const active=!!auto&&(preview||remaining<=45);
  if(active){
-  // 5s ident, 30s promotional spot, 10s next-show card.
-  const elapsed=preview?((Math.floor(Date.now()/1000))%45):45-remaining;
-  const phase=elapsed<5?0:elapsed<35?1:2;
-  const slotKey=((t.year*372+t.month*31+t.day)*24+t.hour);
-  const spot=slots[((slotKey%slots.length)+slots.length)%slots.length];
-  const next=typeof programmes!=='undefined'&&typeof scheduleIndex==='function'?programmes[scheduleIndex((t.hour+1)%24)]?.[0]:'PRÓXIMO PROGRAMA';
-  const state=phase===0?{head:'INTERVALO PUBLICITÁRIO',copy:'LISBON ALIVE™ · A nossa programação continua já a seguir.',status:'SEPARADOR · 5 SEGUNDOS'}:phase===1?spot:{head:'A SEGUIR',copy:next||'PRÓXIMO PROGRAMA',status:'CONTINUIDADE · 10 SEGUNDOS'};
-  if(!visible||lastSlot!==slotKey+'-'+phase){
-   $('cbKicker').textContent=phase===1?'MENSAGEM COMERCIAL':phase===2?'CONTINUIDADE DE EMISSÃO':'LISBON ALIVE™';
-   $('cbHeadline').textContent=state.head;
-   $('cbCopy').textContent=state.copy;
-   $('cbStatus').textContent=state.status;
-   lastSlot=slotKey+'-'+phase;
+  const elapsed=preview?(Math.floor(Date.now()/1000)%45):45-remaining;
+  const phase=elapsed<5?'ident':elapsed<35?'ad':'next';
+  const slotKey=t.year+'-'+t.month+'-'+t.day+'-'+t.hour+'-'+Math.floor(t.minute/30);
+  const enabled=campaigns.filter(c=>c.enabled);
+  const selected=enabled.length?enabled[(t.day*48+t.hour*2+Math.floor(t.minute/30))%enabled.length]:defaultCampaign;
+  const nextHour=t.minute>=30?(t.hour+1)%24:t.hour;
+  const nextIndex=typeof scheduleIndex==='function'?scheduleIndex(nextHour):0;
+  const next=typeof programmes!=='undefined'?programmes[nextIndex]?.[0]||'PRÓXIMO PROGRAMA':'PRÓXIMO PROGRAMA';
+  const impressionKey=slotKey+'|'+selected.id;
+  if(phase==='ad'&&lastImpression!==impressionKey&&!preview){report({at:new Date().toISOString(),campaignId:selected.id,campaignName:selected.name,slot:slotKey,type:'display-start'});lastImpression=impressionKey}
+  const phaseKey=slotKey+'|'+phase+'|'+selected.id;
+  if(lastPhase!==phaseKey){
+   const display=phase==='ident'?{head:'INTERVALO PUBLICITÁRIO',copy:'LISBON ALIVE™ · Voltamos já a seguir.',status:'SEPARADOR · 5 SEGUNDOS'}:phase==='ad'?{head:selected.headline||selected.name,copy:selected.copy||'Uma produção LISBON ALIVE™.',status:'AUTOPROMOÇÃO · '+selected.name}:{head:'A SEGUIR',copy:next,status:'CONTINUIDADE · 10 SEGUNDOS'};
+   $('cbKicker').textContent=phase==='ad'?'MENSAGEM COMERCIAL':phase==='next'?'CONTINUIDADE DE EMISSÃO':'LISBON ALIVE™';
+   $('cbHeadline').textContent=display.head;$('cbCopy').textContent=display.copy;$('cbStatus').textContent=display.status;
+   $('cbNext').textContent='A SEGUIR · '+next;lastPhase=phaseKey;lastCampaign=selected;
   }
-  $('cbNext').textContent='A SEGUIR · '+(next||'PROGRAMAÇÃO');
  }
- if(active!==visible){visible=active;screen.classList.toggle('cb-visible',visible);screen.setAttribute('aria-hidden',String(!visible))}
+ if(active!==shown){shown=active;screen.classList.toggle('cb-visible',shown);screen.setAttribute('aria-hidden',String(!shown))}
 }
+window.LisbonAdManager={getCampaigns:()=>campaigns.map(c=>({...c})),save(list){if(!Array.isArray(list))throw Error('Lista inválida');const cleaned=list.filter(c=>c&&typeof c.id==='string'&&typeof c.name==='string'&&c.format==='html'&&c.duration===30).slice(0,30);if(!cleaned.length)throw Error('É necessária uma campanha HTML de 30 segundos');campaigns=cleaned;localStorage.setItem(campaignKey,JSON.stringify(cleaned));lastPhase='';},getReport(){try{const x=JSON.parse(localStorage.getItem(logKey)||'[]');return Array.isArray(x)?x:[]}catch{return []}},clearReport(){localStorage.removeItem(logKey)}};
 update();setInterval(update,250);
+})();
+</script>
+<style id="adManagerStyles">
+#adManager20{max-width:1250px;margin:18px auto 35px;padding:20px;border:1px solid #4976a2;border-radius:14px;background:#0b1d36;color:#eef5ff;font:15px Arial,sans-serif}
+#adManager20 h2{margin:0 0 12px}#adManager20 label{display:block;margin:9px 0 4px;font-weight:bold}
+#adManager20 input,#adManager20 textarea,#adManager20 button{font:inherit;border-radius:6px;padding:9px}
+#adManager20 input,#adManager20 textarea{width:100%;background:#0b2543;color:white;border:1px solid #4976a2}
+#adManager20 button{background:#1e5a90;color:white;border:1px solid #6096c1;cursor:pointer;margin:5px 5px 5px 0}
+#adManager20 .ad-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+#adManager20 .ad-note{color:#bbd1e6;font-size:13px;line-height:1.5}
+#adManager20 pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:180px;overflow:auto}
+.broadcast-mode #adManager20{display:none}
+</style>
+<section id="adManager20">
+<h2>🍅 LISBON ALIVE™ | AD MANAGER 2.0</h2>
+<p class="ad-note">Campanhas HTML animadas de 30 segundos. O intervalo automático tem 5 s de separador, 30 s de anúncio e 10 s de continuidade. A grelha muda de programa a cada 30 minutos.</p>
+<div class="ad-grid">
+<div><label for="adName20">Nome da campanha</label><input id="adName20" value="LISBON ALIVE™ | Promo oficial" maxlength="100"></div>
+<div><label for="adHeadline20">Título no anúncio</label><input id="adHeadline20" value="PORTUGAL NO ECRÃ" maxlength="110"></div>
+<div><label for="adCopy20">Mensagem</label><textarea id="adCopy20" rows="2" maxlength="250">Lisboa, cultura, informação e histórias. LISBON ALIVE™.</textarea></div>
+<div><label for="adAsset20">Ficheiro local de referência (opcional)</label><input id="adAsset20" type="file" accept="image/png,image/jpeg,image/webp,video/mp4,application/json"><p class="ad-note">O ficheiro é identificado localmente; não é enviado nem reproduzido nesta versão HTML. Para vídeo ou imagem em emissão, será necessário integrar os ativos no alojamento.</p></div>
+</div>
+<label><input id="adEnabled20" type="checkbox" checked style="width:auto"> Campanha ativa</label>
+<p><button id="adSave20">Guardar campanha</button><button id="adPreview20">Pré-visualizar intervalo</button><button id="adExport20">Exportar campanhas JSON</button><button id="adImport20">Importar campanhas JSON</button><input id="adImportFile20" type="file" accept=".json,application/json" hidden></p>
+<p id="adStatus20" class="ad-note" role="status">Gestor preparado.</p>
+<h3>Campanhas locais</h3><pre id="adList20"></pre>
+<h3>Relatório de exibições neste navegador</h3>
+<p class="ad-note">Conta inícios de anúncios programados neste navegador. Não mede espectadores, impressões verificadas no TikTok/YouTube nem visualização completa. O OBS pode ter armazenamento isolado.</p>
+<p><button id="adReport20">Atualizar relatório</button><button id="adCsv20">Exportar CSV</button><button id="adClear20">Limpar relatório</button></p><pre id="adLog20"></pre>
+</section>
+<script id="adManagerControls20">
+(()=>{'use strict';const api=window.LisbonAdManager;if(!api)return;const $=id=>document.getElementById(id),status=t=>$('adStatus20').textContent=t;
+const download=(text,name,type)=>{const u=URL.createObjectURL(new Blob([text],{type}));const a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)};
+function refresh(){const c=api.getCampaigns();$('adList20').textContent=c.map(x=>(x.enabled?'● ':'○ ')+x.name+' · HTML · 30 s'+(x.mediaName?' · '+x.mediaName:'')).join('\n');const logs=api.getReport();$('adLog20').textContent='Inícios registados: '+logs.length+'\n'+logs.slice(-8).map(x=>x.at+' · '+x.campaignName).join('\n')}
+$('adSave20').onclick=()=>{try{const c=api.getCampaigns(),name=$('adName20').value.trim(),head=$('adHeadline20').value.trim();if(!name||!head)throw Error('Indica o nome e o título');const id=name==='LISBON ALIVE™ | Promo oficial'?'official-promo':'campaign-'+name.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,30);const obj={id,name,format:'html',duration:30,headline:head,copy:$('adCopy20').value.trim(),enabled:$('adEnabled20').checked,mediaName:$('adAsset20').files[0]?.name||''};const idx=c.findIndex(x=>x.id===id);if(idx>=0)c[idx]=obj;else c.push(obj);api.save(c);status('Campanha guardada neste navegador. Para uso noutro navegador/OBS, exporta e importa o JSON.');refresh()}catch(e){status('Erro: '+e.message)}};
+$('adPreview20').onclick=()=>{const u=new URL(location.href);u.searchParams.set('adPreview','1');u.searchParams.set('broadcast','1');window.open(u.href,'_blank','noopener')};
+$('adExport20').onclick=()=>download(JSON.stringify(api.getCampaigns(),null,2),'lisbon-alive-campanhas.json','application/json');
+$('adImport20').onclick=()=>$('adImportFile20').click();
+$('adImportFile20').onchange=async()=>{try{const file=$('adImportFile20').files[0];if(!file)return;if(file.size>100000)throw Error('JSON demasiado grande');api.save(JSON.parse(await file.text()));status('Campanhas importadas.');refresh()}catch(e){status('Importação falhou: '+e.message)}};
+$('adReport20').onclick=refresh;
+$('adCsv20').onclick=()=>{const rows=api.getReport(),quote=x=>'"'+String(x??'').replace(/"/g,'""')+'"';download(['data_utc,campanha_id,campanha,bloco,tipo',...rows.map(x=>[x.at,x.campaignId,x.campaignName,x.slot,x.type].map(quote).join(','))].join('\r\n'),'lisbon-alive-relatorio.csv','text/csv;charset=utf-8')};
+$('adClear20').onclick=()=>{if(confirm('Apagar os registos locais de exibições?')){api.clearReport();refresh()}};
+refresh();
 })();
 </script></body></html>
