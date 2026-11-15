@@ -412,12 +412,20 @@
 </main>
 
 <script>
-/* 24 NOTÍCIAS™ | Emissão em direto com extração de imagens e proxy de fallback */
+/* 24 NOTÍCIAS™ | Emissão em direto com extração de imagens e fallback temático */
 const $ = id => document.getElementById(id);
 const MAX_AGE_MS = 48 * 60 * 60 * 1000;
 const REFRESH_MS = 60 * 1000;
 const ROTATION_MS = 18 * 1000;
 let news = [], idx = 0, last = '', busy = false, renderSequence = 0;
+
+// Imagens de Reserva (Fallback) por Categoria
+const FALLBACK_IMAGES = {
+  'Portugal': 'https://images.pexels.com/photos/1534560/pexels-photo-1534560.jpeg?auto=compress&cs=tinysrgb&w=1920', // Lisboa
+  'Mundo': 'https://images.pexels.com/photos/87651/earth-blue-planet-globe-planet-87651.jpeg?auto=compress&cs=tinysrgb&w=1920', // Globo
+  'Economia': 'https://images.pexels.com/photos/210607/pexels-photo-210607.jpeg?auto=compress&cs=tinysrgb&w=1920', // Gráficos
+  'default': 'https://images.pexels.com/photos/518543/pexels-photo-518543.jpeg?auto=compress&cs=tinysrgb&w=1920' // Jornais / Redação
+};
 
 // Fontes Nacionais e Internacionais
 const FEEDS = [
@@ -532,34 +540,27 @@ async function fetchFeed(feed) {
       const get = sel => (it.querySelector(sel) || {}).textContent || '';
       const linkEl = it.querySelector('link');
       
-      // EXTRAÇÃO AGRESSIVA DE IMAGEM
       let imgUrl = null;
-      
-      // 1. Verifica media:content
       const mediaTags = it.getElementsByTagName('media:content');
       for (let m of mediaTags) {
         if (m.getAttribute('url') && (!m.getAttribute('type') || m.getAttribute('type').startsWith('image'))) {
           imgUrl = m.getAttribute('url'); break;
         }
       }
-      // 2. Verifica media:thumbnail
       if (!imgUrl) {
         const thumb = it.getElementsByTagName('media:thumbnail')[0];
         if (thumb) imgUrl = thumb.getAttribute('url');
       }
-      // 3. Verifica enclosure (só se for imagem)
       if (!imgUrl) {
         const enc = it.getElementsByTagName('enclosure')[0];
         if (enc && enc.getAttribute('type') && enc.getAttribute('type').startsWith('image')) imgUrl = enc.getAttribute('url');
       }
-      // 4. Procura dentro do HTML (content:encoded / description)
       let contentHTML = get('content') || get('encoded') || get('description') || '';
       if (!imgUrl && contentHTML) {
         const match = contentHTML.match(/<img[^>]+src=["']([^"']+)["']/i);
         if (match) imgUrl = match[1];
       }
       
-      // Descodifica eventuais caracteres estranhos no URL (ex: &amp;)
       if (imgUrl) {
         const txt = document.createElement('textarea');
         txt.innerHTML = imgUrl;
@@ -622,7 +623,12 @@ function render() {
   });
 
   const heroImg = $('heroImg');
-  const imageURL = safeImage(n.image_url);
+  let imageURL = safeImage(n.image_url);
+  
+  // Se a notícia não tiver imagem, usa a imagem temática de fallback
+  if (!imageURL) {
+    imageURL = FALLBACK_IMAGES[n.category] || FALLBACK_IMAGES['default'];
+  }
   
   if (imageURL) {
     heroImg.onload = () => { if (seq === renderSequence) heroImg.style.display = 'block'; };
@@ -634,7 +640,8 @@ function render() {
         heroImg.dataset.fallbackTried = "true";
         heroImg.src = 'https://images.weserv.nl/?url=' + encodeURIComponent(imageURL.replace(/^https?:\/\//, ''));
       } else {
-        heroImg.style.display = 'none';
+        // Se o proxy também falhar, usa a imagem de reserva temática
+        heroImg.src = FALLBACK_IMAGES[n.category] || FALLBACK_IMAGES['default'];
       }
     };
     
