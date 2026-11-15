@@ -179,95 +179,6 @@
   }
 
   /* =========================================
-     ÁREA DE PUBLICIDADE (ESTILO CNN LIMPO)
-     ========================================= */
-  .ad-container {
-    position: absolute;
-    right: 48px;
-    bottom: 245px;
-    width: 430px;
-    height: 170px;
-    background: #111;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-    z-index: 5;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    animation: slideIn 0.5s ease-out;
-  }
-  
-  @keyframes slideIn {
-    from { transform: translateX(50px); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-  }
-
-  .ad-label {
-    background: #000;
-    color: #999;
-    font-family: 'Roboto Condensed', Arial, sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 4px 10px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    display: flex;
-    justify-content: space-between;
-  }
-
-  .ad-content {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    background: #181818;
-    padding: 0;
-    transition: background 0.5s;
-  }
-
-  .ad-img {
-    width: 135px;
-    height: 100%;
-    object-fit: cover;
-    background: #222;
-  }
-
-  .ad-text-box {
-    flex: 1;
-    padding: 12px 16px;
-  }
-
-  .ad-title {
-    font-family: 'Roboto Condensed', Arial, sans-serif;
-    font-size: 20px;
-    font-weight: 900;
-    text-transform: uppercase;
-    margin-bottom: 4px;
-    color: #fff;
-    letter-spacing: 0.5px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .ad-desc {
-    font-size: 13px;
-    color: #aaa;
-    line-height: 1.2;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    margin-bottom: 6px;
-  }
-
-  .ad-price {
-    font-family: 'Roboto Condensed', Arial, sans-serif;
-    font-size: 17px;
-    font-weight: 900;
-    color: #CC0000;
-  }
-
-  /* =========================================
      LOWER THIRD CLÁSSICO CNN (LARGURA TOTAL)
      ========================================= */
   .lower {
@@ -482,22 +393,6 @@
     <div id="other"></div>
   </aside>
 
-  <!-- ÁREA DE PUBLICIDADE DA INTERNET -->
-  <div class="ad-container" id="adBox">
-    <div class="ad-label">
-      <span>PUBLICIDADE</span>
-      <span id="adSponsor">PATROCINADO</span>
-    </div>
-    <div class="ad-content" id="adContent">
-      <img class="ad-img" id="adImg"  alt="Ad">
-      <div class="ad-text-box">
-        <div class="ad-title" id="adTitle">A carregar...</div>
-        <div class="ad-desc" id="adDesc">A procurar os melhores produtos para si.</div>
-        <div class="ad-price" id="adPrice">--</div>
-      </div>
-    </div>
-  </div>
-
   <section class="lower">
     <div class="lower-top-row">
       <div class="breaking-tag">ÚLTIMA HORA</div>
@@ -528,88 +423,344 @@
 </main>
 
 <script>
-/* LIVE 19.0: emissão apenas de notícias editorialmente aprovadas */
+/* 24 NOTÍCIAS™ | Emissão em direto */
 const $ = id => document.getElementById(id);
-const MAX_AGE_MS = 48*3600*1000, REFRESH_MS=60000, ROTATION_MS=18000;
-let news=[],idx=0,last='',busy=false,seq=0;
-function fit(){
- const scale=Math.min(innerWidth/1920,innerHeight/1080),e=document.querySelector('.screen');
- e.style.transform='scale('+scale+')';
- e.style.left=(innerWidth-1920*scale)/2+'px';
- e.style.top=(innerHeight-1080*scale)/2+'px';
+const MAX_AGE_MS = 48 * 60 * 60 * 1000;
+const REFRESH_MS = 60 * 1000;
+const ROTATION_MS = 18 * 1000;
+let news = [], idx = 0, last = '', busy = false, seq = 0;
+
+const FEEDS = [
+  { url: 'https://www.publico.pt/rss',            source: 'Público',            category: 'Portugal' },
+  { url: 'https://expresso.pt/rss',               source: 'Expresso',           category: 'Portugal' },
+  { url: 'https://eco.sapo.pt/feed/',             source: 'ECO',                category: 'Economia' },
+  { url: 'https://www.dn.pt/rss',                 source: 'Diário de Notícias', category: 'Portugal' },
+  { url: 'https://www.jn.pt/rss',                 source: 'Jornal de Notícias', category: 'Portugal' },
+  { url: 'https://www.noticiasaominuto.com/rss/ultima-hora', source: 'Notícias ao Minuto', category: 'Portugal' },
+  { url: 'https://feeds.bbci.co.uk/news/world/rss.xml', source: 'BBC World', category: 'Mundo' },
+  { url: 'https://pt.euronews.com/rss',           source: 'Euronews',           category: 'Mundo' },
+  { url: 'https://news.google.com/rss/search?q=world&hl=pt-PT&gl=PT&ceid=PT:pt', source: 'Google News', category: 'Mundo' }
+];
+
+const PROXY_CORSDEV    = 'https://proxy.cors.dev/';
+const PROXY_ALLORIGINS = 'https://api.allorigins.win/raw?url=';
+
+function fit() {
+  const scale = Math.min(innerWidth / 1920, innerHeight / 1080);
+  const e = document.querySelector('.screen');
+  e.style.transform = 'scale(' + scale + ')';
+  e.style.left = (innerWidth - 1920 * scale) / 2 + 'px';
+  e.style.top = (innerHeight - 1080 * scale) / 2 + 'px';
 }
-addEventListener('resize',fit);fit();
-function clock(){
- $('clock').textContent=new Intl.DateTimeFormat('pt-PT',{timeZone:'Europe/Lisbon',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(new Date());
+addEventListener('resize', fit);
+fit();
+
+function clock() {
+  $('clock').textContent = new Intl.DateTimeFormat('pt-PT', { timeZone: 'Europe/Lisbon', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).format(new Date());
 }
-clock();setInterval(clock,1000);
-function status(t,k=''){const e=$('status');e.textContent=t;e.className='status'+(k?' '+k:'');}
-function fitText(el,max,min,lines){
- el.style.fontSize=max+'px';el.style.whiteSpace='nowrap';el.style.overflow='hidden';
- el.style.textOverflow='clip';el.style.display='block';el.style.webkitLineClamp='';
- for(let px=max;px>=min;px--){el.style.fontSize=px+'px';if(el.scrollWidth<=el.clientWidth+1)return;}
- if(lines>1){el.style.fontSize=min+'px';el.style.whiteSpace='normal';el.style.display='-webkit-box';el.style.webkitBoxOrient='vertical';el.style.webkitLineClamp=String(lines);}
+clock();
+setInterval(clock, 1000);
+
+function status(t, k = '') {
+  const e = $('status');
+  e.textContent = t;
+  e.className = 'status' + (k ? ' ' + k : '');
 }
-function adjust(){
- fitText($('headline'),56,26,2);fitText($('summary'),23,16,1);
- document.querySelectorAll('.sidetitle').forEach(e=>fitText(e,20,15,2));
- fitText($('adTitle'),20,14,2);
+
+function fitText(el, max, min, lines) {
+  el.style.fontSize = max + 'px';
+  el.style.whiteSpace = 'nowrap';
+  el.style.overflow = 'hidden';
+  el.style.textOverflow = 'clip';
+  el.style.display = 'block';
+  el.style.webkitLineClamp = '';
+  for (let px = max; px >= min; px--) {
+    el.style.fontSize = px + 'px';
+    if (el.scrollWidth <= el.clientWidth + 1) return;
+  }
+  if (lines > 1) {
+    el.style.fontSize = min + 'px';
+    el.style.whiteSpace = 'normal';
+    el.style.display = '-webkit-box';
+    el.style.webkitBoxOrient = 'vertical';
+    el.style.webkitLineClamp = String(lines);
+  }
 }
-addEventListener('resize',adjust);
-if(document.fonts?.ready)document.fonts.ready.then(adjust);
-function safeImage(v){try{const u=new URL(v);return u.protocol==='https:'?u.href:'';}catch{return '';}}
-function valid(n,now){
- if(!n||n.editorial_status!=='revisto_manualmente')return false;
- if(!['title','summary','source','published_at'].every(k=>typeof n[k]==='string'&&n[k].trim()))return false;
- const d=Date.parse(n.published_at);return Number.isFinite(d)&&d<=now+300000&&now-d<MAX_AGE_MS;
+
+function adjust() {
+  fitText($('headline'), 56, 26, 2);
+  fitText($('summary'), 23, 16, 1);
+  document.querySelectorAll('.sidetitle').forEach(e => fitText(e, 20, 15, 2));
 }
-function waiting(msg='A AGUARDAR REVISÃO EDITORIAL'){
- seq++;$('headline').textContent='A AGUARDAR NOTÍCIAS VERIFICADAS';
- $('summary').textContent='A redação prepara conteúdos para emissão.';
- $('source').textContent='REDAÇÃO 24N';$('category').textContent='REDAÇÃO';
- $('other').replaceChildren();$('heroImg').style.display='none';$('heroImg').removeAttribute('src');
- $('ticker').textContent='24 NOTÍCIAS • A AGUARDAR CONTEÚDOS VERIFICADOS •';status(msg);adjust();
+addEventListener('resize', adjust);
+if (document.fonts?.ready) document.fonts.ready.then(adjust);
+
+function stripHtml(s) {
+  if (!s) return '';
+  const d = document.createElement('div');
+  d.innerHTML = s;
+  return (d.textContent || d.innerText || '').replace(/\s+/g, ' ').trim();
 }
-function render(){
- if(!news.length){waiting();return;}
- const n=news[idx%news.length],current=++seq;
- $('category').textContent=(n.category||'ATUALIDADE').toUpperCase();
- $('headline').textContent=n.title;$('summary').textContent=n.summary;
- $('source').textContent=n.source+' • '+new Date(n.published_at).toLocaleTimeString('pt-PT',{timeZone:'Europe/Lisbon',hour:'2-digit',minute:'2-digit'});
- const img=$('heroImg'),url=n.image_rights_confirmed===true&&n.image_credit?safeImage(n.image_url):'';
- img.onload=null;img.onerror=null;img.style.display='none';img.removeAttribute('src');
- if(url){img.onload=()=>{if(current===seq)img.style.display='block';};img.onerror=()=>{if(current===seq)img.style.display='none';};img.src=url;}
- $('other').replaceChildren();
- for(const x of news.filter(x=>x!==n).slice(0,4)){
-  const box=document.createElement('div'),cat=document.createElement('div'),title=document.createElement('div');
-  box.className='sideitem';cat.className='sidecat';title.className='sidetitle';
-  cat.textContent=(x.category||'ATUALIDADE')+' • '+x.source;title.textContent=x.title;
-  box.append(cat,title);$('other').append(box);
- }
- const ticker=$('ticker');
- ticker.textContent=news.slice(0,15).map(x=>'▪ '+(x.category||'NOTÍCIAS')+': '+x.title).join('     ');
- ticker.style.animation='none';void ticker.offsetWidth;
- ticker.style.animation='move '+Math.max(20,ticker.scrollWidth/80)+'s linear infinite';
- adjust();
+function truncar(s, n) {
+  if (!s) return '';
+  if (s.length <= n) return s;
+  const c = s.slice(0, n);
+  const u = c.lastIndexOf(' ');
+  return (u > 40 ? c.slice(0, u) : c) + '…';
 }
-async function refresh(){
- if(busy)return;busy=true;
- try{
-  const r=await fetch('./feed.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);
-  const data=await r.json(),now=Date.now();
-  const selected=(Array.isArray(data.news)?data.news:[]).filter(n=>valid(n,now)).sort((a,b)=>Date.parse(b.published_at)-Date.parse(a.published_at));
-  const key=JSON.stringify(selected);
-  if(key!==last){last=key;news=selected;idx=0;render();}else if(!news.length)waiting();
-  status(news.length?'REDAÇÃO VERIFICADA • '+news.length+' NOTÍCIAS':'A AGUARDAR REVISÃO EDITORIAL',news.length?'ok':'');
- }catch(e){if(!news.length)waiting('FEED INDISPONÍVEL');else status('FEED TEMPORARIAMENTE INDISPONÍVEL','err');console.warn('24N feed:',e);}
- finally{busy=false;}
+function safeImage(u) {
+  if (!u) return '';
+  let url = String(u).trim();
+  if (url.startsWith('//')) url = 'https:' + url;
+  if (url.startsWith('http://')) url = 'https://' + url.slice(7);
+  return /^https:\/\//i.test(url) ? url : '';
 }
-$('adSponsor').textContent='SEM PATROCINADOR';
-$('adTitle').textContent='ESPAÇO DISPONÍVEL';
-$('adDesc').textContent='Publicidade sujeita a acordo comercial.';
-$('adPrice').textContent='';$('adImg').removeAttribute('src');$('adImg').style.visibility='hidden';
-waiting();refresh();setInterval(refresh,REFRESH_MS);
-setInterval(()=>{if(news.length>1){idx=(idx+1)%news.length;render();}},ROTATION_MS);
+function parseDate(s) {
+  if (!s) return new Date();
+  let iso = String(s).trim();
+  if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(iso)) {
+    iso = iso.replace(' ', 'T') + 'Z';
+  }
+  const d = new Date(iso);
+  return isNaN(d.getTime()) ? new Date() : d;
+}
+function getDynamicFallbackImage(category) {
+  const cat = (category || '').toLowerCase();
+  let kw = 'news,press';
+  if (cat.includes('portugal')) kw = 'lisbon,portugal';
+  else if (cat.includes('mundo') || cat.includes('internacional')) kw = 'globe,world';
+  else if (cat.includes('economia')) kw = 'finance,business';
+  else if (cat.includes('desporto')) kw = 'sports,stadium';
+  
+  return 'https://loremflickr.com/1920/1080/' + kw + '?lock=' + Math.floor(Math.random() * 9999);
+}
+
+function normalizar(item, feed) {
+  const titulo = stripHtml(item.title || '');
+  const descricao = stripHtml(item.description || item.content || item.summary || '');
+  const data = parseDate(item.pubDate || item.published || item.date || item.updated);
+  
+  let img = safeImage(item.thumbnail);
+  if (!img && item.description) {
+    const m = item.description.match(/<img[^>]+src=["']([^"']+)["']/i);
+    if (m) img = safeImage(m[1]);
+  }
+
+  return {
+    id: Math.random().toString(36).substr(2, 9),
+    title: titulo,
+    summary: truncar(descricao, 260) || 'Consulte a fonte original para mais detalhes.',
+    source: feed.source,
+    published_at: data.toISOString(),
+    image_url: img,
+    category: feed.category || 'Mundo',
+    editorial_status: 'revisto_manualmente',
+    image_credit: feed.source,
+    link: item.link || ''
+  };
+}
+
+function valid(n, now) {
+  if (!n || n.editorial_status !== 'revisto_manualmente') return false;
+  if (!['title', 'summary', 'source', 'published_at'].every(k => typeof n[k] === 'string' && n[k].trim())) return false;
+  if (typeof n.image_url !== 'string' || !n.image_url.trim()) return false;
+  
+  const pub = Date.parse(n.published_at);
+  return Number.isFinite(pub) && pub <= now + 300000 && now - pub < MAX_AGE_MS;
+}
+
+async function fetchFeed(feed) {
+  async function processarXML(xmlText) {
+    const doc = new DOMParser().parseFromString(xmlText, 'application/xml');
+    const items = Array.from(doc.querySelectorAll('item, entry'));
+    
+    return items.map(it => {
+      const get = sel => (it.querySelector(sel) || {}).textContent || '';
+      const linkEl = it.querySelector('link');
+      const link = linkEl ? (linkEl.getAttribute('href') || linkEl.textContent) : '';
+      const title = get('title');
+      
+      const enc = it.getElementsByTagName('enclosure')[0];
+      const isAudioVideo = enc && (enc.getAttribute('type') || '').match(/^(audio|video)\//i);
+      const isMediaLink = /radio|podcast|\/audio\/|\/video\/|tsf|renascenca|antena/i.test(link);
+      const isMediaTitle = /podcast|episódio|episodio|ouvir|áudio|audio|vídeo|video|rádio|radio|tsf|renascença|antena|emissão/i.test(title);
+
+      if (isAudioVideo || isMediaLink || isMediaTitle) {
+        return null; 
+      }
+      
+      let imgUrl = null;
+      const mediaTags = it.getElementsByTagName('media:content');
+      for (let m of mediaTags) {
+        if (m.getAttribute('url') && (!m.getAttribute('type') || m.getAttribute('type').startsWith('image'))) {
+          imgUrl = m.getAttribute('url'); break;
+        }
+      }
+      if (!imgUrl) {
+        const thumb = it.getElementsByTagName('media:thumbnail')[0];
+        if (thumb) imgUrl = thumb.getAttribute('url');
+      }
+      if (!imgUrl && enc && enc.getAttribute('type') && enc.getAttribute('type').startsWith('image')) {
+        imgUrl = enc.getAttribute('url');
+      }
+      
+      let contentHTML = get('content') || get('encoded') || get('description') || '';
+      if (!imgUrl && contentHTML) {
+        const match = contentHTML.match(/<img[^>]+src=["']([^"']+)["']/i);
+        if (match) imgUrl = match[1];
+      }
+      
+      if (imgUrl) {
+        const txt = document.createElement('textarea');
+        txt.innerHTML = imgUrl;
+        imgUrl = txt.value;
+      }
+
+      return normalizar({
+        title: title,
+        description: contentHTML, 
+        pubDate: get('pubDate') || get('published') || get('updated'),
+        link: link,
+        thumbnail: imgUrl
+      }, feed);
+    }).filter(item => item !== null);
+  }
+
+  try {
+    const r = await fetch(PROXY_CORSDEV + feed.url, { cache: 'no-store' });
+    if (r.ok) {
+      const result = await processarXML(await r.text());
+      if (result.length) return result;
+    }
+  } catch (_) {}
+
+  try {
+    const r = await fetch(PROXY_ALLORIGINS + encodeURIComponent(feed.url), { cache: 'no-store' });
+    if (r.ok) {
+      const result = await processarXML(await r.text());
+      if (result.length) return result;
+    }
+  } catch (_) {}
+
+  return [];
+}
+
+function waiting(msg = 'A AGUARDAR REVISÃO EDITORIAL') {
+  seq++;
+  $('headline').textContent = 'A AGUARDAR NOTÍCIAS VERIFICADAS';
+  $('summary').textContent = 'A redação prepara conteúdos para emissão.';
+  $('source').textContent = 'REDAÇÃO 24N';
+  $('category').textContent = 'REDAÇÃO';
+  $('other').replaceChildren();
+  $('heroImg').style.display = 'none';
+  $('heroImg').removeAttribute('src');
+  $('ticker').textContent = '24 NOTÍCIAS • A AGUARDAR CONTEÚDOS VERIFICADOS •';
+  status(msg);
+  adjust();
+}
+
+function render() {
+  if (!news.length) { waiting(); return; }
+  const n = news[idx % news.length];
+  const current = ++seq;
+  
+  $('category').textContent = (n.category || 'ATUALIDADE').toUpperCase();
+  $('headline').textContent = n.title;
+  $('summary').textContent = n.summary;
+  $('source').textContent = n.source + ' • ' + new Date(n.published_at).toLocaleTimeString('pt-PT', { timeZone: 'Europe/Lisbon', hour: '2-digit', minute: '2-digit' });
+  
+  const img = $('heroImg');
+  let imageURL = safeImage(n.image_url);
+  
+  if (!imageURL) {
+    imageURL = getDynamicFallbackImage(n.category);
+  }
+  
+  if (imageURL) {
+    img.onload = () => { if (current === seq) img.style.display = 'block'; };
+    img.onerror = () => {
+      if (current !== seq) return;
+      if (!img.dataset.fallbackTried) {
+        img.dataset.fallbackTried = "true";
+        img.src = 'https://images.weserv.nl/?url=' + encodeURIComponent(imageURL.replace(/^https?:\/\//, ''));
+      } else {
+        img.style.display = 'none';
+      }
+    };
+    img.dataset.fallbackTried = "";
+    img.src = imageURL;
+    img.style.display = 'none';
+  } else {
+    img.onload = null;
+    img.onerror = null;
+    img.style.display = 'none';
+    img.removeAttribute('src');
+  }
+
+  $('other').replaceChildren();
+  for (const x of news.filter(x => x !== n).slice(0, 4)) {
+    const box = document.createElement('div');
+    const cat = document.createElement('div');
+    const title = document.createElement('div');
+    box.className = 'sideitem';
+    cat.className = 'sidecat';
+    title.className = 'sidetitle';
+    cat.textContent = (x.category || 'ATUALIDADE') + ' • ' + x.source;
+    title.textContent = x.title;
+    box.append(cat, title);
+    $('other').append(box);
+  }
+  
+  const ticker = $('ticker');
+  ticker.textContent = news.slice(0, 15).map(x => '▪ ' + (x.category || 'NOTÍCIAS') + ': ' + x.title).join('     ');
+  ticker.style.animation = 'none';
+  void ticker.offsetWidth;
+  ticker.style.animation = 'move ' + Math.max(20, ticker.scrollWidth / 80) + 's linear infinite';
+  adjust();
+}
+
+async function refresh() {
+  if (busy) return;
+  busy = true;
+  try {
+    const resultados = await Promise.allSettled(FEEDS.map(f => fetchFeed(f)));
+    const todas = [];
+    for (const r of resultados) {
+      if (r.status === 'fulfilled' && Array.isArray(r.value)) todas.push(...r.value);
+    }
+
+    if (!todas.length) throw Error('Sem notícias');
+
+    const now = Date.now();
+    const selected = todas
+      .filter(n => valid(n, now))
+      .sort((a, b) => Date.parse(b.published_at) - Date.parse(a.published_at));
+
+    const key = JSON.stringify(selected.map(n => [n.id, n.title, n.summary, n.published_at, n.image_url]));
+    
+    if (key !== last) {
+      news = selected;
+      idx = 0;
+      last = key;
+      render();
+    } else if (!news.length) {
+      waiting();
+    }
+    
+    status(news.length ? 'REDAÇÃO VERIFICADA • ' + news.length + ' NOTÍCIAS' : 'A AGUARDAR REVISÃO EDITORIAL', news.length ? 'ok' : '');
+  } catch (e) {
+    if (!news.length) waiting('FEED INDISPONÍVEL');
+    else status('FEED TEMPORARIAMENTE INDISPONÍVEL', 'err');
+    console.warn('24N feed:', e);
+  } finally {
+    busy = false;
+  }
+}
+
+waiting();
+refresh();
+setInterval(refresh, REFRESH_MS);
+setInterval(() => { if (news.length > 1) { idx = (idx + 1) % news.length; render(); } }, ROTATION_MS);
 </script>
 </body>
 </html>
