@@ -393,7 +393,6 @@
     background: #000000;
     display: flex;
     align-items: center;
-    /* border-top: 3px solid #CC0000;  <-- REMOVIDO */
     z-index: 8;
   }
 
@@ -562,11 +561,10 @@ setInterval(() => {
 fetchInternetAds();
 
 // ==========================================
-// LÓGICA DAS NOTÍCIAS
+// LÓGICA DAS NOTÍCIAS (Observador Removido)
 // ==========================================
 const FEEDS = [
   { url: 'https://www.publico.pt/rss',            source: 'Público',            category: 'Portugal' },
-  { url: 'https://observador.pt/feed/',           source: 'Observador',         category: 'Portugal' },
   { url: 'https://expresso.pt/rss',               source: 'Expresso',           category: 'Portugal' },
   { url: 'https://eco.sapo.pt/feed/',             source: 'ECO',                category: 'Economia' },
   { url: 'https://www.dn.pt/rss',                 source: 'Diário de Notícias', category: 'Portugal' },
