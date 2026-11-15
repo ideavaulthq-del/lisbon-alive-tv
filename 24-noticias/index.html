@@ -204,6 +204,79 @@
     border-left: 3px solid #CC0000;
   }
 
+  /* =========================================
+     ÁREA DE PUBLICIDADE (SPONSOR BOX)
+     ========================================= */
+  .ad-container {
+    position: absolute;
+    right: 56px;
+    bottom: 280px;
+    width: 440px;
+    height: 160px;
+    background: #111;
+    border: 1px solid #333;
+    border-top: 3px solid #CC0000;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    z-index: 5;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: slideIn 0.5s ease-out;
+  }
+  
+  @keyframes slideIn {
+    from { transform: translateX(50px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  .ad-label {
+    background: #000;
+    color: #888;
+    font-family: 'Roboto Condensed', Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #222;
+  }
+
+  .ad-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    transition: background 0.5s;
+  }
+
+  .ad-icon {
+    font-size: 46px;
+    margin-right: 20px;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+  }
+
+  .ad-text-box {
+    flex: 1;
+  }
+
+  .ad-title {
+    font-family: 'Roboto Condensed', Arial, sans-serif;
+    font-size: 24px;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    color: #fff;
+    letter-spacing: 0.5px;
+  }
+
+  .ad-desc {
+    font-size: 15px;
+    color: rgba(255,255,255,0.8);
+    line-height: 1.2;
+  }
+
   .lower {
     position: absolute;
     left: 56px;
@@ -374,6 +447,21 @@
     <div id="other"></div>
   </aside>
 
+  <!-- ÁREA DE PUBLICIDADE -->
+  <div class="ad-container" id="adBox">
+    <div class="ad-label">
+      <span>PUBLICIDADE</span>
+      <span id="adSponsor">PATROCINADO</span>
+    </div>
+    <div class="ad-content" id="adContent" style="background: linear-gradient(135deg, #1e3c72, #2a5298);">
+      <div class="ad-icon" id="adIcon">🏦</div>
+      <div class="ad-text-box">
+        <div class="ad-title" id="adTitle">Mude de Banco</div>
+        <div class="ad-desc" id="adDesc">Abra conta digital e receba 50€ em saldo.</div>
+      </div>
+    </div>
+  </div>
+
   <div class="hero-credit" id="heroCaption">24 NOTÍCIAS • EMISSÃO CONTÍNUA</div>
 
   <section class="lower">
@@ -398,14 +486,43 @@
 </main>
 
 <script>
-/* 24 NOTÍCIAS™ | Emissão em direto com extração de imagens e fallback dinâmico */
+/* 24 NOTÍCIAS™ | Emissão em direto com filtro de podcasts/vídeos */
 const $ = id => document.getElementById(id);
 const MAX_AGE_MS = 48 * 60 * 60 * 1000;
 const REFRESH_MS = 60 * 1000;
 const ROTATION_MS = 18 * 1000;
 let news = [], idx = 0, last = '', busy = false, renderSequence = 0;
 
-// Gera uma imagem de alta qualidade baseada na categoria, em tempo real
+// ==========================================
+// CONFIGURAÇÃO DE PUBLICIDADE
+// ==========================================
+const ADS = [
+  { title: "Mude de Banco", desc: "Abra conta digital e receba 50€ em saldo.", icon: "🏦", bg: "linear-gradient(135deg, #1e3c72, #2a5298)", sponsor: "BANCO DIGITAL" },
+  { title: "Seguro Auto", desc: "Proteja o seu carro com até 40% de desconto.", icon: "🚗", bg: "linear-gradient(135deg, #e52d27, #b31217)", sponsor: "SEGURADORA" },
+  { title: "Curso de Tecnologia", desc: "Aprenda a programar em apenas 3 meses.", icon: "💻", bg: "linear-gradient(135deg, #11998e, #38ef7d)", sponsor: "EDUCAÇÃO" },
+  { title: "Supermercado", desc: "Entregas gratuitas em todo o país hoje.", icon: "🛒", bg: "linear-gradient(135deg, #f12711, #f5af19)", sponsor: "RETAIL" }
+];
+let adIdx = 0;
+
+function renderAd() {
+  const ad = ADS[adIdx % ADS.length];
+  $('adTitle').textContent = ad.title;
+  $('adDesc').textContent = ad.desc;
+  $('adIcon').textContent = ad.icon;
+  $('adContent').style.background = ad.bg;
+  $('adSponsor').textContent = ad.sponsor;
+  
+  const box = $('adBox');
+  box.style.animation = 'none';
+  void box.offsetWidth;
+  box.style.animation = 'slideIn 0.5s ease-out';
+}
+setInterval(() => { adIdx++; renderAd(); }, 10000);
+renderAd();
+
+// ==========================================
+// LÓGICA DAS NOTÍCIAS
+// ==========================================
 function getDynamicFallbackImage(category) {
   const cat = (category || '').toLowerCase();
   let kw = 'news,press';
@@ -414,11 +531,9 @@ function getDynamicFallbackImage(category) {
   else if (cat.includes('economia')) kw = 'finance,business';
   else if (cat.includes('desporto')) kw = 'sports,stadium';
   
-  // LoremFlickr devolve uma imagem real e aleatória em tempo real baseada na keyword
   return 'https://loremflickr.com/1920/1080/' + kw + '?lock=' + Math.floor(Math.random() * 9999);
 }
 
-// Fontes Nacionais e Internacionais
 const FEEDS = [
   { url: 'https://www.publico.pt/rss',            source: 'Público',            category: 'Portugal' },
   { url: 'https://observador.pt/feed/',           source: 'Observador',         category: 'Portugal' },
@@ -530,6 +645,19 @@ async function fetchFeed(feed) {
     return items.map(it => {
       const get = sel => (it.querySelector(sel) || {}).textContent || '';
       const linkEl = it.querySelector('link');
+      const link = linkEl ? (linkEl.getAttribute('href') || linkEl.textContent) : '';
+      const title = get('title');
+      
+      // FILTRO ANTI-PODCAST E ANTI-VÍDEO
+      const enc = it.getElementsByTagName('enclosure')[0];
+      const isAudioVideo = enc && (enc.getAttribute('type') || '').match(/^(audio|video)\//i);
+      const isPodcastLink = /podcast|\/audio\/|\/video\//i.test(link);
+      const isPodcastTitle = /podcast|episódio|episodio|ouvir|áudio|audio|vídeo|video/i.test(title);
+
+      // Se for podcast/vídeo, ignoramos esta notícia (retorna null)
+      if (isAudioVideo || isPodcastLink || isPodcastTitle) {
+        return null; 
+      }
       
       let imgUrl = null;
       const mediaTags = it.getElementsByTagName('media:content');
@@ -542,10 +670,10 @@ async function fetchFeed(feed) {
         const thumb = it.getElementsByTagName('media:thumbnail')[0];
         if (thumb) imgUrl = thumb.getAttribute('url');
       }
-      if (!imgUrl) {
-        const enc = it.getElementsByTagName('enclosure')[0];
-        if (enc && enc.getAttribute('type') && enc.getAttribute('type').startsWith('image')) imgUrl = enc.getAttribute('url');
+      if (!imgUrl && enc && enc.getAttribute('type') && enc.getAttribute('type').startsWith('image')) {
+        imgUrl = enc.getAttribute('url');
       }
+      
       let contentHTML = get('content') || get('encoded') || get('description') || '';
       if (!imgUrl && contentHTML) {
         const match = contentHTML.match(/<img[^>]+src=["']([^"']+)["']/i);
@@ -559,13 +687,13 @@ async function fetchFeed(feed) {
       }
 
       return normalizar({
-        title: get('title'),
+        title: title,
         description: contentHTML, 
         pubDate: get('pubDate') || get('published') || get('updated'),
-        link: linkEl ? (linkEl.getAttribute('href') || linkEl.textContent) : '',
+        link: link,
         thumbnail: imgUrl
       }, feed);
-    });
+    }).filter(item => item !== null); // Limpa os nulos (podcasts filtrados)
   }
 
   try {
@@ -617,7 +745,6 @@ function render() {
   let imageURL = safeImage(n.image_url);
   let isFallback = false;
   
-  // 1. Se não houver imagem no RSS, gera uma imagem temática em tempo real
   if (!imageURL) {
     imageURL = getDynamicFallbackImage(n.category);
     isFallback = true;
@@ -629,18 +756,15 @@ function render() {
     heroImg.onerror = () => {
       if (seq !== renderSequence) return;
       
-      // 2. Se a imagem falhar (bloqueio anti-hotlink), usa o proxy
       if (!isFallback && !heroImg.dataset.fallbackTried) {
         heroImg.dataset.fallbackTried = "true";
         heroImg.src = 'https://images.weserv.nl/?url=' + encodeURIComponent(imageURL.replace(/^https?:\/\//, ''));
-      } 
-      // 3. Se o proxy falhar, força uma imagem dinâmica temática
-      else {
+      } else {
         heroImg.src = getDynamicFallbackImage(n.category);
       }
     };
     
-    heroImg.dataset.fallbackTried = ""; // Reset flag
+    heroImg.dataset.fallbackTried = "";
     heroImg.src = imageURL;
     heroImg.style.display = 'none';
     
