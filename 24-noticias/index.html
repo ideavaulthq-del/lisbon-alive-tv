@@ -398,20 +398,25 @@
 </main>
 
 <script>
-/* 24 NOTÍCIAS™ | Emissão em direto com extração de imagens e fallback temático */
+/* 24 NOTÍCIAS™ | Emissão em direto com extração de imagens e fallback dinâmico */
 const $ = id => document.getElementById(id);
 const MAX_AGE_MS = 48 * 60 * 60 * 1000;
 const REFRESH_MS = 60 * 1000;
 const ROTATION_MS = 18 * 1000;
 let news = [], idx = 0, last = '', busy = false, renderSequence = 0;
 
-// Imagens de Reserva (Fallback) por Categoria
-const FALLBACK_IMAGES = {
-  'Portugal': 'https://images.pexels.com/photos/1534560/pexels-photo-1534560.jpeg?auto=compress&cs=tinysrgb&w=1920',
-  'Mundo': 'https://images.pexels.com/photos/87651/earth-blue-planet-globe-planet-87651.jpeg?auto=compress&cs=tinysrgb&w=1920',
-  'Economia': 'https://images.pexels.com/photos/210607/pexels-photo-210607.jpeg?auto=compress&cs=tinysrgb&w=1920',
-  'default': 'https://images.pexels.com/photos/518543/pexels-photo-518543.jpeg?auto=compress&cs=tinysrgb&w=1920'
-};
+// Gera uma imagem de alta qualidade baseada na categoria, em tempo real
+function getDynamicFallbackImage(category) {
+  const cat = (category || '').toLowerCase();
+  let kw = 'news,press';
+  if (cat.includes('portugal')) kw = 'lisbon,portugal';
+  else if (cat.includes('mundo') || cat.includes('internacional')) kw = 'globe,world';
+  else if (cat.includes('economia')) kw = 'finance,business';
+  else if (cat.includes('desporto')) kw = 'sports,stadium';
+  
+  // LoremFlickr devolve uma imagem real e aleatória em tempo real baseada na keyword
+  return 'https://loremflickr.com/1920/1080/' + kw + '?lock=' + Math.floor(Math.random() * 9999);
+}
 
 // Fontes Nacionais e Internacionais
 const FEEDS = [
@@ -610,31 +615,38 @@ function render() {
 
   const heroImg = $('heroImg');
   let imageURL = safeImage(n.image_url);
+  let isFallback = false;
   
-  // Se a notícia não tiver imagem, usa a imagem temática de fallback
+  // 1. Se não houver imagem no RSS, gera uma imagem temática em tempo real
   if (!imageURL) {
-    imageURL = FALLBACK_IMAGES[n.category] || FALLBACK_IMAGES['default'];
+    imageURL = getDynamicFallbackImage(n.category);
+    isFallback = true;
   }
   
   if (imageURL) {
     heroImg.onload = () => { if (seq === renderSequence) heroImg.style.display = 'block'; };
     
-    // FALLBACK DE IMAGEM: Se o jornal bloquear o acesso (hotlink), usa um proxy de imagens
     heroImg.onerror = () => {
       if (seq !== renderSequence) return;
-      if (!heroImg.dataset.fallbackTried) {
+      
+      // 2. Se a imagem falhar (bloqueio anti-hotlink), usa o proxy
+      if (!isFallback && !heroImg.dataset.fallbackTried) {
         heroImg.dataset.fallbackTried = "true";
         heroImg.src = 'https://images.weserv.nl/?url=' + encodeURIComponent(imageURL.replace(/^https?:\/\//, ''));
-      } else {
-        // Se o proxy também falhar, usa a imagem de reserva temática
-        heroImg.src = FALLBACK_IMAGES[n.category] || FALLBACK_IMAGES['default'];
+      } 
+      // 3. Se o proxy falhar, força uma imagem dinâmica temática
+      else {
+        heroImg.src = getDynamicFallbackImage(n.category);
       }
     };
     
     heroImg.dataset.fallbackTried = ""; // Reset flag
     heroImg.src = imageURL;
     heroImg.style.display = 'none';
-    $('heroCaption').textContent = 'IMAGEM: ' + n.source;
+    
+    $('heroCaption').textContent = isFallback 
+      ? 'IMAGEM ILUSTRATIVA • ' + n.category 
+      : 'IMAGEM: ' + n.source;
   } else {
     heroImg.onload = null; 
     heroImg.onerror = null;
