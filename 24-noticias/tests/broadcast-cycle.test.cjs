@@ -63,3 +63,23 @@ test('fallback de segurança termina intervalo após 122 segundos',()=>{
  const t=setup();t.window.N24AutoBreak.start();t.advance(122000);
  assert.equal(t.window.N24AutoBreak.active,false);
 });
+
+test('simulação de três ciclos consecutivos sem bloqueio',()=>{
+ const t=setup();
+ for(let i=0;i<3;i++){
+  t.advance(900000);
+  assert.equal(t.window.N24AutoBreak.active,true,'intervalo deve iniciar no ciclo '+(i+1));
+  t.advance(122000);
+  assert.equal(t.window.N24AutoBreak.active,false,'intervalo deve terminar no ciclo '+(i+1));
+  assert.equal(t.frame.style.display,'none');
+ }
+ assert.equal(t.sent.length,3);
+});
+test('Escape termina e o temporizador antigo não fecha um novo intervalo',()=>{
+ const t=setup();const key=k=>t.events.get('keydown')({key:k,altKey:false,ctrlKey:false,metaKey:false,repeat:false});
+ key('i');t.advance(1000);key('Escape');key('i');
+ t.advance(121000);
+ assert.equal(t.window.N24AutoBreak.active,true);
+ t.advance(1000);
+ assert.equal(t.window.N24AutoBreak.active,false);
+});
