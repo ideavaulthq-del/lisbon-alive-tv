@@ -1,0 +1,55 @@
+<!doctype html><html lang="pt-PT"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>24N SHOP™ | Conversor de Feeds</title><style>
+:root{color-scheme:dark;font-family:Arial,sans-serif}*{box-sizing:border-box}body{margin:0;background:#0d0e11;color:#f8f8fa}header{background:#17181c;border-bottom:4px solid #cb0717;padding:20px max(20px,calc((100vw - 1000px)/2));font-size:24px;font-weight:900}header span{background:#c90919;padding:8px;margin-right:12px}main{max-width:1000px;margin:30px auto;padding:0 20px}.panel{background:#1b1c21;border:1px solid #383b44;padding:22px;border-radius:12px;margin:18px 0}.note{border-left:4px solid #e54350;padding:12px 16px;background:#2b1a20;line-height:1.6}label{display:block;margin:12px 0 5px;color:#ccc}input,select,textarea{background:#101115;color:#fff;border:1px solid #555966;border-radius:8px;padding:11px;width:100%;font:inherit}button,a.action{display:inline-block;background:#c90919;color:white;border:0;border-radius:8px;padding:12px 16px;margin:10px 8px 0 0;cursor:pointer;font-weight:bold;text-decoration:none}button:disabled{opacity:.45;cursor:not-allowed}.mapping{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}small{color:#b7b8bf}table{border-collapse:collapse;width:100%;font-size:13px}th,td{padding:9px;border-bottom:1px solid #42444a;text-align:left;overflow-wrap:anywhere}div.scroll{overflow:auto}#status{min-height:24px}a{color:#ff9da5}</style></head><body>
+<header><span>24N</span>SHOP™ | CONVERSOR DE FEEDS · LIVE 20.8</header><main>
+<p class="note"><b>Importação local, sem ligação à Awin.</b> Utiliza apenas CSV obtidos legalmente de fornecedores que autorizaram o uso dos dados. Os produtos exportados são sempre <b>rascunhos não aprovados</b>, sem data de revisão. Este conversor não verifica preços, direitos de imagem nem disponibilidade. Não introduzas tokens ou URLs privados.</p>
+<section class="panel"><h2>1. Escolher ficheiro CSV autorizado</h2><input type="file" id="file" accept=".csv,text/csv"><label for="delimiter">Separador</label><select id="delimiter"><option value="auto">Deteção automática</option><option value=",">Vírgula</option><option value=";">Ponto e vírgula</option><option value="tab">Tabulação</option></select><p><small>Máximo 1 MB / 500 produtos. O ficheiro permanece neste navegador.</small></p></section>
+<section class="panel"><h2>2. Associar colunas do fornecedor</h2><div id="mapping" class="mapping"></div><button id="preview" disabled>Pré-visualizar conversão</button></section>
+<section class="panel"><h2>3. Rever e exportar rascunhos</h2><p id="status" role="status">Seleciona um CSV para começar.</p><div class="scroll"><table><thead><tr><th>Produto</th><th>Categoria</th><th>Loja</th><th>Preço (texto original)</th><th>Estado</th></tr></thead><tbody id="rows"></tbody></table></div><button id="export" disabled>Exportar products.json (rascunhos)</button><p><small>O ficheiro exportado substitui um catálogo quando importado na Central. Guarda uma cópia do catálogo existente antes de o substituir. Para juntar produtos, usa o editor e verifica duplicados.</small></p><a href="./central.html">Abrir Central Editorial</a></section></main>
+<script>
+const $=id=>document.getElementById(id);
+const fields={name:'Nome *',description:'Descrição *',category:'Categoria',price:'Preço original',store:'Loja',image_url:'Imagem HTTPS',link:'Ligação HTTPS',emoji:'Símbolo'};
+let headers=[],records=[],drafts=[];
+function parseCSV(s,sep){
+ let rows=[],row=[],field='',quoted=false; s=s.replace(/^\uFEFF/,'');
+ for(let i=0;i<s.length;i++){const c=s[i];if(quoted){if(c==='"'&&s[i+1]==='"'){field+='"';i++;}else if(c==='"')quoted=false;else field+=c;}
+ else if(c==='"'){if(field!=='')throw Error('Aspas inesperadas no CSV.');quoted=true;}
+ else if(c===sep){row.push(field);field='';}
+ else if(c==='\n'){row.push(field.replace(/\r$/,''));if(row.some(x=>x.trim()))rows.push(row);row=[];field='';}
+ else field+=c;}
+ if(quoted)throw Error('Aspas não fechadas.');row.push(field.replace(/\r$/,''));if(row.some(x=>x.trim()))rows.push(row);return rows;
+}
+function detect(s){const first=s.split(/\r?\n/)[0]||'';const opts=[',',';','\t'];return opts.sort((a,b)=>first.split(b).length-first.split(a).length)[0];}
+function validHttps(s){if(!s)return true;try{const u=new URL(s);return u.protocol==='https:'&&!!u.hostname&&!u.username&&!u.password;}catch{return false;}}
+function msg(s){$('status').textContent=s;}
+function reset(){drafts=[];$('export').disabled=true;$('rows').replaceChildren();}
+$('file').onchange=async()=>{reset();try{
+ const f=$('file').files[0];if(!f)return;if(f.size>1048576)throw Error('Ficheiro acima de 1 MB.');
+ const raw=await f.text();const delimiter=$('delimiter').value;const sep=delimiter==='auto'?detect(raw):delimiter==='tab'?'\t':delimiter;
+ const rows=parseCSV(raw,sep);if(rows.length<2)throw Error('CSV sem registos.');
+ headers=rows.shift().map(h=>h.trim());records=rows;if(records.length>500)throw Error('Mais de 500 produtos.');
+ if(headers.length<2)throw Error('Não foram encontradas colunas suficientes. Confirma o separador.');
+ const mapping=$('mapping');mapping.replaceChildren();
+ for(const [field,label] of Object.entries(fields)){const box=document.createElement('div'),lab=document.createElement('label'),sel=document.createElement('select');lab.textContent=label;sel.id='map_'+field;const none=document.createElement('option');none.value='';none.textContent='Não importar';sel.append(none);
+ headers.forEach((h,i)=>{const opt=document.createElement('option');opt.value=String(i);opt.textContent=h;sel.append(opt);});
+ const aliases={name:['name','product_name','product name','product','productname'],description:['description','product_description','product description','short_description'],category:['category','merchant_category','product_category'],price:['price','search_price','display_price'],store:['store','merchant_name','merchant','advertiser_name'],image_url:['image_url','image_link','aw_image_url','large_image'],link:['link','aw_deep_link','merchant_deep_link','product_url','url'],emoji:['emoji']};
+ const index=headers.findIndex(h=>(aliases[field]||[]).includes(h.toLowerCase()));if(index>=0)sel.value=String(index);
+ box.append(lab,sel);mapping.append(box);
+ }$('preview').disabled=false;msg(records.length+' registos carregados. Confirma a associação de colunas.');
+ }catch(e){$('preview').disabled=true;msg('Erro: '+e.message);}};
+$('delimiter').onchange=()=>{if($('file').files.length)$('file').onchange();};
+$('preview').onclick=()=>{reset();try{
+ const indexes=Object.fromEntries(Object.keys(fields).map(k=>[k,$('map_'+k).value]));if(indexes.name===''||indexes.description==='')throw Error('Associa nome e descrição.');
+ const seen=new Set();let skipped=0;
+ for(const row of records){const val=k=>indexes[k]===''?'':String(row[Number(indexes[k])]||'').trim();
+ const name=val('name').slice(0,100),description=val('description').slice(0,300),store=val('store').slice(0,100);
+ if(!name||!description){skipped++;continue;}
+ const link=val('link'),image_url=val('image_url');if(!validHttps(link)||!validHttps(image_url)){skipped++;continue;}
+ const key=(name+'|'+store).toLocaleLowerCase();if(seen.has(key)){skipped++;continue;}seen.add(key);
+ drafts.push({name,description,category:val('category').slice(0,60)||'Outros',price:val('price').slice(0,40),store,image_url,link,emoji:val('emoji').slice(0,8)||'🛍️',approved:false,reviewed_at:''});
+ }
+ if(!drafts.length)throw Error('Nenhum registo válido para exportar.');
+ const tbody=$('rows');for(const p of drafts.slice(0,30)){const tr=document.createElement('tr');for(const value of [p.name,p.category,p.store,p.price,'RASCUNHO']){const td=document.createElement('td');td.textContent=value;tr.append(td);}tbody.append(tr);}
+ $('export').disabled=false;msg(drafts.length+' rascunhos preparados; '+skipped+' registos ignorados (incompletos, duplicados ou URL inválido). '+(drafts.length>30?'Mostrados os primeiros 30.':''));
+ }catch(e){drafts=[];msg('Erro: '+e.message);}};
+$('export').onclick=()=>{if(!drafts.length)return;const json=JSON.stringify({description:'24N SHOP — importação de feed autorizado; revisão obrigatória',products:drafts},null,2)+'\n';const url=URL.createObjectURL(new Blob([json],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='products.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);msg('Rascunhos exportados. Revisa-os na Central antes de aprovar e publicar.');};
+</script></body></html>
