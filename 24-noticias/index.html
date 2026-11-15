@@ -762,5 +762,35 @@ refresh();
 setInterval(refresh, REFRESH_MS);
 setInterval(() => { if (news.length > 1) { idx = (idx + 1) % news.length; render(); } }, ROTATION_MS);
 </script>
+
+<!-- 24N AUTO BREAK™ | overlay independente do grafismo noticioso -->
+<iframe id="autoBreak" title="24N SHOP — intervalo comercial" src="./intervalo.html" allow="autoplay" style="position:fixed;inset:0;width:100vw;height:100vh;border:0;display:none;z-index:99999;background:#090909" aria-hidden="true"></iframe>
+<script>
+(() => {
+  const NEWS_MS=15*60*1000, AD_MS=2*60*1000;
+  const frame=document.getElementById('autoBreak');
+  let active=false,started=Date.now(),lastBreak=Date.now(),timeout=null;
+  function finish(){
+    if(!active)return;
+    active=false;frame.style.display='none';frame.setAttribute('aria-hidden','true');
+    lastBreak=Date.now();clearTimeout(timeout);
+  }
+  function start(){
+    if(active)return;
+    active=true;started=Date.now();frame.style.display='block';frame.setAttribute('aria-hidden','false');
+    const send=()=>frame.contentWindow?.postMessage({type:'24n-break-start',duration:AD_MS},location.origin);
+    if(frame.contentDocument?.readyState==='complete')send();
+    else frame.addEventListener('load',send,{once:true});
+    timeout=setTimeout(finish,AD_MS+2000);
+  }
+  window.addEventListener('message',e=>{
+    if(e.origin===location.origin&&e.source===frame.contentWindow&&e.data?.type==='24n-break-finished')finish();
+  });
+  // O intervalo conta desde o último regresso às notícias.
+  setInterval(()=>{if(!active&&Date.now()-lastBreak>=NEWS_MS)start();},1000);
+  // Comandos opcionais para operador OBS, na consola do navegador.
+  window.N24AutoBreak={start,finish,get active(){return active;}};
+})();
+</script>
 </body>
 </html>
