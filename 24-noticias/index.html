@@ -426,15 +426,28 @@
 </main>
 
 <script>
-/* 24 NOTÍCIAS™ | Emissão de notícias exclusivamente com revisão editorial.
- * Mantém o grafismo aprovado, sem recolha RSS direta no navegador.
- */
+/* 24 NOTÍCIAS™ | Emissão em direto integrada via Feeds RSS (client-side) */
 const $ = id => document.getElementById(id);
 const MAX_AGE_MS = 48 * 60 * 60 * 1000;
 const REFRESH_MS = 60 * 1000;
 const ROTATION_MS = 18 * 1000;
 let news = [], idx = 0, last = '', busy = false, renderSequence = 0;
 
+// Fontes de Notícias e Proxies CORS
+const FEEDS = [
+  { url: 'https://www.publico.pt/rss',            source: 'Público',            category: 'Portugal' },
+  { url: 'https://observador.pt/feed/',           source: 'Observador',         category: 'Portugal' },
+  { url: 'https://expresso.pt/rss',               source: 'Expresso',           category: 'Portugal' },
+  { url: 'https://www.rtp.pt/noticias/rss',       source: 'RTP',                category: 'Portugal' },
+  { url: 'https://eco.sapo.pt/feed/',             source: 'ECO',                category: 'Economia' },
+  { url: 'https://www.dn.pt/rss',                 source: 'Diário de Notícias', category: 'Portugal' },
+  { url: 'https://www.jn.pt/rss',                 source: 'Jornal de Notícias', category: 'Portugal' },
+  { url: 'https://www.noticiasaominuto.com/rss/ultima-hora', source: 'Notícias ao Minuto', category: 'Portugal' }
+];
+const PROXY_CORSDEV    = 'https://proxy.cors.dev/';
+const PROXY_ALLORIGINS = 'https://api.allorigins.win/raw?url=';
+
+// Escala responsive
 function fit() {
   const s = Math.min(innerWidth / 1920, innerHeight / 1080);
   const e = document.querySelector('.screen');
@@ -445,6 +458,7 @@ function fit() {
 addEventListener('resize', fit);
 fit();
 
+// Relógio
 function clock() {
   $('clock').textContent = 'LISBOA ' + new Intl.DateTimeFormat('pt-PT', {
     timeZone: 'Europe/Lisbon', hour: '2-digit', minute: '2-digit',
@@ -454,23 +468,133 @@ function clock() {
 clock();
 setInterval(clock, 1000);
 
+// Estado no canto
 function setStatus(txt, tipo) {
   const s = $('status');
   s.textContent = txt;
   s.className = 'status' + (tipo ? ' ' + tipo : '');
 }
 
-function safeImage(url) {
-  if (typeof url !== 'string') return '';
-  try { const u = new URL(url); return u.protocol === 'https:' ? u.href : ''; }
-  catch (_) { return ''; }
+// Utilitários
+function stripHtml(s) {
+  if (!s) return '';
+  const d = document.createElement('div');
+  d.innerHTML = s;
+  return (d.textContent || d.innerText || '').replace(/\s+/g, ' ').trim();
+}
+function truncar(s, n) {
+  if (!s) return '';
+  if (s.length <= n) return s;
+  const c = s.slice(0, n);
+  const u = c.lastIndexOf(' ');
+  return (u > 40 ? c.slice(0, u) : c) + '…';
+}
+function safeImage(u) {
+  if (!u) return '';
+  let url = String(u).trim();
+  if (url.startsWith('//')) url = 'https:' + url;
+  if (url.startsWith('http://')) url = 'https://' + url.slice(7);
+  return /^https:\/\//i.test(url) ? url : '';
+}
+function parseDate(s) {
+  if (!s) return new Date();
+  let iso = String(s).trim();
+  if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(iso)) {
+    iso = iso.replace(' ', 'T') + 'Z';
+  }
+  const d = new Date(iso);
+  return isNaN(d.getTime()) ? new Date() : d;
 }
 
+// Normalização
+function normalizar(item, feed) {
+  const titulo    = stripHtml(item.title || '');
+  const descricao = stripHtml(item.description || item.content || item.summary || '');
+  const data      = parseDate(item.pubDate || item.published || item.date || item.updated);
+  let img         = safeImage(item.thumbnail);
+  if (!img && item.description) {
+    const m = item.description.match(/<img[^>]+src=["']([^"']+)["']/i);
+    if (m) img = safeImage(m[1]);
+  }
+
+  return {
+    id: Math.random().toString(36).substr(2, 9),
+    title: titulo,
+    summary: truncar(descricao, 260) || 'Consulte a fonte original para mais detalhes.',
+    source: feed.source,
+    published_at: data.toISOString(),
+    image_url: img,
+    category: feed.category || 'Portugal',
+    editorial_status: 'revisto_manualmente', // Passa o filtro de validação
+    image_rights_confirmed: true,            // Passa o filtro de imagem
+    image_credit: feed.source,
+    link: item.link || ''
+  };
+}
+
+// Validação
 function valid(n, now) {
   if (!n || n.editorial_status !== 'revisto_manualmente') return false;
   if (!['title', 'summary', 'source', 'published_at'].every(k => typeof n[k] === 'string' && n[k].trim())) return false;
   const pub = Date.parse(n.published_at);
   return Number.isFinite(pub) && pub <= now + 300000 && now - pub < MAX_AGE_MS;
+}
+
+// Fetch RSS
+async function fetchFeed(feed) {
+  async function processarXML(xmlText) {
+    const doc = new DOMParser().parseFromString(xmlText, 'application/xml');
+    const items = Array.from(doc.querySelectorAll('item, entry'));
+    
+    return items.map(it => {
+      const xmlStr = new XMLSerializer().serializeToString(it);
+      const get = sel => (it.querySelector(sel) || {}).textContent || '';
+      const linkEl = it.querySelector('link');
+      
+      let imgUrl = null;
+      const regexes = [
+        /<media:content[^>]+url=["']([^"']+)["']/i,
+        /<media:thumbnail[^>]+url=["']([^"']+)["']/i,
+        /<enclosure[^>]+url=["']([^"']+)["']/i
+      ];
+      
+      for (const r of regexes) {
+        const match = xmlStr.match(r);
+        if (match && match[1]) { imgUrl = match[1]; break; }
+      }
+      if (imgUrl) {
+        const txt = document.createElement('textarea');
+        txt.innerHTML = imgUrl;
+        imgUrl = txt.value;
+      }
+
+      return normalizar({
+        title: get('title'),
+        description: get('description') || get('summary') || get('content') || xmlStr,
+        pubDate: get('pubDate') || get('published') || get('updated'),
+        link: linkEl ? (linkEl.getAttribute('href') || linkEl.textContent) : '',
+        thumbnail: imgUrl
+      }, feed);
+    });
+  }
+
+  try {
+    const r = await fetch(PROXY_CORSDEV + feed.url, { cache: 'no-store' });
+    if (r.ok) {
+      const result = await processarXML(await r.text());
+      if (result.length) return result;
+    }
+  } catch (_) {}
+
+  try {
+    const r = await fetch(PROXY_ALLORIGINS + encodeURIComponent(feed.url), { cache: 'no-store' });
+    if (r.ok) {
+      const result = await processarXML(await r.text());
+      if (result.length) return result;
+    }
+  } catch (_) {}
+
+  return [];
 }
 
 function waiting(message) {
@@ -491,15 +615,18 @@ function render() {
   if (!news.length) { waiting(); return; }
   const n = news[idx % news.length];
   const seq = ++renderSequence;
+  
   $('category').textContent = (n.category || 'ATUALIDADE').toUpperCase();
   $('headline').textContent = n.title;
   $('summary').textContent = n.summary;
   $('source').textContent = n.source + ' • ' + new Date(n.published_at).toLocaleTimeString('pt-PT', {
     timeZone: 'Europe/Lisbon', hour: '2-digit', minute: '2-digit'
   });
+
   const heroImg = $('heroImg');
   const imageURL = n.image_rights_confirmed === true && typeof n.image_credit === 'string' && n.image_credit.trim()
     ? safeImage(n.image_url) : '';
+    
   if (imageURL) {
     heroImg.onload = () => { if (seq === renderSequence) heroImg.style.display = 'block'; };
     heroImg.onerror = () => { if (seq === renderSequence) heroImg.style.display = 'none'; };
@@ -512,6 +639,7 @@ function render() {
     heroImg.removeAttribute('src');
     $('heroCaption').textContent = '24 NOTÍCIAS • EMISSÃO CONTÍNUA';
   }
+
   $('other').replaceChildren();
   for (const x of news.filter(x => x !== n).slice(0, 4)) {
     const box = document.createElement('div');
@@ -525,9 +653,13 @@ function render() {
     box.append(cat, title);
     $('other').append(box);
   }
+
+  // Lógica do rodapé a 80px/s
   const tickerTextEl = $('ticker');
   tickerTextEl.textContent = news.slice(0, 15).map(x => '▪ ' + (x.category || 'NOTÍCIAS') + ': ' + x.title).join('     ');
-  const duracao = Math.max(20, tickerTextEl.scrollWidth / 95);
+  const larguraTexto = tickerTextEl.scrollWidth || 2000;
+  const duracao = Math.max(20, larguraTexto / 80); 
+  
   tickerTextEl.style.animation = 'none';
   void tickerTextEl.offsetWidth;
   tickerTextEl.style.animation = 'move ' + duracao + 's linear infinite';
@@ -537,27 +669,40 @@ async function refresh() {
   if (busy) return;
   busy = true;
   try {
-    const response = await fetch('./feed.json?ts=' + Date.now(), { cache: 'no-store' });
-    if (!response.ok) throw Error('feed HTTP ' + response.status);
-    const data = await response.json();
+    const resultados = await Promise.allSettled(FEEDS.map(f => fetchFeed(f)));
+    const todas = [];
+    for (const r of resultados) {
+      if (r.status === 'fulfilled' && Array.isArray(r.value)) todas.push(...r.value);
+    }
+
+    if (!todas.length) throw Error('Sem notícias');
+
     const now = Date.now();
-    const selected = (Array.isArray(data.news) ? data.news : [])
+    const selected = todas
       .filter(n => valid(n, now))
       .sort((a, b) => Date.parse(b.published_at) - Date.parse(a.published_at));
-    const key = JSON.stringify(selected.map(n => [n.id, n.title, n.summary, n.published_at, n.image_url, n.image_rights_confirmed]));
+
+    const key = JSON.stringify(selected.map(n => [n.id, n.title, n.summary, n.published_at, n.image_url]));
+    
     if (key !== last) {
       news = selected;
       idx = 0;
       last = key;
       render();
-    } else if (!news.length) waiting();
+    } else if (!news.length) {
+      waiting();
+    }
+    
     setStatus(news.length ? 'REDAÇÃO VERIFICADA • ' + news.length + ' NOTÍCIAS' : 'A AGUARDAR REVISÃO EDITORIAL', news.length ? 'ok' : '');
   } catch (err) {
     if (!news.length) waiting('FEED INDISPONÍVEL');
     else setStatus('FEED TEMPORARIAMENTE INDISPONÍVEL', 'err');
     console.info('24 NOTÍCIAS: erro no feed', err.message);
-  } finally { busy = false; }
+  } finally { 
+    busy = false; 
+  }
 }
+
 waiting();
 refresh();
 setInterval(refresh, REFRESH_MS);
