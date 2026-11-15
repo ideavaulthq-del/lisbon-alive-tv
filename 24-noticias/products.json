@@ -1,0 +1,15 @@
+{
+  "description": "Catálogo opcional de produtos reais. Só entradas approved:true são exibidas. Sem catálogo, a emissão mostra uma demonstração identificada, sem preços.",
+  "products": [],
+  "example_schema": {
+    "name": "Nome do produto",
+    "category": "Tecnologia",
+    "description": "Descrição factual e curta",
+    "price": "Preço verificado, por exemplo 49,99 €",
+    "store": "Nome da loja",
+    "image_url": "https://loja.exemplo/imagem.jpg",
+    "link": "https://loja.exemplo/produto",
+    "emoji": "📱",
+    "approved": false
+  }
+}
