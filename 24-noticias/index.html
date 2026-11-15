@@ -393,7 +393,7 @@
     background: #000000;
     display: flex;
     align-items: center;
-    border-top: 3px solid #CC0000;
+    /* border-top: 3px solid #CC0000;  <-- REMOVIDO */
     z-index: 8;
   }
 
@@ -506,7 +506,7 @@
 </main>
 
 <script>
-/* 24 NOTÍCIAS™ | Emissão em direto com publicidade automática da internet */
+/* 24 NOTÍCIAS™ | Emissão em direto com filtro restrito de imagens */
 const $ = id => document.getElementById(id);
 const MAX_AGE_MS = 48 * 60 * 60 * 1000;
 const REFRESH_MS = 60 * 1000;
@@ -521,14 +521,10 @@ let adIdx = 0;
 
 async function fetchInternetAds() {
   try {
-    // Vai buscar 10 produtos aleatórios reais à internet
     const res = await fetch('https://dummyjson.com/products?limit=10');
     const data = await res.json();
     adsList = data.products;
-    
-    // Se falhar ou vier vazio, usa fallback
     if (!adsList || adsList.length === 0) throw new Error('Sem ads');
-    
     renderAd();
   } catch (e) {
     console.warn('Falha ao carregar ads da internet. A usar fallback.', e);
@@ -547,8 +543,6 @@ function renderAd() {
   $('adTitle').textContent = ad.title;
   $('adDesc').textContent = ad.description;
   $('adPrice').textContent = (ad.price ? ad.price.toFixed(2) + ' €' : 'Ver Oferta');
-  
-  // As imagens do dummyjson já vêm com CORS, ou usamos o thumbnail
   $('adImg').src = ad.thumbnail || 'https://dummyjson.com/image/i/products/1/thumbnail.jpg';
   $('adSponsor').textContent = 'LOJA ONLINE';
   
@@ -558,7 +552,6 @@ function renderAd() {
   box.style.animation = 'slideIn 0.5s ease-out';
 }
 
-// Roda os produtos a cada 8 segundos
 setInterval(() => {
   if (adsList.length > 0) {
     adIdx++;
@@ -571,17 +564,6 @@ fetchInternetAds();
 // ==========================================
 // LÓGICA DAS NOTÍCIAS
 // ==========================================
-function getDynamicFallbackImage(category) {
-  const cat = (category || '').toLowerCase();
-  let kw = 'news,press';
-  if (cat.includes('portugal')) kw = 'lisbon,portugal';
-  else if (cat.includes('mundo') || cat.includes('internacional')) kw = 'globe,world';
-  else if (cat.includes('economia')) kw = 'finance,business';
-  else if (cat.includes('desporto')) kw = 'sports,stadium';
-  
-  return 'https://loremflickr.com/1920/1080/' + kw + '?lock=' + Math.floor(Math.random() * 9999);
-}
-
 const FEEDS = [
   { url: 'https://www.publico.pt/rss',            source: 'Público',            category: 'Portugal' },
   { url: 'https://observador.pt/feed/',           source: 'Observador',         category: 'Portugal' },
@@ -681,6 +663,8 @@ function normalizar(item, feed) {
 function valid(n, now) {
   if (!n || n.editorial_status !== 'revisto_manualmente') return false;
   if (!['title', 'summary', 'source', 'published_at'].every(k => typeof n[k] === 'string' && n[k].trim())) return false;
+  if (typeof n.image_url !== 'string' || !n.image_url.trim()) return false;
+  
   const pub = Date.parse(n.published_at);
   return Number.isFinite(pub) && pub <= now + 300000 && now - pub < MAX_AGE_MS;
 }
@@ -763,15 +747,15 @@ async function fetchFeed(feed) {
 
 function waiting(message) {
   renderSequence++;
-  $('headline').textContent = 'A AGUARDAR NOTÍCIAS VERIFICADAS';
-  $('summary').textContent = 'A redação prepara informações para emissão após revisão editorial.';
+  $('headline').textContent = 'A AGUARDAR NOTÍCIAS COM IMAGEM';
+  $('summary').textContent = 'Aguardamos por conteúdos verificados que incluam suporte visual.';
   $('source').textContent = 'REDAÇÃO 24N';
   $('category').textContent = 'REDAÇÃO';
   $('other').replaceChildren();
   $('heroImg').style.display = 'none';
   $('heroImg').removeAttribute('src');
   $('heroCaption').textContent = '24 NOTÍCIAS • EMISSÃO CONTÍNUA';
-  $('ticker').textContent = '24 NOTÍCIAS • A AGUARDAR CONTEÚDOS REVISTOS EDITORIALMENTE •';
+  $('ticker').textContent = '24 NOTÍCIAS • A AGUARDAR CONTEÚDOS COM IMAGEM •';
   setStatus(message || 'AGUARDAR REVISÃO EDITORIAL', '');
 }
 
@@ -789,34 +773,24 @@ function render() {
 
   const heroImg = $('heroImg');
   let imageURL = safeImage(n.image_url);
-  let isFallback = false;
-  
-  if (!imageURL) {
-    imageURL = getDynamicFallbackImage(n.category);
-    isFallback = true;
-  }
   
   if (imageURL) {
     heroImg.onload = () => { if (seq === renderSequence) heroImg.style.display = 'block'; };
     
     heroImg.onerror = () => {
       if (seq !== renderSequence) return;
-      
-      if (!isFallback && !heroImg.dataset.fallbackTried) {
+      if (!heroImg.dataset.fallbackTried) {
         heroImg.dataset.fallbackTried = "true";
         heroImg.src = 'https://images.weserv.nl/?url=' + encodeURIComponent(imageURL.replace(/^https?:\/\//, ''));
       } else {
-        heroImg.src = getDynamicFallbackImage(n.category);
+        heroImg.style.display = 'none';
       }
     };
     
     heroImg.dataset.fallbackTried = "";
     heroImg.src = imageURL;
     heroImg.style.display = 'none';
-    
-    $('heroCaption').textContent = isFallback 
-      ? 'IMAGEM ILUSTRATIVA • ' + n.category 
-      : 'IMAGEM: ' + n.source;
+    $('heroCaption').textContent = 'IMAGEM: ' + n.source;
   } else {
     heroImg.onload = null; 
     heroImg.onerror = null;
