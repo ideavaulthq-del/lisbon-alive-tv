@@ -426,14 +426,13 @@
 </main>
 
 <script>
-/* 24 NOTÍCIAS™ | Emissão em direto integrada via Feeds RSS (client-side) */
+/* 24 NOTÍCIAS™ | Emissão em direto com extração avançada de imagens */
 const $ = id => document.getElementById(id);
 const MAX_AGE_MS = 48 * 60 * 60 * 1000;
 const REFRESH_MS = 60 * 1000;
 const ROTATION_MS = 18 * 1000;
 let news = [], idx = 0, last = '', busy = false, renderSequence = 0;
 
-// Fontes de Notícias e Proxies CORS
 const FEEDS = [
   { url: 'https://www.publico.pt/rss',            source: 'Público',            category: 'Portugal' },
   { url: 'https://observador.pt/feed/',           source: 'Observador',         category: 'Portugal' },
@@ -447,7 +446,6 @@ const FEEDS = [
 const PROXY_CORSDEV    = 'https://proxy.cors.dev/';
 const PROXY_ALLORIGINS = 'https://api.allorigins.win/raw?url=';
 
-// Escala responsive
 function fit() {
   const s = Math.min(innerWidth / 1920, innerHeight / 1080);
   const e = document.querySelector('.screen');
@@ -458,7 +456,6 @@ function fit() {
 addEventListener('resize', fit);
 fit();
 
-// Relógio
 function clock() {
   $('clock').textContent = 'LISBOA ' + new Intl.DateTimeFormat('pt-PT', {
     timeZone: 'Europe/Lisbon', hour: '2-digit', minute: '2-digit',
@@ -468,14 +465,12 @@ function clock() {
 clock();
 setInterval(clock, 1000);
 
-// Estado no canto
 function setStatus(txt, tipo) {
   const s = $('status');
   s.textContent = txt;
   s.className = 'status' + (tipo ? ' ' + tipo : '');
 }
 
-// Utilitários
 function stripHtml(s) {
   if (!s) return '';
   const d = document.createElement('div');
@@ -506,12 +501,13 @@ function parseDate(s) {
   return isNaN(d.getTime()) ? new Date() : d;
 }
 
-// Normalização
 function normalizar(item, feed) {
   const titulo    = stripHtml(item.title || '');
   const descricao = stripHtml(item.description || item.content || item.summary || '');
   const data      = parseDate(item.pubDate || item.published || item.date || item.updated);
-  let img         = safeImage(item.thumbnail);
+  
+  // Se a imagem não foi encontrada nas tags padrão, procura dentro do conteúdo HTML
+  let img = safeImage(item.thumbnail);
   if (!img && item.description) {
     const m = item.description.match(/<img[^>]+src=["']([^"']+)["']/i);
     if (m) img = safeImage(m[1]);
@@ -525,14 +521,13 @@ function normalizar(item, feed) {
     published_at: data.toISOString(),
     image_url: img,
     category: feed.category || 'Portugal',
-    editorial_status: 'revisto_manualmente', // Passa o filtro de validação
-    image_rights_confirmed: true,            // Passa o filtro de imagem
+    editorial_status: 'revisto_manualmente',
+    image_rights_confirmed: true,
     image_credit: feed.source,
     link: item.link || ''
   };
 }
 
-// Validação
 function valid(n, now) {
   if (!n || n.editorial_status !== 'revisto_manualmente') return false;
   if (!['title', 'summary', 'source', 'published_at'].every(k => typeof n[k] === 'string' && n[k].trim())) return false;
@@ -540,28 +535,35 @@ function valid(n, now) {
   return Number.isFinite(pub) && pub <= now + 300000 && now - pub < MAX_AGE_MS;
 }
 
-// Fetch RSS
 async function fetchFeed(feed) {
   async function processarXML(xmlText) {
     const doc = new DOMParser().parseFromString(xmlText, 'application/xml');
     const items = Array.from(doc.querySelectorAll('item, entry'));
     
     return items.map(it => {
-      const xmlStr = new XMLSerializer().serializeToString(it);
       const get = sel => (it.querySelector(sel) || {}).textContent || '';
       const linkEl = it.querySelector('link');
       
+      // EXTRAÇÃO AVANÇADA DE IMAGEM
       let imgUrl = null;
-      const regexes = [
-        /<media:content[^>]+url=["']([^"']+)["']/i,
-        /<media:thumbnail[^>]+url=["']([^"']+)["']/i,
-        /<enclosure[^>]+url=["']([^"']+)["']/i
-      ];
       
-      for (const r of regexes) {
-        const match = xmlStr.match(r);
-        if (match && match[1]) { imgUrl = match[1]; break; }
+      // 1. Tenta buscar nas tags padrão do RSS (media:content, media:thumbnail, enclosure)
+      const mediaContent = it.getElementsByTagName('media:content')[0];
+      const mediaThumb = it.getElementsByTagName('media:thumbnail')[0];
+      const enclosure = it.getElementsByTagName('enclosure')[0];
+      
+      if (mediaContent && mediaContent.getAttribute('url')) imgUrl = mediaContent.getAttribute('url');
+      else if (mediaThumb && mediaThumb.getAttribute('url')) imgUrl = mediaThumb.getAttribute('url');
+      else if (enclosure && enclosure.getAttribute('url')) imgUrl = enclosure.getAttribute('url');
+      
+      // 2. Se não encontrou, vasculha dentro de content:encoded ou description (onde sites WordPress escondem)
+      let contentHTML = get('content') || get('encoded') || get('description') || '';
+      if (!imgUrl && contentHTML) {
+        const match = contentHTML.match(/<img[^>]+src=["']([^"']+)["']/i);
+        if (match) imgUrl = match[1];
       }
+      
+      // Descodifica eventuais caracteres estranhos no URL (ex: &amp;)
       if (imgUrl) {
         const txt = document.createElement('textarea');
         txt.innerHTML = imgUrl;
@@ -570,7 +572,7 @@ async function fetchFeed(feed) {
 
       return normalizar({
         title: get('title'),
-        description: get('description') || get('summary') || get('content') || xmlStr,
+        description: contentHTML, 
         pubDate: get('pubDate') || get('published') || get('updated'),
         link: linkEl ? (linkEl.getAttribute('href') || linkEl.textContent) : '',
         thumbnail: imgUrl
@@ -654,7 +656,6 @@ function render() {
     $('other').append(box);
   }
 
-  // Lógica do rodapé a 80px/s
   const tickerTextEl = $('ticker');
   tickerTextEl.textContent = news.slice(0, 15).map(x => '▪ ' + (x.category || 'NOTÍCIAS') + ': ' + x.title).join('     ');
   const larguraTexto = tickerTextEl.scrollWidth || 2000;
