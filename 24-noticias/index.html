@@ -110,19 +110,6 @@
     50% { opacity: 0.3; transform: scale(0.8); }
   }
 
-  .location-tag {
-    background: rgba(15, 15, 15, 0.88);
-    border-left: 3px solid #CC0000;
-    color: #f0f0f0;
-    font-size: 20px;
-    font-weight: 800;
-    padding: 0 20px;
-    display: flex;
-    align-items: center;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-
   .status {
     position: absolute;
     right: 56px;
@@ -378,7 +365,6 @@
   <header class="topbar">
     <div class="cnn-logo">24N</div>
     <div class="live-badge"><span class="live-dot"></span>DIRETO</div>
-    <div class="location-tag">PORTUGAL • MUNDO</div>
   </header>
 
   <div class="status" id="status">A ligar à redação…</div>
@@ -421,10 +407,10 @@ let news = [], idx = 0, last = '', busy = false, renderSequence = 0;
 
 // Imagens de Reserva (Fallback) por Categoria
 const FALLBACK_IMAGES = {
-  'Portugal': 'https://images.pexels.com/photos/1534560/pexels-photo-1534560.jpeg?auto=compress&cs=tinysrgb&w=1920', // Lisboa
-  'Mundo': 'https://images.pexels.com/photos/87651/earth-blue-planet-globe-planet-87651.jpeg?auto=compress&cs=tinysrgb&w=1920', // Globo
-  'Economia': 'https://images.pexels.com/photos/210607/pexels-photo-210607.jpeg?auto=compress&cs=tinysrgb&w=1920', // Gráficos
-  'default': 'https://images.pexels.com/photos/518543/pexels-photo-518543.jpeg?auto=compress&cs=tinysrgb&w=1920' // Jornais / Redação
+  'Portugal': 'https://images.pexels.com/photos/1534560/pexels-photo-1534560.jpeg?auto=compress&cs=tinysrgb&w=1920',
+  'Mundo': 'https://images.pexels.com/photos/87651/earth-blue-planet-globe-planet-87651.jpeg?auto=compress&cs=tinysrgb&w=1920',
+  'Economia': 'https://images.pexels.com/photos/210607/pexels-photo-210607.jpeg?auto=compress&cs=tinysrgb&w=1920',
+  'default': 'https://images.pexels.com/photos/518543/pexels-photo-518543.jpeg?auto=compress&cs=tinysrgb&w=1920'
 };
 
 // Fontes Nacionais e Internacionais
