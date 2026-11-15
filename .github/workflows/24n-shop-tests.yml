@@ -1,0 +1,22 @@
+name: 24N SHOP catalog checks
+on:
+  push:
+    paths:
+      - '24-noticias/**'
+      - '.github/workflows/24n-shop-tests.yml'
+  pull_request:
+    paths:
+      - '24-noticias/**'
+      - '.github/workflows/24n-shop-tests.yml'
+permissions:
+  contents: read
+jobs:
+  catalog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate catalog and converter
+        run: node --test 24-noticias/tests/catalog.test.cjs
