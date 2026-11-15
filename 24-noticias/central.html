@@ -6,7 +6,7 @@
 </style></head><body>
 <header><div class="brand">24N</div><div class="brandtext">SHOP™ | CENTRAL EDITORIAL<small>Gestão local do catálogo de publicidade · LIVE 20.2</small></div></header>
 <main><div class="notice"><strong>Editor local, não é uma área privada autenticada.</strong> Esta página não guarda palavras-passe nem publica diretamente no GitHub. As alterações são preparadas no navegador; para entrar na emissão, exporta o ficheiro e atualiza <code>24-noticias/products.json</code> no repositório. Só os produtos aprovados entram na rotação. Confirma direitos de utilização de imagens, preços, disponibilidade e ligações antes de aprovar.</div>
-<div class="toolbar"><button class="btn" id="load">Carregar catálogo publicado</button><button class="btn" id="import">Importar JSON</button><button class="btn primary" id="export">Exportar products.json</button><input id="file" type="file" accept=".json,application/json" hidden></div>
+<section class="notice" style="margin-top:16px;background:#141b1b;border-color:#355c55"><strong>Auditoria do catálogo:</strong> <span id="audit">Sem produtos carregados.</span><div style="margin-top:10px"><button type="button" class="btn" id="auditBtn">Verificar catálogo</button></div></section><div class="toolbar"><button class="btn" id="load">Carregar catálogo publicado</button><button class="btn" id="import">Importar JSON</button><button class="btn primary" id="export">Exportar products.json</button><input id="file" type="file" accept=".json,application/json" hidden></div>
 <section class="preview"><h2>Pré-visualização editorial 16:9</h2><p class="preview-note">Escolhe «Pré-visualizar» num produto. Esta simulação não publica nem aprova anúncios.</p><div class="preview-stage"><div class="preview-art" id="previewArt">🛍️</div><div class="preview-copy"><small id="previewCategory">24N SHOP™</small><b id="previewName">Escolhe um produto</b><p id="previewDescription">Pré-visualização antes da emissão.</p><div id="previewPrice" class="preview-price" hidden></div><small id="previewStore"></small></div><div class="preview-tag">PUBLICIDADE</div></div><p class="preview-note" id="previewDisclaimer">DEMONSTRAÇÃO EDITORIAL · Sem ofertas verificadas</p></section><div class="layout"><section class="panel"><h2 id="formTitle">Adicionar produto</h2><form id="form">
 <label for="name">Nome do produto *</label><input id="name" maxlength="100" required>
 <label for="category">Categoria *</label><select id="category"><option>Tecnologia</option><option>Casa</option><option>Moda</option><option>Desporto</option><option>Alimentação</option><option>Saúde</option><option>Outros</option></select>
@@ -16,7 +16,7 @@
 <label for="image_url">Imagem HTTPS (opcional)</label><input id="image_url" type="url" placeholder="https://...">
 <label for="link">Ligação oficial ao produto (opcional)</label><input id="link" type="url" placeholder="https://...">
 <label for="emoji">Símbolo (opcional)</label><input id="emoji" maxlength="8" placeholder="🛍️">
-<div class="checks"><input id="approved" type="checkbox"><label for="approved">Aprovado para emissão (verifiquei dados e direitos)</label></div>
+<label for="reviewed_at">Data de verificação do preço e disponibilidade</label><input id="reviewed_at" type="date"><div class="checks"><input id="approved" type="checkbox"><label for="approved">Aprovado para emissão (verifiquei dados e direitos)</label></div>
 <div class="actions"><button class="btn primary" type="submit">Guardar produto</button><button class="btn" id="clear" type="button">Novo</button></div>
 </form></section><section class="panel"><h2>Produtos do catálogo <span id="count"></span></h2><div id="list" class="list"></div></section></div>
 <p class="status" id="status" role="status"></p>
@@ -25,10 +25,13 @@
 <script>
 const $=id=>document.getElementById(id);
 let products=[],selected=-1;
-const keys=['name','category','description','price','store','image_url','link','emoji'];
+const keys=['name','category','description','price','store','image_url','link','emoji','reviewed_at'];
 function validURL(s){return !s||(/^https:\/\//i.test(s)&&(()=>{try{const u=new URL(s);return !!u.hostname&&u.username===''&&u.password==='';}catch{return false;}})());}
-function clean(p){return {name:String(p.name||'').trim().slice(0,100),category:String(p.category||'Outros').trim().slice(0,60),description:String(p.description||'').trim().slice(0,300),price:String(p.price||'').trim().slice(0,40),store:String(p.store||'').trim().slice(0,100),image_url:String(p.image_url||'').trim(),link:String(p.link||'').trim(),emoji:String(p.emoji||'🛍️').trim().slice(0,8),approved:p.approved===true};}
-function check(p){if(!p.name||!p.category||!p.description)throw Error('Nome, categoria e descrição são obrigatórios.');if(!validURL(p.image_url)||!validURL(p.link))throw Error('As ligações têm de ser URLs HTTPS válidos, sem credenciais.');}
+function clean(p){return {name:String(p.name||'').trim().slice(0,100),category:String(p.category||'Outros').trim().slice(0,60),description:String(p.description||'').trim().slice(0,300),price:String(p.price||'').trim().slice(0,40),store:String(p.store||'').trim().slice(0,100),image_url:String(p.image_url||'').trim(),link:String(p.link||'').trim(),emoji:String(p.emoji||'🛍️').trim().slice(0,8),reviewed_at:String(p.reviewed_at||'').trim(),approved:p.approved===true};}
+function ageDays(date){if(!/^\d{4}-\d{2}-\d{2}$/.test(date||''))return Infinity;const t=Date.parse(date+'T00:00:00Z');if(!Number.isFinite(t))return Infinity;return Math.floor((Date.now()-t)/86400000);}
+function check(p){if(!p.name||!p.category||!p.description)throw Error('Nome, categoria e descrição são obrigatórios.');if(!validURL(p.image_url)||!validURL(p.link))throw Error('As ligações têm de ser URLs HTTPS válidos, sem credenciais.');if(p.approved&&(!p.link||!p.store||!p.reviewed_at||ageDays(p.reviewed_at)<0||ageDays(p.reviewed_at)>30))throw Error('Para aprovar: loja, ligação HTTPS e data de verificação nos últimos 30 dias são obrigatórios.');}
+function audit(){const approved=products.filter(p=>p.approved);const duplicates=products.filter((p,i)=>products.findIndex(x=>x.name.toLowerCase()===p.name.toLowerCase()&&x.store.toLowerCase()===p.store.toLowerCase())!==i).length;const stale=products.filter(p=>p.approved&&ageDays(p.reviewed_at)>30).length;$('audit').textContent=products.length+' produtos · '+approved.length+' aprovados · '+duplicates+' duplicados · '+stale+' aprovações desatualizadas. A validação não verifica automaticamente os preços nas lojas.';return {duplicates,stale};}
+$('auditBtn').onclick=()=>{const a=audit();say(a.duplicates||a.stale?'Corrige os avisos antes de exportar.':'Sem duplicados nem aprovações desatualizadas detetados.');};
 function say(s){$('status').textContent=s;}
 function reset(){selected=-1;$('form').reset();$('formTitle').textContent='Adicionar produto';}
 function showPreview(p){
@@ -40,7 +43,7 @@ function showPreview(p){
  document.querySelector('.preview').scrollIntoView({behavior:'smooth',block:'start'});
 }
 function render(){
- $('count').textContent='('+products.length+')';$('list').replaceChildren();
+ $('count').textContent='('+products.length+')';audit();$('list').replaceChildren();
  if(!products.length){const p=document.createElement('p');p.className='empty';p.textContent='Ainda não existem produtos. Adiciona o primeiro à esquerda.';$('list').append(p);}
  products.forEach((p,i)=>{
  const row=document.createElement('div');row.className='item';
@@ -53,12 +56,12 @@ function render(){
  buttons.append(edit,remove);row.append(info,buttons);$('list').append(row);
  });
 }
-$('form').onsubmit=e=>{e.preventDefault();try{const p=clean(Object.fromEntries(keys.map(k=>[k,$(k).value])));p.approved=$('approved').checked;check(p);if(selected<0)products.push(p);else products[selected]=p;reset();render();showPreview(p);say('Produto guardado localmente. Exporta o JSON para publicar no GitHub.');}catch(err){say(err.message);}};
+$('form').onsubmit=e=>{e.preventDefault();try{const p=clean(Object.fromEntries(keys.map(k=>[k,$(k).value])));p.approved=$('approved').checked;check(p);if(products.some((x,i)=>i!==selected&&x.name.toLowerCase()===p.name.toLowerCase()&&x.store.toLowerCase()===p.store.toLowerCase()))throw Error('Produto duplicado: nome e loja já existem.');if(selected<0)products.push(p);else products[selected]=p;reset();render();showPreview(p);say('Produto guardado localmente. Exporta o JSON para publicar no GitHub.');}catch(err){say(err.message);}};
 $('clear').onclick=reset;
 function readCatalog(data){if(!data||!Array.isArray(data.products))throw Error('O ficheiro não contém uma lista products.');if(data.products.length>500)throw Error('Catálogo demasiado grande (máximo 500 produtos).');const entries=data.products.map(clean);entries.forEach(check);products=entries;reset();render();say('Catálogo carregado: '+products.length+' produtos.');}
 $('load').onclick=async()=>{try{const r=await fetch('./products.json?nocache='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error('Não foi possível carregar products.json.');readCatalog(await r.json());}catch(e){say(e.message);}};
 $('import').onclick=()=>$('file').click();
 $('file').onchange=async e=>{try{const f=e.target.files[0];if(!f)return;if(f.size>1024*1024)throw Error('Ficheiro demasiado grande.');readCatalog(JSON.parse(await f.text()));}catch(err){say('Importação falhou: '+err.message);}finally{$('file').value='';}};
-$('export').onclick=()=>{try{products.forEach(check);const payload={description:'24N SHOP — catálogo editorial aprovado manualmente',products};const blob=new Blob([JSON.stringify(payload,null,2)+'\n'],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='products.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);say('products.json exportado. Atualiza-o no GitHub para publicar.');}catch(err){say(err.message);}};
+$('export').onclick=()=>{try{products.forEach(check);const a=audit();if(a.duplicates||a.stale)throw Error('Corrige duplicados e verificações desatualizadas antes de exportar.');const payload={description:'24N SHOP — catálogo editorial aprovado manualmente',products};const blob=new Blob([JSON.stringify(payload,null,2)+'\n'],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='products.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);say('products.json exportado. Atualiza-o no GitHub para publicar.');}catch(err){say(err.message);}};
 render();
 </script></body></html>

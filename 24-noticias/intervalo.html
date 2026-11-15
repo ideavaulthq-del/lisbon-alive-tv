@@ -42,7 +42,7 @@ const demo=[
 let products=demo,idx=0,phase='commercial',start=Date.now(),duration=120000,standalone=true,cycle;
 function validProduct(p){return p&&typeof p.name==='string'&&p.name.trim()&&typeof p.category==='string'&&typeof p.description==='string'&&(!p.image_url||/^https:\/\//.test(p.image_url))&&(!p.link||/^https:\/\//.test(p.link));}
 async function load(){
- try{const r=await fetch('./products.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error('sem catálogo');const data=await r.json();const verified=(Array.isArray(data.products)?data.products:[]).filter(p=>p.approved===true&&validProduct(p));if(verified.length)products=verified;}catch(e){console.info('24N SHOP: catálogo indisponível; demonstração local');}
+ try{const r=await fetch('./products.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error('sem catálogo');const data=await r.json();const verified=(Array.isArray(data.products)?data.products:[]).filter(p=>p.approved===true&&validProduct(p)&&typeof p.store==='string'&&p.store.trim()&&/^https:\/\//.test(p.link||'')&&/^\d{4}-\d{2}-\d{2}$/.test(p.reviewed_at||'')&&(()=>{const age=(Date.now()-Date.parse(p.reviewed_at+'T00:00:00Z'))/86400000;return Number.isFinite(age)&&age>=0&&age<=30;})());if(verified.length)products=verified;}catch(e){console.info('24N SHOP: catálogo indisponível; demonstração local');}
  render();
 }
 function render(){
