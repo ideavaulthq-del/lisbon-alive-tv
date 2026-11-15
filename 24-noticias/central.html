@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-PT"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>24N SHOP™ | Central Editorial</title>
+<style>
+:root{color-scheme:dark;font-family:Inter,Arial,sans-serif}*{box-sizing:border-box}body{margin:0;background:#0b0c0f;color:#f6f6f6}header{background:#15161a;border-bottom:4px solid #d20a18;padding:20px max(20px,calc((100vw - 1160px)/2));display:flex;align-items:center;gap:18px}.brand{background:#d20a18;padding:10px 16px;font-size:30px;font-weight:900}.brandtext{font-weight:900;font-size:22px}.brandtext small{display:block;font-weight:500;color:#aaa;font-size:13px;margin-top:4px}main{max-width:1160px;margin:30px auto;padding:0 20px}.notice{background:#252026;border:1px solid #7e3640;padding:16px 20px;border-radius:12px;line-height:1.5}.toolbar{display:flex;flex-wrap:wrap;gap:12px;margin:24px 0}.btn{cursor:pointer;border:1px solid #53565d;border-radius:10px;background:#26272c;color:#fff;padding:13px 18px;font-size:15px;font-weight:700}.btn:hover{filter:brightness(1.2)}.primary{background:#c90919;border-color:#c90919}.layout{display:grid;grid-template-columns:minmax(280px,380px) minmax(320px,1fr);gap:24px}.panel{background:#17181d;border:1px solid #33363e;border-radius:15px;padding:22px}h2{margin:0 0 20px;font-size:21px}label{display:block;font-size:13px;color:#d2d2d2;margin:13px 0 5px}input,textarea,select{width:100%;background:#0e0f12;border:1px solid #444751;border-radius:8px;padding:12px;color:#fff;font:inherit}textarea{min-height:90px;resize:vertical}.checks{display:flex;gap:12px;align-items:center;margin:18px 0}.checks input{width:20px;height:20px}.checks label{margin:0}.actions{display:flex;gap:10px;flex-wrap:wrap}.list{display:grid;gap:10px}.item{border:1px solid #383b42;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px;justify-content:space-between}.item strong{display:block}.item small{display:block;color:#a9a9ad;margin-top:6px}.empty{color:#a9a9ad}.status{min-height:24px;color:#d7d7d7;margin:16px 0}a{color:#ff8992}footer{color:#999;margin:30px 0 50px;font-size:13px}@media(max-width:800px){.layout{grid-template-columns:1fr}header{padding:16px}}
+</style></head><body>
+<header><div class="brand">24N</div><div class="brandtext">SHOP™ | CENTRAL EDITORIAL<small>Gestão local do catálogo de publicidade · LIVE 20.2</small></div></header>
+<main><div class="notice"><strong>Editor local, não é uma área privada autenticada.</strong> Esta página não guarda palavras-passe nem publica diretamente no GitHub. As alterações são preparadas no navegador; para entrar na emissão, exporta o ficheiro e atualiza <code>24-noticias/products.json</code> no repositório. Só os produtos aprovados entram na rotação. Confirma direitos de utilização de imagens, preços, disponibilidade e ligações antes de aprovar.</div>
+<div class="toolbar"><button class="btn" id="load">Carregar catálogo publicado</button><button class="btn" id="import">Importar JSON</button><button class="btn primary" id="export">Exportar products.json</button><input id="file" type="file" accept=".json,application/json" hidden></div>
+<div class="layout"><section class="panel"><h2 id="formTitle">Adicionar produto</h2><form id="form">
+<label for="name">Nome do produto *</label><input id="name" maxlength="100" required>
+<label for="category">Categoria *</label><select id="category"><option>Tecnologia</option><option>Casa</option><option>Moda</option><option>Desporto</option><option>Alimentação</option><option>Saúde</option><option>Outros</option></select>
+<label for="description">Descrição *</label><textarea id="description" maxlength="300" required></textarea>
+<label for="price">Preço verificado (opcional)</label><input id="price" maxlength="40" placeholder="Ex.: 49,99 €">
+<label for="store">Loja (opcional)</label><input id="store" maxlength="100">
+<label for="image_url">Imagem HTTPS (opcional)</label><input id="image_url" type="url" placeholder="https://...">
+<label for="link">Ligação oficial ao produto (opcional)</label><input id="link" type="url" placeholder="https://...">
+<label for="emoji">Símbolo (opcional)</label><input id="emoji" maxlength="8" placeholder="🛍️">
+<div class="checks"><input id="approved" type="checkbox"><label for="approved">Aprovado para emissão (verifiquei dados e direitos)</label></div>
+<div class="actions"><button class="btn primary" type="submit">Guardar produto</button><button class="btn" id="clear" type="button">Novo</button></div>
+</form></section><section class="panel"><h2>Produtos do catálogo <span id="count"></span></h2><div id="list" class="list"></div></section></div>
+<p class="status" id="status" role="status"></p>
+<footer>24N SHOP™ · Os dados só são alterados na emissão após atualização do ficheiro no GitHub. Não introduzas tokens ou credenciais nesta página.</footer>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+let products=[],selected=-1;
+const keys=['name','category','description','price','store','image_url','link','emoji'];
+function validURL(s){return !s||(/^https:\/\//i.test(s)&&(()=>{try{const u=new URL(s);return !!u.hostname&&u.username===''&&u.password==='';}catch{return false;}})());}
+function clean(p){return {name:String(p.name||'').trim().slice(0,100),category:String(p.category||'Outros').trim().slice(0,60),description:String(p.description||'').trim().slice(0,300),price:String(p.price||'').trim().slice(0,40),store:String(p.store||'').trim().slice(0,100),image_url:String(p.image_url||'').trim(),link:String(p.link||'').trim(),emoji:String(p.emoji||'🛍️').trim().slice(0,8),approved:p.approved===true};}
+function check(p){if(!p.name||!p.category||!p.description)throw Error('Nome, categoria e descrição são obrigatórios.');if(!validURL(p.image_url)||!validURL(p.link))throw Error('As ligações têm de ser URLs HTTPS válidos, sem credenciais.');}
+function say(s){$('status').textContent=s;}
+function reset(){selected=-1;$('form').reset();$('formTitle').textContent='Adicionar produto';}
+function render(){
+ $('count').textContent='('+products.length+')';$('list').replaceChildren();
+ if(!products.length){const p=document.createElement('p');p.className='empty';p.textContent='Ainda não existem produtos. Adiciona o primeiro à esquerda.';$('list').append(p);}
+ products.forEach((p,i)=>{
+ const row=document.createElement('div');row.className='item';
+ const info=document.createElement('div');const name=document.createElement('strong');name.textContent=(p.emoji||'🛍️')+' '+p.name;
+ const meta=document.createElement('small');meta.textContent=p.category+' · '+(p.approved?'APROVADO':'RASCUNHO')+(p.price?' · '+p.price:'');info.append(name,meta);
+ const buttons=document.createElement('div');buttons.className='actions';
+ const edit=document.createElement('button');edit.className='btn';edit.textContent='Editar';edit.onclick=()=>{selected=i;keys.forEach(k=>$(k).value=p[k]||'');$('approved').checked=p.approved;$('formTitle').textContent='Editar produto';window.scrollTo({top:0,behavior:'smooth'});};
+ const remove=document.createElement('button');remove.className='btn';remove.textContent='Apagar';remove.onclick=()=>{if(confirm('Apagar este produto do catálogo local?')){products.splice(i,1);reset();render();}};
+ buttons.append(edit,remove);row.append(info,buttons);$('list').append(row);
+ });
+}
+$('form').onsubmit=e=>{e.preventDefault();try{const p=clean(Object.fromEntries(keys.map(k=>[k,$(k).value])));p.approved=$('approved').checked;check(p);if(selected<0)products.push(p);else products[selected]=p;reset();render();say('Produto guardado localmente. Exporta o JSON para publicar no GitHub.');}catch(err){say(err.message);}};
+$('clear').onclick=reset;
+function readCatalog(data){if(!data||!Array.isArray(data.products))throw Error('O ficheiro não contém uma lista products.');if(data.products.length>500)throw Error('Catálogo demasiado grande (máximo 500 produtos).');const entries=data.products.map(clean);entries.forEach(check);products=entries;reset();render();say('Catálogo carregado: '+products.length+' produtos.');}
+$('load').onclick=async()=>{try{const r=await fetch('./products.json?nocache='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error('Não foi possível carregar products.json.');readCatalog(await r.json());}catch(e){say(e.message);}};
+$('import').onclick=()=>$('file').click();
+$('file').onchange=async e=>{try{const f=e.target.files[0];if(!f)return;if(f.size>1024*1024)throw Error('Ficheiro demasiado grande.');readCatalog(JSON.parse(await f.text()));}catch(err){say('Importação falhou: '+err.message);}finally{$('file').value='';}};
+$('export').onclick=()=>{try{products.forEach(check);const payload={description:'24N SHOP — catálogo editorial aprovado manualmente',products};const blob=new Blob([JSON.stringify(payload,null,2)+'\n'],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='products.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);say('products.json exportado. Atualiza-o no GitHub para publicar.');}catch(err){say(err.message);}};
+render();
+</script></body></html>
