@@ -29,7 +29,6 @@
     background: #0a0a0a;
   }
 
-  /* Imagem de fundo / Ecrã principal estilo emissão TV */
   .hero {
     position: absolute;
     inset: 0;
@@ -52,7 +51,6 @@
     to { transform: scale(1.06); }
   }
 
-  /* Vinheta e sombras dramáticas estilo CNN */
   .hero .shade {
     position: absolute;
     inset: 0;
@@ -61,7 +59,6 @@
       linear-gradient(90deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0) 60%, rgba(0,0,0,0.75) 100%);
   }
 
-  /* Barra Superior / Identidade CNN Style */
   .topbar {
     position: absolute;
     top: 42px;
@@ -126,7 +123,6 @@
     text-transform: uppercase;
   }
 
-  /* Estado discreto no canto superior direito */
   .status {
     position: absolute;
     right: 56px;
@@ -145,7 +141,6 @@
   .status.ok { border-left-color: #2ea043; color: #b8f2c2; }
   .status.err { border-left-color: #CC0000; color: #ff8a8a; }
 
-  /* Painel lateral direito semitransparente estilo "A SEGUIR / EM DESTAQUE" */
   .sidebar {
     position: absolute;
     right: 56px;
@@ -208,7 +203,6 @@
     overflow: hidden;
   }
 
-  /* Crédito da imagem acima do oráculo */
   .hero-credit {
     position: absolute;
     left: 56px;
@@ -223,7 +217,6 @@
     border-left: 3px solid #CC0000;
   }
 
-  /* Oráculo Inferior Clássico CNN (Lower Third) */
   .lower {
     position: absolute;
     left: 56px;
@@ -265,7 +258,6 @@
     align-items: center;
   }
 
-  /* Faixa branca de alto contraste típica da CNN */
   .headline {
     background: #ffffff;
     color: #0b0b0b;
@@ -282,7 +274,6 @@
     border-left: 12px solid #CC0000;
   }
 
-  /* Sub-faixa escura com resumo e fonte */
   .sub-bar {
     background: #111111;
     border-top: 2px solid #d9d9d9;
@@ -314,7 +305,6 @@
     white-space: nowrap;
   }
 
-  /* Rodapé Ticker CNN */
   .ticker {
     position: absolute;
     bottom: 0;
@@ -385,7 +375,6 @@
     <div class="shade"></div>
   </section>
 
-  <!-- Canto superior esquerdo estilo CNN -->
   <header class="topbar">
     <div class="cnn-logo">24N</div>
     <div class="live-badge"><span class="live-dot"></span>DIRETO</div>
@@ -394,7 +383,6 @@
 
   <div class="status" id="status">A ligar à redação…</div>
 
-  <!-- Painel lateral estilo alinhamento de emissão -->
   <aside class="sidebar">
     <div class="sidehead">ÚLTIMAS NOTÍCIAS <span>AO MINUTO</span></div>
     <div id="other"></div>
@@ -402,7 +390,6 @@
 
   <div class="hero-credit" id="heroCaption">24 NOTÍCIAS • EMISSÃO CONTÍNUA</div>
 
-  <!-- Oráculo Inferior estilo CNN (Lower Third) -->
   <section class="lower">
     <div class="lower-top-row">
       <div class="breaking-tag">ÚLTIMA HORA</div>
@@ -410,12 +397,11 @@
     </div>
     <div class="headline" id="headline">A CARREGAR NOTÍCIAS EM DIRETO…</div>
     <div class="sub-bar">
-      <div class="summary" id="summary">A recolher os principais destaques dos órgãos de comunicação social portugueses.</div>
+      <div class="summary" id="summary">A recolher os principais destaques dos órgãos de comunicação social.</div>
       <div class="source" id="source">REDAÇÃO 24N</div>
     </div>
   </section>
 
-  <!-- Rodapé Ticker + Relógio -->
   <footer class="ticker">
     <div class="ticker-brand">24 NOTÍCIAS</div>
     <div class="ticker-clock" id="clock">LISBOA --:--</div>
@@ -426,23 +412,30 @@
 </main>
 
 <script>
-/* 24 NOTÍCIAS™ | Emissão em direto com extração avançada de imagens */
+/* 24 NOTÍCIAS™ | Emissão em direto com fontes nacionais e internacionais */
 const $ = id => document.getElementById(id);
 const MAX_AGE_MS = 48 * 60 * 60 * 1000;
 const REFRESH_MS = 60 * 1000;
 const ROTATION_MS = 18 * 1000;
 let news = [], idx = 0, last = '', busy = false, renderSequence = 0;
 
+// Fontes Nacionais e Internacionais (RTP removida)
 const FEEDS = [
+  // --- PORTUGAL ---
   { url: 'https://www.publico.pt/rss',            source: 'Público',            category: 'Portugal' },
   { url: 'https://observador.pt/feed/',           source: 'Observador',         category: 'Portugal' },
   { url: 'https://expresso.pt/rss',               source: 'Expresso',           category: 'Portugal' },
-  { url: 'https://www.rtp.pt/noticias/rss',       source: 'RTP',                category: 'Portugal' },
   { url: 'https://eco.sapo.pt/feed/',             source: 'ECO',                category: 'Economia' },
   { url: 'https://www.dn.pt/rss',                 source: 'Diário de Notícias', category: 'Portugal' },
   { url: 'https://www.jn.pt/rss',                 source: 'Jornal de Notícias', category: 'Portugal' },
-  { url: 'https://www.noticiasaominuto.com/rss/ultima-hora', source: 'Notícias ao Minuto', category: 'Portugal' }
+  { url: 'https://www.noticiasaominuto.com/rss/ultima-hora', source: 'Notícias ao Minuto', category: 'Portugal' },
+  
+  // --- INTERNACIONAL / MUNDO ---
+  { url: 'https://feeds.bbci.co.uk/news/world/rss.xml', source: 'BBC World', category: 'Mundo' },
+  { url: 'https://pt.euronews.com/rss',           source: 'Euronews',           category: 'Mundo' },
+  { url: 'https://news.google.com/rss/search?q=world&hl=pt-PT&gl=PT&ceid=PT:pt', source: 'Google News', category: 'Mundo' }
 ];
+
 const PROXY_CORSDEV    = 'https://proxy.cors.dev/';
 const PROXY_ALLORIGINS = 'https://api.allorigins.win/raw?url=';
 
@@ -506,7 +499,6 @@ function normalizar(item, feed) {
   const descricao = stripHtml(item.description || item.content || item.summary || '');
   const data      = parseDate(item.pubDate || item.published || item.date || item.updated);
   
-  // Se a imagem não foi encontrada nas tags padrão, procura dentro do conteúdo HTML
   let img = safeImage(item.thumbnail);
   if (!img && item.description) {
     const m = item.description.match(/<img[^>]+src=["']([^"']+)["']/i);
@@ -520,7 +512,7 @@ function normalizar(item, feed) {
     source: feed.source,
     published_at: data.toISOString(),
     image_url: img,
-    category: feed.category || 'Portugal',
+    category: feed.category || 'Mundo',
     editorial_status: 'revisto_manualmente',
     image_rights_confirmed: true,
     image_credit: feed.source,
@@ -544,10 +536,7 @@ async function fetchFeed(feed) {
       const get = sel => (it.querySelector(sel) || {}).textContent || '';
       const linkEl = it.querySelector('link');
       
-      // EXTRAÇÃO AVANÇADA DE IMAGEM
       let imgUrl = null;
-      
-      // 1. Tenta buscar nas tags padrão do RSS (media:content, media:thumbnail, enclosure)
       const mediaContent = it.getElementsByTagName('media:content')[0];
       const mediaThumb = it.getElementsByTagName('media:thumbnail')[0];
       const enclosure = it.getElementsByTagName('enclosure')[0];
@@ -556,14 +545,12 @@ async function fetchFeed(feed) {
       else if (mediaThumb && mediaThumb.getAttribute('url')) imgUrl = mediaThumb.getAttribute('url');
       else if (enclosure && enclosure.getAttribute('url')) imgUrl = enclosure.getAttribute('url');
       
-      // 2. Se não encontrou, vasculha dentro de content:encoded ou description (onde sites WordPress escondem)
       let contentHTML = get('content') || get('encoded') || get('description') || '';
       if (!imgUrl && contentHTML) {
         const match = contentHTML.match(/<img[^>]+src=["']([^"']+)["']/i);
         if (match) imgUrl = match[1];
       }
       
-      // Descodifica eventuais caracteres estranhos no URL (ex: &amp;)
       if (imgUrl) {
         const txt = document.createElement('textarea');
         txt.innerHTML = imgUrl;
@@ -618,7 +605,7 @@ function render() {
   const n = news[idx % news.length];
   const seq = ++renderSequence;
   
-  $('category').textContent = (n.category || 'ATUALIDADE').toUpperCase();
+  $('category').textContent = (n.category || 'MUNDO').toUpperCase();
   $('headline').textContent = n.title;
   $('summary').textContent = n.summary;
   $('source').textContent = n.source + ' • ' + new Date(n.published_at).toLocaleTimeString('pt-PT', {
