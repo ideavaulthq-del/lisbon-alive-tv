@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>24 NOTÍCIAS™ — DIRETO</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,700;0,900;1,700&family=Inter:wght@500;700;800;900&display=swap');
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #050505;
+    color: #ffffff;
+    font-family: 'Inter', Arial, Helvetica, sans-serif;
+  }
+
+  .screen {
+    width: 1920px;
+    height: 1080px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform-origin: top left;
+    overflow: hidden;
+    background: #0a0a0a;
+  }
+
+  /* Imagem de fundo / Ecrã principal estilo emissão TV */
+  .hero {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 40% 40%, #1c1c1c, #080808 80%);
+    overflow: hidden;
+  }
+
+  .hero .img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+    animation: slowZoom 22s ease-in-out infinite alternate;
+  }
+
+  @keyframes slowZoom {
+    from { transform: scale(1); }
+    to { transform: scale(1.06); }
+  }
+
+  /* Vinheta e sombras dramáticas estilo CNN */
+  .hero .shade {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 22%, rgba(0,0,0,0.15) 55%, rgba(0,0,0,0.92) 88%, #000000 100%),
+      linear-gradient(90deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0) 60%, rgba(0,0,0,0.75) 100%);
+  }
+
+  /* Barra Superior / Identidade CNN Style */
+  .topbar {
+    position: absolute;
+    top: 42px;
+    left: 56px;
+    display: flex;
+    align-items: stretch;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+    z-index: 5;
+  }
+
+  .cnn-logo {
+    background: #CC0000;
+    color: #ffffff;
+    font-family: 'Roboto Condensed', Arial, sans-serif;
+    font-size: 54px;
+    font-weight: 900;
+    letter-spacing: -2px;
+    padding: 4px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+
+  .live-badge {
+    background: #ffffff;
+    color: #CC0000;
+    font-family: 'Roboto Condensed', Arial, sans-serif;
+    font-size: 26px;
+    font-weight: 900;
+    padding: 0 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  .live-dot {
+    width: 13px;
+    height: 13px;
+    background: #CC0000;
+    border-radius: 50%;
+    animation: pulse 1.3s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.3; transform: scale(0.8); }
+  }
+
+  .location-tag {
+    background: rgba(15, 15, 15, 0.88);
+    border-left: 3px solid #CC0000;
+    color: #f0f0f0;
+    font-size: 20px;
+    font-weight: 800;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* Estado discreto no canto superior direito */
+  .status {
+    position: absolute;
+    right: 56px;
+    top: 42px;
+    background: rgba(12, 12, 12, 0.88);
+    border: 1px solid #333;
+    border-left: 5px solid #CC0000;
+    color: #e0e0e0;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 700;
+    z-index: 10;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .status.ok { border-left-color: #2ea043; color: #b8f2c2; }
+  .status.err { border-left-color: #CC0000; color: #ff8a8a; }
+
+  /* Painel lateral direito semitransparente estilo "A SEGUIR / EM DESTAQUE" */
+  .sidebar {
+    position: absolute;
+    right: 56px;
+    top: 125px;
+    width: 440px;
+    background: rgba(10, 10, 10, 0.86);
+    backdrop-filter: blur(8px);
+    border-top: 5px solid #CC0000;
+    border-bottom: 2px solid #2b2b2b;
+    padding: 22px 24px;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.75);
+    z-index: 4;
+  }
+
+  .sidehead {
+    font-family: 'Roboto Condensed', Arial, sans-serif;
+    font-size: 24px;
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #CC0000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .sidehead span {
+    background: #CC0000;
+    font-size: 13px;
+    padding: 3px 8px;
+    letter-spacing: 1px;
+  }
+
+  .sideitem {
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.14);
+  }
+  .sideitem:last-child { border-bottom: none; padding-bottom: 4px; }
+
+  .sidecat {
+    font-family: 'Roboto Condensed', Arial, sans-serif;
+    font-size: 15px;
+    color: #ff3b3b;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .sidetitle {
+    font-size: 19px;
+    line-height: 1.25;
+    font-weight: 700;
+    color: #f4f4f4;
+    margin-top: 5px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Crédito da imagem acima do oráculo */
+  .hero-credit {
+    position: absolute;
+    left: 56px;
+    bottom: 292px;
+    background: rgba(0, 0, 0, 0.72);
+    padding: 5px 12px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #cccccc;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-left: 3px solid #CC0000;
+  }
+
+  /* Oráculo Inferior Clássico CNN (Lower Third) */
+  .lower {
+    position: absolute;
+    left: 56px;
+    right: 56px;
+    bottom: 84px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.85);
+    z-index: 6;
+  }
+
+  .lower-top-row {
+    display: flex;
+    align-items: stretch;
+  }
+
+  .breaking-tag {
+    background: #CC0000;
+    color: #ffffff;
+    font-family: 'Roboto Condensed', Arial, sans-serif;
+    font-size: 24px;
+    font-weight: 900;
+    padding: 8px 22px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+  }
+
+  .cat-tag {
+    background: #141414;
+    color: #ffffff;
+    font-family: 'Roboto Condensed', Arial, sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    padding: 8px 20px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border-top: 2px solid #CC0000;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Faixa branca de alto contraste típica da CNN */
+  .headline {
+    background: #ffffff;
+    color: #0b0b0b;
+    font-family: 'Roboto Condensed', Arial, sans-serif;
+    font-size: 52px;
+    font-weight: 900;
+    line-height: 1.08;
+    padding: 16px 28px;
+    text-transform: uppercase;
+    letter-spacing: -0.5px;
+    min-height: 92px;
+    display: flex;
+    align-items: center;
+    border-left: 12px solid #CC0000;
+  }
+
+  /* Sub-faixa escura com resumo e fonte */
+  .sub-bar {
+    background: #111111;
+    border-top: 2px solid #d9d9d9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 28px;
+    gap: 24px;
+  }
+
+  .summary {
+    font-size: 21px;
+    font-weight: 600;
+    color: #efefef;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+  }
+
+  .source {
+    font-family: 'Roboto Condensed', Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #ff4d4d;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+
+  /* Rodapé Ticker CNN */
+  .ticker {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: #000000;
+    display: flex;
+    align-items: center;
+    border-top: 3px solid #CC0000;
+    z-index: 8;
+  }
+
+  .ticker-brand {
+    height: 100%;
+    background: #CC0000;
+    color: #ffffff;
+    font-family: 'Roboto Condensed', Arial, sans-serif;
+    font-weight: 900;
+    font-size: 26px;
+    padding: 0 26px;
+    display: flex;
+    align-items: center;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+
+  .ticker-clock {
+    height: 100%;
+    background: #1a1a1a;
+    color: #ffffff;
+    font-family: 'Roboto Condensed', Arial, sans-serif;
+    font-weight: 900;
+    font-size: 24px;
+    padding: 0 22px;
+    display: flex;
+    align-items: center;
+    border-right: 2px solid #333;
+    white-space: nowrap;
+  }
+
+  .tickerbody {
+    overflow: hidden;
+    white-space: nowrap;
+    flex: 1;
+    font-size: 22px;
+    font-weight: 800;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .tickertext {
+    display: inline-block;
+    padding-left: 100%;
+    animation: move 60s linear infinite;
+  }
+
+  @keyframes move {
+    to { transform: translateX(-100%); }
+  }
+</style>
+</head>
+<body>
+<main class="screen">
+  <section class="hero">
+    <img class="img" id="heroImg" referrerpolicy="no-referrer" alt="">
+    <div class="shade"></div>
+  </section>
+
+  <!-- Canto superior esquerdo estilo CNN -->
+  <header class="topbar">
+    <div class="cnn-logo">24N</div>
+    <div class="live-badge"><span class="live-dot"></span>DIRETO</div>
+    <div class="location-tag">PORTUGAL • MUNDO</div>
+  </header>
+
+  <div class="status" id="status">A ligar à redação…</div>
+
+  <!-- Painel lateral estilo alinhamento de emissão -->
+  <aside class="sidebar">
+    <div class="sidehead">ÚLTIMAS NOTÍCIAS <span>AO MINUTO</span></div>
+    <div id="other"></div>
+  </aside>
+
+  <div class="hero-credit" id="heroCaption">24 NOTÍCIAS • EMISSÃO CONTÍNUA</div>
+
+  <!-- Oráculo Inferior estilo CNN (Lower Third) -->
+  <section class="lower">
+    <div class="lower-top-row">
+      <div class="breaking-tag">ÚLTIMA HORA</div>
+      <div class="cat-tag" id="category">ATUALIDADE</div>
+    </div>
+    <div class="headline" id="headline">A CARREGAR NOTÍCIAS EM DIRETO…</div>
+    <div class="sub-bar">
+      <div class="summary" id="summary">A recolher os principais destaques dos órgãos de comunicação social portugueses.</div>
+      <div class="source" id="source">REDAÇÃO 24N</div>
+    </div>
+  </section>
+
+  <!-- Rodapé Ticker + Relógio -->
+  <footer class="ticker">
+    <div class="ticker-brand">24 NOTÍCIAS</div>
+    <div class="ticker-clock" id="clock">LISBOA --:--</div>
+    <div class="tickerbody">
+      <span class="tickertext" id="ticker">A CARREGAR ÚLTIMAS NOTÍCIAS…</span>
+    </div>
+  </footer>
+</main>
+
+<script>
+/* 24 NOTÍCIAS™ | Emissão de notícias exclusivamente com revisão editorial.
+ * Mantém o grafismo aprovado, sem recolha RSS direta no navegador.
+ */
+const $ = id => document.getElementById(id);
+const MAX_AGE_MS = 48 * 60 * 60 * 1000;
+const REFRESH_MS = 60 * 1000;
+const ROTATION_MS = 18 * 1000;
+let news = [], idx = 0, last = '', busy = false, renderSequence = 0;
+
+function fit() {
+  const s = Math.min(innerWidth / 1920, innerHeight / 1080);
+  const e = document.querySelector('.screen');
+  e.style.transform = 'scale(' + s + ')';
+  e.style.left = (innerWidth - 1920 * s) / 2 + 'px';
+  e.style.top = (innerHeight - 1080 * s) / 2 + 'px';
+}
+addEventListener('resize', fit);
+fit();
+
+function clock() {
+  $('clock').textContent = 'LISBOA ' + new Intl.DateTimeFormat('pt-PT', {
+    timeZone: 'Europe/Lisbon', hour: '2-digit', minute: '2-digit',
+    second: '2-digit', hour12: false
+  }).format(new Date());
+}
+clock();
+setInterval(clock, 1000);
+
+function setStatus(txt, tipo) {
+  const s = $('status');
+  s.textContent = txt;
+  s.className = 'status' + (tipo ? ' ' + tipo : '');
+}
+
+function safeImage(url) {
+  if (typeof url !== 'string') return '';
+  try { const u = new URL(url); return u.protocol === 'https:' ? u.href : ''; }
+  catch (_) { return ''; }
+}
+
+function valid(n, now) {
+  if (!n || n.editorial_status !== 'revisto_manualmente') return false;
+  if (!['title', 'summary', 'source', 'published_at'].every(k => typeof n[k] === 'string' && n[k].trim())) return false;
+  const pub = Date.parse(n.published_at);
+  return Number.isFinite(pub) && pub <= now + 300000 && now - pub < MAX_AGE_MS;
+}
+
+function waiting(message) {
+  renderSequence++;
+  $('headline').textContent = 'A AGUARDAR NOTÍCIAS VERIFICADAS';
+  $('summary').textContent = 'A redação prepara informações para emissão após revisão editorial.';
+  $('source').textContent = 'REDAÇÃO 24N';
+  $('category').textContent = 'REDAÇÃO';
+  $('other').replaceChildren();
+  $('heroImg').style.display = 'none';
+  $('heroImg').removeAttribute('src');
+  $('heroCaption').textContent = '24 NOTÍCIAS • EMISSÃO CONTÍNUA';
+  $('ticker').textContent = '24 NOTÍCIAS • A AGUARDAR CONTEÚDOS REVISTOS EDITORIALMENTE •';
+  setStatus(message || 'AGUARDAR REVISÃO EDITORIAL', '');
+}
+
+function render() {
+  if (!news.length) { waiting(); return; }
+  const n = news[idx % news.length];
+  const seq = ++renderSequence;
+  $('category').textContent = (n.category || 'ATUALIDADE').toUpperCase();
+  $('headline').textContent = n.title;
+  $('summary').textContent = n.summary;
+  $('source').textContent = n.source + ' • ' + new Date(n.published_at).toLocaleTimeString('pt-PT', {
+    timeZone: 'Europe/Lisbon', hour: '2-digit', minute: '2-digit'
+  });
+  const heroImg = $('heroImg');
+  const imageURL = n.image_rights_confirmed === true && typeof n.image_credit === 'string' && n.image_credit.trim()
+    ? safeImage(n.image_url) : '';
+  if (imageURL) {
+    heroImg.onload = () => { if (seq === renderSequence) heroImg.style.display = 'block'; };
+    heroImg.onerror = () => { if (seq === renderSequence) heroImg.style.display = 'none'; };
+    heroImg.style.display = 'none';
+    heroImg.src = imageURL;
+    $('heroCaption').textContent = 'IMAGEM: ' + n.image_credit;
+  } else {
+    heroImg.onload = null; heroImg.onerror = null;
+    heroImg.style.display = 'none';
+    heroImg.removeAttribute('src');
+    $('heroCaption').textContent = '24 NOTÍCIAS • EMISSÃO CONTÍNUA';
+  }
+  $('other').replaceChildren();
+  for (const x of news.filter(x => x !== n).slice(0, 4)) {
+    const box = document.createElement('div');
+    box.className = 'sideitem';
+    const cat = document.createElement('div');
+    cat.className = 'sidecat';
+    cat.textContent = (x.category || 'ATUALIDADE') + ' • ' + x.source;
+    const title = document.createElement('div');
+    title.className = 'sidetitle';
+    title.textContent = x.title;
+    box.append(cat, title);
+    $('other').append(box);
+  }
+  const tickerTextEl = $('ticker');
+  tickerTextEl.textContent = news.slice(0, 15).map(x => '▪ ' + (x.category || 'NOTÍCIAS') + ': ' + x.title).join('     ');
+  const duracao = Math.max(20, tickerTextEl.scrollWidth / 95);
+  tickerTextEl.style.animation = 'none';
+  void tickerTextEl.offsetWidth;
+  tickerTextEl.style.animation = 'move ' + duracao + 's linear infinite';
+}
+
+async function refresh() {
+  if (busy) return;
+  busy = true;
+  try {
+    const response = await fetch('./feed.json?ts=' + Date.now(), { cache: 'no-store' });
+    if (!response.ok) throw Error('feed HTTP ' + response.status);
+    const data = await response.json();
+    const now = Date.now();
+    const selected = (Array.isArray(data.news) ? data.news : [])
+      .filter(n => valid(n, now))
+      .sort((a, b) => Date.parse(b.published_at) - Date.parse(a.published_at));
+    const key = JSON.stringify(selected.map(n => [n.id, n.title, n.summary, n.published_at, n.image_url, n.image_rights_confirmed]));
+    if (key !== last) {
+      news = selected;
+      idx = 0;
+      last = key;
+      render();
+    } else if (!news.length) waiting();
+    setStatus(news.length ? 'REDAÇÃO VERIFICADA • ' + news.length + ' NOTÍCIAS' : 'A AGUARDAR REVISÃO EDITORIAL', news.length ? 'ok' : '');
+  } catch (err) {
+    if (!news.length) waiting('FEED INDISPONÍVEL');
+    else setStatus('FEED TEMPORARIAMENTE INDISPONÍVEL', 'err');
+    console.info('24 NOTÍCIAS: erro no feed', err.message);
+  } finally { busy = false; }
+}
+waiting();
+refresh();
+setInterval(refresh, REFRESH_MS);
+setInterval(() => { if (news.length > 1) { idx = (idx + 1) % news.length; render(); } }, ROTATION_MS);
+</script>
+</body>
+</html>
