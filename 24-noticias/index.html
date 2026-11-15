@@ -205,14 +205,14 @@
   }
 
   /* =========================================
-     ÁREA DE PUBLICIDADE (SPONSOR BOX)
+     ÁREA DE PUBLICIDADE AUTOMÁTICA (INTERNET)
      ========================================= */
   .ad-container {
     position: absolute;
     right: 56px;
     bottom: 280px;
     width: 440px;
-    height: 160px;
+    height: 180px;
     background: #111;
     border: 1px solid #333;
     border-top: 3px solid #CC0000;
@@ -233,7 +233,7 @@
     background: #000;
     color: #888;
     font-family: 'Roboto Condensed', Arial, sans-serif;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
     padding: 4px 10px;
     text-transform: uppercase;
@@ -247,34 +247,53 @@
     flex: 1;
     display: flex;
     align-items: center;
-    padding: 16px 20px;
+    background: #181818;
+    padding: 0;
     transition: background 0.5s;
   }
 
-  .ad-icon {
-    font-size: 46px;
-    margin-right: 20px;
-    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+  .ad-img {
+    width: 140px;
+    height: 100%;
+    object-fit: cover;
+    border-right: 1px solid #333;
+    background: #222;
   }
 
   .ad-text-box {
     flex: 1;
+    padding: 12px 16px;
   }
 
   .ad-title {
     font-family: 'Roboto Condensed', Arial, sans-serif;
-    font-size: 24px;
+    font-size: 20px;
     font-weight: 900;
     text-transform: uppercase;
     margin-bottom: 4px;
     color: #fff;
     letter-spacing: 0.5px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   .ad-desc {
-    font-size: 15px;
-    color: rgba(255,255,255,0.8);
+    font-size: 13px;
+    color: #aaa;
     line-height: 1.2;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+
+  .ad-price {
+    font-size: 16px;
+    font-weight: 800;
+    color: #ff3b3b;
   }
 
   .lower {
@@ -447,17 +466,18 @@
     <div id="other"></div>
   </aside>
 
-  <!-- ÁREA DE PUBLICIDADE -->
+  <!-- ÁREA DE PUBLICIDADE DA INTERNET -->
   <div class="ad-container" id="adBox">
     <div class="ad-label">
       <span>PUBLICIDADE</span>
       <span id="adSponsor">PATROCINADO</span>
     </div>
-    <div class="ad-content" id="adContent" style="background: linear-gradient(135deg, #1e3c72, #2a5298);">
-      <div class="ad-icon" id="adIcon">🏦</div>
+    <div class="ad-content" id="adContent">
+      <img class="ad-img" id="adImg" src="https://dummyjson.com/image/i/products/1/thumbnail.jpg" alt="Ad">
       <div class="ad-text-box">
-        <div class="ad-title" id="adTitle">Mude de Banco</div>
-        <div class="ad-desc" id="adDesc">Abra conta digital e receba 50€ em saldo.</div>
+        <div class="ad-title" id="adTitle">A carregar...</div>
+        <div class="ad-desc" id="adDesc">A procurar os melhores produtos para si.</div>
+        <div class="ad-price" id="adPrice">--</div>
       </div>
     </div>
   </div>
@@ -486,7 +506,7 @@
 </main>
 
 <script>
-/* 24 NOTÍCIAS™ | Emissão em direto com filtro de podcasts/vídeos */
+/* 24 NOTÍCIAS™ | Emissão em direto com publicidade automática da internet */
 const $ = id => document.getElementById(id);
 const MAX_AGE_MS = 48 * 60 * 60 * 1000;
 const REFRESH_MS = 60 * 1000;
@@ -494,31 +514,59 @@ const ROTATION_MS = 18 * 1000;
 let news = [], idx = 0, last = '', busy = false, renderSequence = 0;
 
 // ==========================================
-// CONFIGURAÇÃO DE PUBLICIDADE
+// PUBLICIDADE AUTOMÁTICA DA INTERNET
 // ==========================================
-const ADS = [
-  { title: "Mude de Banco", desc: "Abra conta digital e receba 50€ em saldo.", icon: "🏦", bg: "linear-gradient(135deg, #1e3c72, #2a5298)", sponsor: "BANCO DIGITAL" },
-  { title: "Seguro Auto", desc: "Proteja o seu carro com até 40% de desconto.", icon: "🚗", bg: "linear-gradient(135deg, #e52d27, #b31217)", sponsor: "SEGURADORA" },
-  { title: "Curso de Tecnologia", desc: "Aprenda a programar em apenas 3 meses.", icon: "💻", bg: "linear-gradient(135deg, #11998e, #38ef7d)", sponsor: "EDUCAÇÃO" },
-  { title: "Supermercado", desc: "Entregas gratuitas em todo o país hoje.", icon: "🛒", bg: "linear-gradient(135deg, #f12711, #f5af19)", sponsor: "RETAIL" }
-];
+let adsList = [];
 let adIdx = 0;
 
+async function fetchInternetAds() {
+  try {
+    // Vai buscar 10 produtos aleatórios reais à internet
+    const res = await fetch('https://dummyjson.com/products?limit=10');
+    const data = await res.json();
+    adsList = data.products;
+    
+    // Se falhar ou vier vazio, usa fallback
+    if (!adsList || adsList.length === 0) throw new Error('Sem ads');
+    
+    renderAd();
+  } catch (e) {
+    console.warn('Falha ao carregar ads da internet. A usar fallback.', e);
+    adsList = [
+      { title: "Smartphone de Última Geração", description: "Câmara de 108MP e ecrã AMOLED.", price: 899.99, thumbnail: "https://images.pexels.com/photos/404280/pexels-photo-404280.jpeg?auto=compress&cs=tinysrgb&w=300" },
+      { title: "Portátil Ultra Fino", description: "Processador de 12ª geração e 16GB RAM.", price: 1200.00, thumbnail: "https://images.pexels.com/photos/18105/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=300" }
+    ];
+    renderAd();
+  }
+}
+
 function renderAd() {
-  const ad = ADS[adIdx % ADS.length];
+  if (!adsList.length) return;
+  const ad = adsList[adIdx % adsList.length];
+  
   $('adTitle').textContent = ad.title;
-  $('adDesc').textContent = ad.desc;
-  $('adIcon').textContent = ad.icon;
-  $('adContent').style.background = ad.bg;
-  $('adSponsor').textContent = ad.sponsor;
+  $('adDesc').textContent = ad.description;
+  $('adPrice').textContent = (ad.price ? ad.price.toFixed(2) + ' €' : 'Ver Oferta');
+  
+  // As imagens do dummyjson já vêm com CORS, ou usamos o thumbnail
+  $('adImg').src = ad.thumbnail || 'https://dummyjson.com/image/i/products/1/thumbnail.jpg';
+  $('adSponsor').textContent = 'LOJA ONLINE';
   
   const box = $('adBox');
   box.style.animation = 'none';
   void box.offsetWidth;
   box.style.animation = 'slideIn 0.5s ease-out';
 }
-setInterval(() => { adIdx++; renderAd(); }, 10000);
-renderAd();
+
+// Roda os produtos a cada 8 segundos
+setInterval(() => {
+  if (adsList.length > 0) {
+    adIdx++;
+    renderAd();
+  }
+}, 8000);
+
+fetchInternetAds();
 
 // ==========================================
 // LÓGICA DAS NOTÍCIAS
@@ -648,14 +696,12 @@ async function fetchFeed(feed) {
       const link = linkEl ? (linkEl.getAttribute('href') || linkEl.textContent) : '';
       const title = get('title');
       
-      // FILTRO ANTI-PODCAST E ANTI-VÍDEO
       const enc = it.getElementsByTagName('enclosure')[0];
       const isAudioVideo = enc && (enc.getAttribute('type') || '').match(/^(audio|video)\//i);
-      const isPodcastLink = /podcast|\/audio\/|\/video\//i.test(link);
-      const isPodcastTitle = /podcast|episódio|episodio|ouvir|áudio|audio|vídeo|video/i.test(title);
+      const isMediaLink = /radio|podcast|\/audio\/|\/video\/|tsf|renascenca|antena/i.test(link);
+      const isMediaTitle = /podcast|episódio|episodio|ouvir|áudio|audio|vídeo|video|rádio|radio|tsf|renascença|antena|emissão/i.test(title);
 
-      // Se for podcast/vídeo, ignoramos esta notícia (retorna null)
-      if (isAudioVideo || isPodcastLink || isPodcastTitle) {
+      if (isAudioVideo || isMediaLink || isMediaTitle) {
         return null; 
       }
       
@@ -693,7 +739,7 @@ async function fetchFeed(feed) {
         link: link,
         thumbnail: imgUrl
       }, feed);
-    }).filter(item => item !== null); // Limpa os nulos (podcasts filtrados)
+    }).filter(item => item !== null);
   }
 
   try {
