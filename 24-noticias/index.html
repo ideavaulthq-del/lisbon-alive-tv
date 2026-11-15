@@ -412,16 +412,15 @@
 </main>
 
 <script>
-/* 24 NOTÍCIAS™ | Emissão em direto com fontes nacionais e internacionais */
+/* 24 NOTÍCIAS™ | Emissão em direto com extração de imagens e proxy de fallback */
 const $ = id => document.getElementById(id);
 const MAX_AGE_MS = 48 * 60 * 60 * 1000;
 const REFRESH_MS = 60 * 1000;
 const ROTATION_MS = 18 * 1000;
 let news = [], idx = 0, last = '', busy = false, renderSequence = 0;
 
-// Fontes Nacionais e Internacionais (RTP removida)
+// Fontes Nacionais e Internacionais
 const FEEDS = [
-  // --- PORTUGAL ---
   { url: 'https://www.publico.pt/rss',            source: 'Público',            category: 'Portugal' },
   { url: 'https://observador.pt/feed/',           source: 'Observador',         category: 'Portugal' },
   { url: 'https://expresso.pt/rss',               source: 'Expresso',           category: 'Portugal' },
@@ -429,8 +428,6 @@ const FEEDS = [
   { url: 'https://www.dn.pt/rss',                 source: 'Diário de Notícias', category: 'Portugal' },
   { url: 'https://www.jn.pt/rss',                 source: 'Jornal de Notícias', category: 'Portugal' },
   { url: 'https://www.noticiasaominuto.com/rss/ultima-hora', source: 'Notícias ao Minuto', category: 'Portugal' },
-  
-  // --- INTERNACIONAL / MUNDO ---
   { url: 'https://feeds.bbci.co.uk/news/world/rss.xml', source: 'BBC World', category: 'Mundo' },
   { url: 'https://pt.euronews.com/rss',           source: 'Euronews',           category: 'Mundo' },
   { url: 'https://news.google.com/rss/search?q=world&hl=pt-PT&gl=PT&ceid=PT:pt', source: 'Google News', category: 'Mundo' }
@@ -514,7 +511,6 @@ function normalizar(item, feed) {
     image_url: img,
     category: feed.category || 'Mundo',
     editorial_status: 'revisto_manualmente',
-    image_rights_confirmed: true,
     image_credit: feed.source,
     link: item.link || ''
   };
@@ -536,21 +532,34 @@ async function fetchFeed(feed) {
       const get = sel => (it.querySelector(sel) || {}).textContent || '';
       const linkEl = it.querySelector('link');
       
+      // EXTRAÇÃO AGRESSIVA DE IMAGEM
       let imgUrl = null;
-      const mediaContent = it.getElementsByTagName('media:content')[0];
-      const mediaThumb = it.getElementsByTagName('media:thumbnail')[0];
-      const enclosure = it.getElementsByTagName('enclosure')[0];
       
-      if (mediaContent && mediaContent.getAttribute('url')) imgUrl = mediaContent.getAttribute('url');
-      else if (mediaThumb && mediaThumb.getAttribute('url')) imgUrl = mediaThumb.getAttribute('url');
-      else if (enclosure && enclosure.getAttribute('url')) imgUrl = enclosure.getAttribute('url');
-      
+      // 1. Verifica media:content
+      const mediaTags = it.getElementsByTagName('media:content');
+      for (let m of mediaTags) {
+        if (m.getAttribute('url') && (!m.getAttribute('type') || m.getAttribute('type').startsWith('image'))) {
+          imgUrl = m.getAttribute('url'); break;
+        }
+      }
+      // 2. Verifica media:thumbnail
+      if (!imgUrl) {
+        const thumb = it.getElementsByTagName('media:thumbnail')[0];
+        if (thumb) imgUrl = thumb.getAttribute('url');
+      }
+      // 3. Verifica enclosure (só se for imagem)
+      if (!imgUrl) {
+        const enc = it.getElementsByTagName('enclosure')[0];
+        if (enc && enc.getAttribute('type') && enc.getAttribute('type').startsWith('image')) imgUrl = enc.getAttribute('url');
+      }
+      // 4. Procura dentro do HTML (content:encoded / description)
       let contentHTML = get('content') || get('encoded') || get('description') || '';
       if (!imgUrl && contentHTML) {
         const match = contentHTML.match(/<img[^>]+src=["']([^"']+)["']/i);
         if (match) imgUrl = match[1];
       }
       
+      // Descodifica eventuais caracteres estranhos no URL (ex: &amp;)
       if (imgUrl) {
         const txt = document.createElement('textarea');
         txt.innerHTML = imgUrl;
@@ -613,17 +622,29 @@ function render() {
   });
 
   const heroImg = $('heroImg');
-  const imageURL = n.image_rights_confirmed === true && typeof n.image_credit === 'string' && n.image_credit.trim()
-    ? safeImage(n.image_url) : '';
-    
+  const imageURL = safeImage(n.image_url);
+  
   if (imageURL) {
     heroImg.onload = () => { if (seq === renderSequence) heroImg.style.display = 'block'; };
-    heroImg.onerror = () => { if (seq === renderSequence) heroImg.style.display = 'none'; };
-    heroImg.style.display = 'none';
+    
+    // FALLBACK DE IMAGEM: Se o jornal bloquear o acesso (hotlink), usa um proxy de imagens
+    heroImg.onerror = () => {
+      if (seq !== renderSequence) return;
+      if (!heroImg.dataset.fallbackTried) {
+        heroImg.dataset.fallbackTried = "true";
+        heroImg.src = 'https://images.weserv.nl/?url=' + encodeURIComponent(imageURL.replace(/^https?:\/\//, ''));
+      } else {
+        heroImg.style.display = 'none';
+      }
+    };
+    
+    heroImg.dataset.fallbackTried = ""; // Reset flag
     heroImg.src = imageURL;
-    $('heroCaption').textContent = 'IMAGEM: ' + n.image_credit;
+    heroImg.style.display = 'none';
+    $('heroCaption').textContent = 'IMAGEM: ' + n.source;
   } else {
-    heroImg.onload = null; heroImg.onerror = null;
+    heroImg.onload = null; 
+    heroImg.onerror = null;
     heroImg.style.display = 'none';
     heroImg.removeAttribute('src');
     $('heroCaption').textContent = '24 NOTÍCIAS • EMISSÃO CONTÍNUA';
