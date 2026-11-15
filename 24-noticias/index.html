@@ -786,6 +786,15 @@ setInterval(() => { if (news.length > 1) { idx = (idx + 1) % news.length; render
   window.addEventListener('message',e=>{
     if(e.origin===location.origin&&e.source===frame.contentWindow&&e.data?.type==='24n-break-finished')finish();
   });
+  // Atalhos do operador: I inicia intervalo; Escape termina.
+  window.addEventListener('keydown',e=>{
+    if(e.altKey||e.ctrlKey||e.metaKey||e.repeat)return;
+    if(e.key.toLowerCase()==='i')start();
+    if(e.key==='Escape')finish();
+  });
+  // Permite abrir a cena no OBS com ?intervalo=agora para testes manuais.
+  const params=new URLSearchParams(location.search);
+  if(params.get('intervalo')==='agora')setTimeout(start,1200);
   // O intervalo conta desde o último regresso às notícias.
   setInterval(()=>{if(!active&&Date.now()-lastBreak>=NEWS_MS)start();},1000);
   // Comandos opcionais para operador OBS, na consola do navegador.
