@@ -19,4 +19,4 @@ jobs:
         with:
           node-version: '22'
       - name: Validate catalog and converter
-        run: node --test 24-noticias/tests/catalog.test.cjs
+        run: node --test 24-noticias/tests/*.test.cjs
