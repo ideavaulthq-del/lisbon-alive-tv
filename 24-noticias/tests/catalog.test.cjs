@@ -16,7 +16,7 @@ function section(source,start,end){
  return source.slice(a,b);
 }
 const csv=vm.runInNewContext(section(converter,'function parseCSV(','function msg(')+';({parseCSV,detect,validHttps})',{URL});
-const editor=vm.runInNewContext(section(central,'function ageDays(','function audit(')+';({ageDays,check})',{Date,URL});
+const editor=vm.runInNewContext(section(central,'function validURL(','function audit(')+';({validURL,ageDays,check})',{Date,URL});
 test('CSV com aspas, vírgulas e linhas multilinha',()=>{
  const rows=csv.parseCSV('name,description\n"Telemóvel, modelo X","Linha 1\nLinha 2"\n',',');
  assert.equal(rows.length,2);assert.equal(rows[1][0],'Telemóvel, modelo X');assert.equal(rows[1][1],'Linha 1\nLinha 2');
