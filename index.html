@@ -1,441 +1,805 @@
-<!doctype html><html lang="pt-PT"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LISBON ALIVE™ | MASTER CONTROL 7.0 · WEB CHANNEL</title><style>
-*{box-sizing:border-box}html,body{margin:0;background:#020813;color:#fff;font-family:Arial,Helvetica,sans-serif}button,input,textarea,select{font:inherit}#stage{width:min(100vw,177.77778vh);aspect-ratio:16/9;position:relative;margin:auto;overflow:hidden;background:#061a37;isolation:isolate}#bg{position:absolute;inset:0;width:100%;height:100%;transform:scale(1.015);transition:transform 14s ease-in-out;transform-origin:55% 45%}#stage.cam-medium #bg{transform:translate(-1%,.3%) scale(1.065)}#stage.cam-detail #bg{transform:translate(1%,-.6%) scale(1.12)}#stage.cam-wide #bg{transform:scale(1.015)}#stage.cam-drift #bg{transform:translate(-.7%,-.5%) scale(1.045)}.shade{position:absolute;inset:0;background:linear-gradient(90deg,#020a20c9 0%,#03122b7a 46%,#041b3760 100%);pointer-events:none}.top{position:absolute;left:2%;right:2%;top:2.5%;display:flex;justify-content:space-between;align-items:flex-start;gap:15px}.logo{border-left:5px solid #ff2345;padding:1% 2%;background:linear-gradient(100deg,#061e4b,#1355a1);font-weight:1000;font-size:clamp(15px,2.3vw,39px);box-shadow:0 5px 22px #0006}.logo em{font-style:normal;color:#ff5a69}.logo small{display:block;font-size:31%;letter-spacing:.12em;margin-top:4px}.clock{background:#051b40e8;padding:1.2% 1.5%;font-weight:900;font-size:clamp(12px,1.4vw,24px)}.watermark{position:absolute;right:2%;top:13%;font-size:clamp(9px,.85vw,14px);border:1px solid #ffffff55;background:#07152bba;padding:.5% 1%}.content{position:absolute;left:3%;right:3%;top:24%;bottom:26%;display:grid;grid-template-columns:1.55fr 1fr;gap:3%;align-items:center}.mainStory{padding:3% 4%;border-left:5px solid #f11d3e;text-shadow:0 3px 15px #000b;background:#06152b4d}.eyebrow{font-size:clamp(12px,1.45vw,23px);font-weight:900;color:#ff6777;letter-spacing:.07em}.mainStory h1{font-size:clamp(19px,3.1vw,51px);line-height:1.12;margin:3% 0;text-transform:uppercase;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;line-clamp:4;overflow:hidden}.mainStory p{font-size:clamp(12px,1.5vw,24px);line-height:1.4;margin:0;color:#e4eeff}.facts{background:#061a39eb;border:2px solid #74aee17d;padding:5%;font-size:clamp(11px,1.35vw,22px);line-height:1.5;white-space:pre-line;overflow:hidden;max-height:100%;box-shadow:0 10px 30px #0007}.facts strong{color:#ff6274}.strap{position:absolute;left:0;right:0;bottom:6.5%;height:19.5%;background:linear-gradient(95deg,#08275b,#1656a3);border-top:5px solid #ed1837;display:flex;flex-direction:column;justify-content:center;padding:1.2% 3%}.strap h2{font-size:clamp(20px,3.2vw,53px);margin:0;line-height:1.08}.strap p{font-size:clamp(12px,1.4vw,22px);margin:5px 0 0}.tag{position:absolute;bottom:26%;left:3%;background:#d70928;padding:.8% 2%;font-weight:900;font-size:clamp(11px,1.6vw,27px)}.ticker{position:absolute;bottom:0;height:6.5%;width:100%;display:flex;align-items:center;background:#ae0b27;white-space:nowrap;overflow:hidden;font-size:clamp(11px,1.2vw,21px);font-weight:900}.ticker b{background:#ed1b3b;align-self:stretch;display:flex;align-items:center;padding:0 2%;flex-shrink:0;z-index:1}.tickerTrack{overflow:hidden;flex:1}.tickerText{display:inline-block;white-space:nowrap;padding-left:100%;animation:scroll 85s linear infinite}@keyframes scroll{to{transform:translateX(-100%)}}.camera-status{position:absolute;top:19%;right:2%;font-size:clamp(9px,.8vw,13px);background:#06172bbd;padding:.4% .8%;border:1px solid #4676aa;color:#dceeff}.flash{position:absolute;inset:0;background:#e91a37;opacity:0;pointer-events:none;transition:opacity .6s}.flash.on{opacity:.55;transition:none}.panel{max-width:1280px;margin:15px auto 25px;padding:20px;background:#0a1b35;border:1px solid #2b4b77;border-radius:12px}.panel h2{margin:0 0 12px}.toolbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.panel button,.panel select,.panel input,.panel textarea{border:1px solid #3a628d;border-radius:6px;background:#173357;color:white;padding:10px}.panel button{cursor:pointer}.panel button:hover{background:#27558a}.fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px}.fields label{display:flex;flex-direction:column;gap:6px}.fields label.wide{grid-column:1/-1}.fields textarea{min-height:65px;resize:vertical}.help{color:#b9cbe4;font-size:12px;line-height:1.5;margin-top:12px}.broadcast-mode .panel{display:none}.broadcast-mode{overflow:hidden}.broadcast-mode #stage{width:min(100vw,177.77778vh);height:min(100vh,56.25vw)}@media(max-width:700px){.fields{grid-template-columns:1fr}.fields label.wide{grid-column:auto}.panel{border-radius:0}.content{top:23%}.facts{font-size:10px}}@media(prefers-reduced-motion:reduce){.tickerText{animation:none;padding-left:10px}}
-.operations{display:flex;flex-wrap:wrap;gap:12px;margin-top:14px;font-size:12px;color:#d5e9ff}.operations span{padding:9px;background:#102b51;border:1px solid #3b608b;border-radius:6px}#fullscreen{border-color:#f75b70}.stage-paused #bg{animation-play-state:paused}@media(max-width:650px){.operations{flex-direction:column}}
-.alertBanner{position:absolute;z-index:8;top:10%;left:2%;padding:.7% 1.5%;font-weight:900;font-size:clamp(12px,1.4vw,25px);background:#cc1028;border-left:5px solid white;box-shadow:0 3px 22px #000a}.alertBanner[hidden]{display:none!important}#editEditorial,#editSource{width:100%}.feeddesk{max-width:1250px;margin:16px auto 40px;padding:20px;border:1px solid #345075;border-radius:16px;background:#08172c;color:#eaf2ff}.feeddesk h2{margin:0 0 10px}.feeddesk p{line-height:1.5}.feedtools{display:flex;flex-wrap:wrap;align-items:end;gap:10px}.feedtools label{flex:1;min-width:220px}.feedtools select{display:block;width:100%;padding:10px;background:#102b4b;color:white;border:1px solid #57759a;border-radius:8px}.feedtools button,.feedresults button{padding:10px 14px;background:#174b81;color:white;border:1px solid #5a87b7;border-radius:8px;cursor:pointer}.feedresults{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:14px}.feeditem{padding:13px;background:#11233c;border:1px solid #395374;border-radius:12px}.feeditem h3{font-size:16px;margin:7px 0}.feeditem a{color:#8cd3ff;word-break:break-word}.feeditem small{color:#bbcadb}.feeditem button{margin-top:10px}.feednote{font-size:12px;color:#b5c4d7}#feedStatus{padding:10px 0;color:#b9d9fa}body.broadcast-mode .feeddesk{display:none}@media(max-width:600px){.feeddesk{margin:10px;padding:12px}.feedtools button{flex:1}} </style><style>
-.editor42{max-width:1250px;margin:16px auto 40px;padding:20px;border:1px solid #365d7f;border-radius:16px;background:#07192d;color:#e9f3ff}.editor42 h2{margin:0 0 10px}.editor42 p{line-height:1.5}.editor42 .tools42{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}.editor42 button{padding:10px 14px;border:1px solid #618cb4;border-radius:8px;background:#154b78;color:white;cursor:pointer}.editor42 label{display:block;flex:1;min-width:190px}.editor42 input,.editor42 select,.editor42 textarea{display:block;box-sizing:border-box;width:100%;padding:10px;margin-top:5px;border:1px solid #57759a;border-radius:7px;background:#0e2946;color:white}.editor42 textarea{min-height:75px}.editor42 .story42{border:1px solid #345775;border-radius:9px;padding:12px;margin:10px 0;background:#10253d}.editor42 small{color:#b8cbe0}.editor42 a{color:#8bd4ff}.editor42 .notice42{padding:10px;background:#263045;border-left:4px solid #e3ae52}body.broadcast-mode .editor42{display:none}@media(max-width:600px){.editor42{padding:12px;margin:10px}}
-</style><style>
-#live43{position:absolute;top:16%;left:2%;z-index:9;background:#071b37db;border:1px solid #76a3d4;border-radius:5px;padding:.35% .8%;font-size:clamp(10px,.9vw,16px);font-weight:800;letter-spacing:.06em}#live43 b{color:#ff5e71}#live43[hidden]{display:none!important}
-#breaking43{position:absolute;z-index:10;left:2%;right:2%;top:12%;background:#be0e2a;color:white;padding:.7% 1.5%;font-size:clamp(12px,1.5vw,26px);font-weight:900;border:2px solid white;box-shadow:0 5px 20px #0009}#breaking43[hidden]{display:none!important}
-#desk43{max-width:1250px;margin:18px auto;padding:20px;border:1px solid #41628a;border-radius:14px;background:#091b32}#desk43 h2{margin-top:0}.tools43{display:flex;flex-wrap:wrap;gap:8px}.tools43 button,.tools43 select{background:#164472;color:#fff;border:1px solid #6589b2;border-radius:7px;padding:10px;cursor:pointer}.tools43 button:disabled{opacity:.4;cursor:not-allowed}.status43{color:#bcd6f4;font-size:13px;line-height:1.6}.broadcast-mode #desk43{display:none}@media(max-width:650px){#desk43{margin:10px;padding:12px}}
-</style><style id="broadcast-capture-only">
-/* TikTok/OBS: isolate the existing 16:9 stage without changing its design. */
-body.broadcast-mode > :not(#stage):not(script):not(style){display:none!important}
-html:has(body.broadcast-mode),body.broadcast-mode{width:100%;height:100%;margin:0;overflow:hidden!important}
-body.broadcast-mode #stage{display:block;position:relative;margin:auto;width:min(100vw,177.77778vh);height:min(100vh,56.25vw);aspect-ratio:16/9}
-</style><style id="commercialBreakStyles">
-#commercialBreak{position:absolute;inset:0;z-index:40;display:none;align-items:center;justify-content:center;text-align:center;background:radial-gradient(circle at 55% 35%,#17365b 0%,#071a32 52%,#020813 100%);color:#fff;overflow:hidden;font-family:Arial,Helvetica,sans-serif}
-#commercialBreak.cb-visible{display:flex}#commercialBreak .cb-inner{width:88%;max-width:1400px;position:relative;z-index:2}
-#commercialBreak .cb-brand{font-size:clamp(28px,5vw,86px);font-weight:900;letter-spacing:.045em}
-#commercialBreak .cb-brand em{font-style:normal;color:#ff5574}
-#commercialBreak .cb-kicker{font-size:clamp(13px,1.5vw,27px);font-weight:700;letter-spacing:.22em;color:#c6dbef;margin-bottom:2.5%}
-#commercialBreak .cb-head{font-size:clamp(24px,3.7vw,68px);font-weight:800;margin:3% 0 1%}
-#commercialBreak .cb-copy{font-size:clamp(14px,1.8vw,33px);color:#d0e2f2;line-height:1.4}
-#commercialBreak .cb-footer{position:absolute;bottom:5%;left:5%;right:5%;display:flex;justify-content:space-between;gap:12px;color:#b9cee2;font-size:clamp(12px,1.25vw,24px);font-weight:bold}
-#commercialBreak .cb-rule{height:5px;width:38%;margin:3% auto;background:#f04a6c;border-radius:8px}
-#commercialBreak .cb-glow{position:absolute;inset:-25%;background:radial-gradient(ellipse at 65% 35%,#22588a66,transparent 52%);pointer-events:none}
-</style></head><body><main id="stage"><canvas id="bg" width="1920" height="1080" aria-hidden="true"></canvas><div class="shade"></div><div id="live43"><b>●</b> EMISSÃO LOCAL · <span id="time43">--:--:--</span></div><div id="breaking43" hidden></div><div class="top"><div class="logo">LISBON <em>ALIVE™</em></div><div class="clock" id="clock"></div></div><div class="watermark" id="watermark">CENÁRIO DIGITAL · VISUALIZAÇÃO ILUSTRATIVA</div><div id="alertBanner" class="alertBanner" hidden>ÚLTIMA HORA · ALERTA EDITORIAL</div><div class="camera-status" id="cameraStatus">CÂMARA · PANORÂMICA</div><div class="content"><div class="mainStory"><div class="eyebrow" id="eyebrow">CIDADE 3D</div><h1 id="headline"></h1><p id="description"></p></div><div class="facts"><strong>EM DESTAQUE</strong><hr><span id="facts"></span></div></div><div class="tag" id="tag"></div><div class="strap"><h2 id="programme"></h2><p id="subtitle"></p></div><div class="ticker"><b>EM FOCO</b><div class="tickerTrack"><span class="tickerText" id="ticker"></span></div></div><div class="flash" id="flash"></div><section id="commercialBreak" aria-label="Intervalo publicitário" aria-hidden="true"><div class="cb-glow"></div><div class="cb-inner"><div class="cb-kicker" id="cbKicker">INTERVALO PUBLICITÁRIO</div><div class="cb-brand">LISBON <em>ALIVE™</em></div><div class="cb-rule"></div><div class="cb-head" id="cbHeadline">PORTUGAL NO ECRÃ</div><div class="cb-copy" id="cbCopy">Informação, cultura e cidade. Sempre consigo.</div></div><div class="cb-footer"><span id="cbStatus">AUTOPROMOÇÃO · LISBON ALIVE™</span><span id="cbNext">A SEGUIR</span></div></section></main><section class="panel" id="panel"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><h2>🍅 MASTER CONTROL 4.3 · REALIZAÇÃO</h2><a href="./anunciar.html" style="display:inline-block;background:#e33458;color:#fff;text-decoration:none;font-weight:800;border-radius:9px;padding:12px 16px" aria-label="Abrir página Anuncie Connosco">📣 ANUNCIE CONNOSCO</a></div><div class="toolbar"><label>Programa <select id="programSelect"></select></label><button id="auto">Automático: ON</button><button id="next">Próximo programa</button><button id="camera">Câmara: AUTO</button><button id="shot">Mudar plano</button><button id="apply">Aplicar edição</button><button id="save">Guardar alterações</button><button id="reset">Repor programa</button><button id="mode">Modo OBS</button><button id="fullscreen">Ecrã completo</button><button id="restartAuto">Retomar emissão automática</button><button id="export">Exportar configurações</button><button id="import">Importar configurações</button><input type="file" id="importFile" accept="application/json,.json" hidden><button id="diagnose">Diagnóstico</button><button id="quality">Qualidade: AUTO</button><button id="alertToggle">Alerta: OFF</button></div><div class="toolbar" style="margin-top:12px"><button id="europe">🌍 EUROPA EM ALERTA™</button><button id="europeSecurity">🛡 Segurança</button><button id="europeEconomy">€ Economia</button><button id="europePortugal">🇵🇹 Portugal</button><button id="europeMedia">🔎 MEDIA WATCH™</button></div><div class="operations" role="status"><span id="onair">EMISSÃO LOCAL · A INICIAR</span><span id="nextShow">PRÓXIMO PROGRAMA · A CALCULAR</span><span id="uptime">TEMPO ATIVO · 00:00:00</span><span id="diagnostics">SISTEMA · A INICIAR</span></div><div class="fields"><label>Título<input id="editHeadline"></label><label>Categoria<input id="editCategory"></label><label class="wide">Descrição<textarea id="editDescription"></textarea></label><label class="wide">Factos / painel lateral<textarea id="editFacts"></textarea></label><label class="wide">Rodapé<textarea id="editTicker"></textarea></label><label>Estado editorial<select id="editEditorial"><option value="demo">Demonstração / por verificar</option><option value="verified">Verificado por editor</option></select></label><label>Fonte e data da verificação<input id="editSource" placeholder="Ex.: comunicado oficial, 05/11/2026"></label></div><div class="help">Modo automático: programação contínua 24 horas, com horários calculados pela hora de Lisboa. Os fundos são cenários digitais com perspetiva 2.5D, não imagens reais nem os motores 3D originais da 2.4. Consulta manual de RSS disponível na central de fontes; não há publicação automática nem recolha automática de meteorologia. Para OBS usar ?broadcast=1. Importação e exportação de configurações JSON, diagnóstico de FPS e migração das edições 3.7. Tecla M alterna o painel. Tecla E abre EUROPA EM ALERTA™. Os módulos editoriais são demonstrações e exigem verificação antes da emissão. Indicador de programa seguinte e tempo de funcionamento. Realização multicâmara simulada com quatro planos automáticos a cada 18 segundos.</div></section><section class="feeddesk" id="feeddesk"><h2>🌍 EUROPA EM ALERTA™ · CENTRAL DE FONTES</h2><p>Consultar títulos RSS públicos. Os resultados são material externo por verificar. Nenhuma notícia entra automaticamente em emissão.</p><div class="feedtools"><label>Fonte RSS <select id="rssSource"><option value="https://www.europarl.europa.eu/rss/doc/press-releases/pt.xml">Parlamento Europeu (PT)</option><option value="https://www.consilium.europa.eu/pt/press/press-releases/rss/">Conselho da UE (PT)</option><option value="https://www.ecb.europa.eu/rss/press.html">Banco Central Europeu (EN)</option><option value="https://news.google.com/rss/search?q=Europa+Ucr%C3%A2nia&hl=pt-PT&gl=PT&ceid=PT:pt-150">Google Notícias: Europa/Ucrânia (agregador)</option></select></label><button id="loadFeed">Consultar RSS</button><button id="refreshFeed">Atualizar consulta</button><button id="clearFeed">Limpar fila</button></div><div id="feedStatus" role="status">Sem consulta realizada. A ligação exige internet e pode depender de um serviço intermediário externo.</div><div id="feedResults" class="feedresults"></div><p class="feednote">Privacidade: a consulta usa o intermediário público allorigins.win para contornar restrições CORS. Este serviço recebe o URL do RSS consultado. Pode estar indisponível. Não introduzas dados privados. Verifica sempre a notícia na fonte original.</p></section><section id="editor42" class="editor42"><h2>📡 TOMATE NEWS 24™ · MESA EDITORIAL 4.2</h2><p>Fila de notícias e verificação editorial. Os títulos RSS são material externo, não notícias confirmadas. Os alertas só aparecem na emissão após autorização manual.</p><div class="tools42"><button id="queueFromRSS">Adicionar títulos RSS à fila</button><button id="queueExport">Exportar fila JSON</button><button id="queueClear">Limpar fila editorial</button><button id="queueMedia">Abrir auditoria MEDIA WATCH</button></div><div class="tools42"><label>Título para avaliação<input id="queueTitle" maxlength="250" placeholder="Título da notícia"></label><label>URL original<input id="queueUrl" placeholder="https://..."></label><label>Estado<select id="queueState"><option value="pending">Por verificar</option><option value="review">Em análise</option><option value="confirmed">Confirmada pelo operador</option><option value="rejected">Rejeitada</option></select></label></div><div class="tools42"><label>Fontes e provas<textarea id="queueEvidence" placeholder="URLs, documentos e notas de verificação"></textarea></label><label>Comparação de cobertura mediática<textarea id="queueCoverage" placeholder="Meio, hora, destaque, ligação e eventuais lacunas"></textarea></label></div><div class="tools42"><button id="queueAdd">Guardar registo editorial</button><button id="queueFilter">Mostrar todos / pendentes</button></div><p class="notice42" id="queueStatus" role="status">Sem alterações. Os dados ficam apenas neste navegador até exportação.</p><div id="queueList"></div><small>Nota: “Confirmada pelo operador” é uma declaração editorial manual, não uma validação automática independente. Nunca emitir informação sem consultar as fontes.</small></section><script>
-'use strict';const $=id=>document.getElementById(id),news='Conteúdo de demonstração.\nPublicar apenas após confirmação editorial e identificação das fontes.';
-const programmes=[
-['LISBOA AO VIVO™','CIDADE 3D','Lisboa em destaque','Uma viagem visual pela capital portuguesa.','PATRIMÓNIO · CULTURA · CIDADE','city'],
-['LISBOA NOTÍCIAS™','TOMATE NEWS 24™','Lisboa notícias','Informação sujeita a verificação editorial.','NOTÍCIAS · LISBOA · PORTUGAL','news'],
-['LISBOA AO VIVO™','CIDADE 3D','Lisboa em destaque','Património, cultura e histórias da cidade.','LISBOA · CULTURA · PATRIMÓNIO','city'],
-['LISBOA EM MOVIMENTO™','MOBILIDADE','Lisboa em movimento','Mobilidade, transportes e vida urbana.','TRANSPORTES · MOBILIDADE · CIDADE','city'],
-['LISBOA NOTÍCIAS™','TOMATE NEWS 24™','Edição da tarde','Atualidade portuguesa e internacional, sujeita a verificação.','PORTUGAL · EUROPA · MUNDO','news'],
-['FÉ EM LISBOA™','REFLEXÃO','Um momento de reflexão','Cultura, espiritualidade e património.','CULTURA · REFLEXÃO · PATRIMÓNIO','faith'],
-['LISBOA AO VIVO™','EDIÇÃO ESPECIAL','Lisboa em destaque','Monumentos, percursos e histórias da cidade.','LISBOA · HISTÓRIA · CULTURA','city'],
-['LISBOA NOTÍCIAS™','TOMATE NEWS 24™','Jornal da noite','Resumo informativo com fontes verificadas.','JORNAL DA NOITE · PORTUGAL · MUNDO','news'],
-['LISBOA À NOITE™','CIDADE NOTURNA','Lisboa à noite','A capital iluminada numa viagem visual.','NOITE · CIDADE · CULTURA','night'],
-['FÉ EM LISBOA™','REFLEXÃO DA NOITE','Reflexão da noite','Um momento de serenidade e contemplação.','REFLEXÃO · CULTURA · LISBOA','faith'],
-['LISBOA 24 HORAS™','MADRUGADA / MANHÃ','Lisboa nunca pára','Paisagens digitais e cultura da cidade durante a madrugada e a manhã.','LISBON ALIVE™ · PROGRAMAÇÃO CONTÍNUA · 24 HORAS','night'],
-['EUROPA EM ALERTA™','TOMATE NEWS 24™ · EUROPA','Europa · notícias atuais','Títulos RSS externos, sujeitos a verificação editorial.','EUROPA · NATO · ECONOMIA · PORTUGAL','news']];
-const KEY='lisbonAlive39Edits';let edits={};try{edits=JSON.parse(localStorage.getItem(KEY)||localStorage.getItem('lisbonAlive38Edits')||localStorage.getItem('lisbonAlive37Edits')||'{}')}catch{};let selected=-1,automatic=true,cameraAuto=true,shotIndex=0,alertOn=false;const sel=$('programSelect');programmes.forEach((p,i)=>{const o=document.createElement('option');o.value=i;o.textContent=String(i+1).padStart(2,'0')+' · '+p[0];sel.appendChild(o)});
-function data(i){let p=programmes[i],e=edits[i]||{};return {name:p[0],category:e.category??p[1],headline:e.headline??p[2],description:e.description??p[3],ticker:e.ticker??p[4],scene:p[5],facts:e.facts??news}}
-// FÉ EM LISBOA: reflexões originais e intemporais, não notícias nem citações atribuídas.
-const reflections=[
- ['A força dos pequenos gestos','Um gesto de atenção pode transformar o dia de alguém. Nem sempre é preciso muito para fazer a diferença.'],
- ['O valor do silêncio','Há momentos em que escutar com calma é mais importante do que encontrar uma resposta imediata.'],
- ['A cidade que acolhe','Lisboa é feita de ruas, memórias e pessoas. O respeito pelo outro também constrói o património de uma cidade.'],
- ['O tempo de recomeçar','Cada novo dia oferece uma oportunidade para corrigir o rumo, cuidar de alguém e aprender.'],
- ['Gratidão pelas coisas simples','Uma conversa, um lugar tranquilo ou um encontro inesperado podem merecer a nossa gratidão.'],
- ['Cuidar uns dos outros','Uma comunidade torna-se mais forte quando ninguém é esquecido e todos encontram espaço para participar.'],
- ['Serenidade ao anoitecer','Ao terminar o dia, podemos reconhecer o que conseguimos e aceitar com serenidade o que ficou por fazer.']
-];
-function liveReflection(p,i){
- if(edits[i]&&['headline','description','facts','ticker'].some(k=>Object.hasOwn(edits[i],k)))return p;
- const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Lisbon',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
- const year=parts.find(p=>p.type==='year').value,month=parts.find(p=>p.type==='month').value,day=parts.find(p=>p.type==='day').value;
- const key=Number(year+month+day);
- const index=(key+(i===9?3:0))%reflections.length;
- const item=reflections[index];
- return {...p,headline:item[0],description:item[1],facts:'REFLEXÃO ORIGINAL · LISBON ALIVE™\nTexto de caráter contemplativo, sem pretensão noticiosa.\nEdição automática diária · Hora de Lisboa.',ticker:'FÉ EM LISBOA · REFLEXÃO ORIGINAL · '+item[0]};
-}
-// LISBOA 24 HORAS: cápsulas culturais originais e intemporais, sem simular acontecimentos ao vivo.
-const overnightCapsules=[
- ['Lisboa ao nascer do dia','Entre as colinas e o Tejo, a cidade revela diferentes ritmos. Este cenário é uma representação digital, não uma câmara em direto.'],
- ['A memória dos bairros','Alfama, Graça e Mouraria guardam ruas estreitas e histórias de muitas gerações.'],
- ['O Tejo e a cidade','O rio Tejo marca a paisagem de Lisboa e acompanha a sua história marítima e urbana.'],
- ['Praças e encontros','As praças de Lisboa são espaços de passagem, convívio e memória coletiva.'],
- ['A luz de Lisboa','A paisagem da capital muda com a luz do dia, das fachadas aos miradouros.'],
- ['A cidade que descansa','Durante a madrugada, Lisboa abranda o ritmo. Este programa apresenta uma viagem visual ilustrativa.'],
- ['Património à descoberta','Museus, monumentos e bairros históricos convidam a conhecer a diversidade cultural da capital.']
-];
-function liveOvernight(p,i){
- if(edits[i]&&['headline','description','facts','ticker'].some(k=>Object.hasOwn(edits[i],k)))return p;
- const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Lisbon',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date());
- const val=t=>parts.find(x=>x.type===t).value;
- const day=Number(val('year')+val('month')+val('day'));
- const slot=Number(val('hour'))*2+Math.floor(Number(val('minute'))/30);
- const item=overnightCapsules[(day+slot)%overnightCapsules.length];
- return {...p,headline:item[0],description:item[1],facts:'CÁPSULA CULTURAL ORIGINAL · LISBON ALIVE™\nCenário digital ilustrativo. Não é uma transmissão de câmara ao vivo.\nConteúdo intemporal · Rotação automática a cada 30 minutos.',ticker:'LISBOA 24 HORAS · CULTURA E CIDADE · '+item[0]};
-}
-function render(i){if(i<0||i>=programmes.length)return;let changed=i!==selected;selected=i;sel.value=String(i);let p=data(i);if(p.scene==='news'||i===8||i===2||i===6)p=liveEditorial(p,i);if(i===3)p=liveMobility(p);if(i===0)p=liveAir(p);if(i===5||i===9)p=liveReflection(p,i);if(i===10)p=liveOvernight(p,i);$('programme').textContent=p.name;$('subtitle').textContent=p.category;$('tag').textContent=p.category;$('eyebrow').textContent=p.category;$('headline').textContent=p.headline;$('description').textContent=p.description;$('facts').textContent=p.facts;$('ticker').textContent=(p.ticker+'  •  ').repeat(4);for(let k of ['headline','category','description','facts','ticker'])$('edit'+k[0].toUpperCase()+k.slice(1)).value=p[k];const ed=edits[i]||{};const editorial=ed.editorial==='verified'&&String(ed.source||'').trim()&&String(ed.verifiedAt||'').trim();$('watermark').textContent=i===0?(airState&&Date.now()-airState.loaded<75*60*1000?'DADOS MODELO · OPEN-METEO AIR QUALITY · CENÁRIO DIGITAL':'QUALIDADE DO AR INDISPONÍVEL · CENÁRIO DIGITAL'):(p.scene==='news'||i===8||i===2||i===6)?(liveFeedFor(i)?'TÍTULOS DE FONTE EXTERNA · NÃO VERIFICADOS PELA REDAÇÃO':(cachedFeedFor(i)?'ARQUIVO RECENTE · FONTE INDISPONÍVEL · NÃO É DIRETO':editorial?'VERIFICAÇÃO DECLARADA PELO OPERADOR · '+ed.source:'FONTE EM TEMPO REAL INDISPONÍVEL · SEM NOTÍCIAS CONFIRMADAS')):(i===5||i===9?'REFLEXÃO ORIGINAL · CENÁRIO DIGITAL':'CENÁRIO DIGITAL · VISUALIZAÇÃO ILUSTRATIVA');$('editEditorial').value=ed.editorial||'demo';$('editSource').value=ed.source||'';if(changed){setShot(0);$('flash').classList.add('on');setTimeout(()=>$('flash').classList.remove('on'),160)}}
-// LISBON ALIVE 9.9: qualidade do ar de Lisboa (modelos Open-Meteo).
-// Dados modelados, não medições de estação nem imagens em direto.
-let airState=null;
-function liveAir(p){
- const a=airState&&Date.now()-airState.loaded<75*60*1000?airState:null;
- if(!a)return {...p,headline:'Lisboa · qualidade do ar indisponível',description:'Não há dados atuais de qualidade do ar disponíveis nesta consulta. Cenário visual ilustrativo.',facts:'QUALIDADE DO AR · DADOS INDISPONÍVEIS',ticker:'LISBOA AO VIVO · QUALIDADE DO AR · SEM DADOS ATUAIS'};
- const v=a.data,aqi=Number(v.european_aqi),pm=Number(v.pm2_5);
- if(!Number.isFinite(aqi)||!Number.isFinite(pm))return p;
- const state=aqi<=20?'Boa':aqi<=40?'Razoável':aqi<=60?'Moderada':aqi<=80?'Fraca':aqi<=100?'Muito fraca':'Extremamente fraca';
- const time=new Intl.DateTimeFormat('pt-PT',{timeZone:'Europe/Lisbon',hour:'2-digit',minute:'2-digit'}).format(new Date(a.loaded));
- return {...p,headline:'Lisboa · qualidade do ar: '+state,description:'Índice europeu de qualidade do ar (modelo Open-Meteo): '+Math.round(aqi)+'. Dados consultados às '+time+' (Lisboa). Não são medições locais em direto.',facts:'ÍNDICE EUROPEU · '+Math.round(aqi)+'\nPM2,5 · '+pm.toFixed(1).replace('.',',')+' µg/m³\nFONTE · OPEN-METEO AIR QUALITY\nCENÁRIO DIGITAL ILUSTRATIVO',ticker:'LISBOA AO VIVO · QUALIDADE DO AR MODELO OPEN-METEO · '+state.toUpperCase()};
-}
-async function refreshAir(){
- const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),12000);
- try{const url='https://air-quality-api.open-meteo.com/v1/air-quality?latitude=38.7223&longitude=-9.1393&current=european_aqi,pm2_5&timezone=Europe%2FLisbon';
- const r=await fetch(url,{signal:controller.signal,cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);
- const payload=await r.json(),v=payload.current;
- if(!v||!Number.isFinite(Number(v.european_aqi))||!Number.isFinite(Number(v.pm2_5)))throw Error('Resposta inválida');
- airState={data:v,loaded:Date.now()};
- }catch(err){console.warn('Qualidade do ar indisponível',err);airState=null}
- finally{clearTimeout(timeout)}
- if(selected===0)render(0);
-}
-refreshAir();setInterval(refreshAir,30*60*1000);
-// LISBON ALIVE 9.8: dados operacionais de veículos, sem alterar o esquema visual.
-// Fonte: API pública Carris Metropolitana. Posições não equivalem a atrasos nem a trânsito.
-let mobilityState=null;
-function liveMobility(p){
- const m=mobilityState&&Date.now()-mobilityState.loaded<3*60*1000?mobilityState:null;
- if(!m)return {...p,headline:'Mobilidade · dados atuais indisponíveis',description:'Não foi possível confirmar posições recentes dos veículos da Carris Metropolitana.',ticker:'LISBOA EM MOVIMENTO · A AGUARDAR FONTE',facts:'SEM DADOS ATUAIS CONFIRMADOS · NÃO SÃO APRESENTADOS ATRASOS OU TRÂNSITO ESTIMADOS'};
- const time=new Intl.DateTimeFormat('pt-PT',{timeZone:'Europe/Lisbon',hour:'2-digit',minute:'2-digit'}).format(new Date(m.loaded));
- return {...p,headline:'Carris Metropolitana · '+m.count+' veículos reportados',description:'Contagem de posições comunicadas pela API pública. Consulta: '+time+' (Lisboa). Não indica pontualidade, passageiros nem trânsito.',ticker:'MOBILIDADE · CARRIS METROPOLITANA · DADOS OPERACIONAIS',facts:'FONTE: API CARRIS METROPOLITANA · '+m.count+' POSIÇÕES · CONSULTA '+time+' · NÃO É UMA CÂMARA EM DIRETO'};
-}
-async function refreshMobility(){
- const c=new AbortController(),timer=setTimeout(()=>c.abort(),12000);
- try{
-  const r=await fetch('https://api.carrismetropolitana.pt/v2/vehicles',{signal:c.signal,cache:'no-store'});
-  if(!r.ok)throw Error('HTTP '+r.status);
-  const payload=await r.json();
-  const list=Array.isArray(payload)?payload:Array.isArray(payload.vehicles)?payload.vehicles:Array.isArray(payload.data)?payload.data:null;
-  if(!list)throw Error('Formato inesperado da API');
-  mobilityState={count:list.length,loaded:Date.now()};
- }catch(err){console.warn('Dados de mobilidade indisponíveis',err);mobilityState=null}
- finally{clearTimeout(timer)}
- if(selected===3)render(3);
-}
-refreshMobility();setInterval(refreshMobility,60*1000);
-
-// LISBON ALIVE 9.6: fontes RSS externas, atualização periódica, sem alterar CSS ou estrutura visual.
-const liveSources={
-  lisboa:'https://news.google.com/rss/search?q=Lisboa+Portugal&hl=pt-PT&gl=PT&ceid=PT:pt-150',
-  portugal:'https://news.google.com/rss/search?q=Portugal&hl=pt-PT&gl=PT&ceid=PT:pt-150',
-  europa:'https://news.google.com/rss/search?q=Europa+Uni%C3%A3o+Europeia&hl=pt-PT&gl=PT&ceid=PT:pt-150'
-};
-liveSources.noite='https://news.google.com/rss/search?q=Lisboa+agenda+cultural&hl=pt-PT&gl=PT&ceid=PT:pt-150';
-liveSources.patrimonio='https://news.google.com/rss/search?q=Lisboa+patrimonio+museus&hl=pt-PT&gl=PT&ceid=PT:pt-150';
-const liveFeeds={};
-function feedGroup(i){return i===11?'europa':i===8?'noite':(i===2||i===6)?'patrimonio':i===1?'lisboa':'portugal'}
-function liveFeedFor(i){const f=liveFeeds[feedGroup(i)];return f&&f.items.length&&Date.now()-f.loaded<20*60*1000?f:null}
-function cachedFeedFor(i){const f=liveFeeds[feedGroup(i)];return f&&f.items.length&&Date.now()-f.loaded<2*60*60*1000?f:null}
-function liveEditorial(p,i){const f=liveFeedFor(i);if(!f){const cached=cachedFeedFor(i);if(cached){const item=cached.items[Math.floor(Date.now()/25000)%cached.items.length];return {...p,headline:item.title,description:'Arquivo recente · '+item.source+' · '+(item.date||'data não indicada')+'. A fonte está temporariamente indisponível; esta notícia NÃO está atualizada em tempo real.',facts:'ARQUIVO RECENTE · FONTE TEMPORARIAMENTE INDISPONÍVEL\nFONTE: '+item.source+'\nPUBLICAÇÃO: '+(item.date||'não indicada')+'\nSEM VERIFICAÇÃO EDITORIAL',ticker:'ARQUIVO RECENTE · NÃO É NOTÍCIA EM DIRETO · '+cached.items.slice(0,3).map(x=>x.title).join(' · ')}}return {...p,headline:'A aguardar atualização de fontes',description:'Não foi possível confirmar títulos atuais. A emissão mantém a programação automática.',facts:'Fonte RSS indisponível ou sem atualização recente. Não apresentar dados antigos como atuais.',ticker:'FONTES EXTERNAS INDISPONÍVEIS · SEM INFORMAÇÃO CONFIRMADA'}}
- const elapsed=Math.floor(Date.now()/25000);const item=f.items[elapsed%f.items.length];return {...p,headline:item.title,description:'Título publicado por '+item.source+' · '+(item.date||'data não indicada')+'. Consulte a publicação original para contexto.',facts:'FONTE: '+item.source+'\nPUBLICAÇÃO: '+(item.date||'não indicada')+'\nAGREGAÇÃO AUTOMÁTICA · SEM VERIFICAÇÃO EDITORIAL',ticker:f.items.slice(0,5).map(x=>x.title).join(' · ')};
-}
-async function refreshLiveFeed(group){
- const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),12000);
- try{
-  const response=await fetch((location.hostname==='ideavaulthq-del.github.io'?'https://lisboalivetv.netlify.app':'')+'/.netlify/functions/news?group='+encodeURIComponent(group),{signal:controller.signal,cache:'no-store'});
-  if(!response.ok)throw Error('HTTP '+response.status);
-  const payload=await response.json();
-  if(!Array.isArray(payload.items))throw Error('Formato inválido');
-  const items=payload.items.filter(x=>x&&typeof x.title==='string'&&typeof x.source==='string'&&typeof x.date==='string'&&typeof x.url==='string'&&/^https:\/\//.test(x.url)).slice(0,12);
-  if(!items.length)throw Error('Sem notícias recentes');
-  liveFeeds[group]={items,loaded:Date.now()};
- }catch(err){console.warn('Notícias indisponíveis',group,err);if(liveFeeds[group]&&Date.now()-liveFeeds[group].loaded>=2*60*60*1000)delete liveFeeds[group]}
- finally{clearTimeout(timeout)}
- if(selected>=0&&(programmes[selected][5]==='news'||selected===8||selected===2||selected===6))render(selected);
-}
-function refreshAllLive(){Object.keys(liveSources).forEach(refreshLiveFeed)}
-refreshAllLive();setInterval(refreshAllLive,5*60*1000);
-setInterval(()=>{if(selected>=0&&(programmes[selected][5]==='news'||selected===8||selected===2||selected===6))render(selected)},25000);
-const shots=['wide','medium','detail','drift'];const shotNames=['PANORÂMICA','PLANO MÉDIO','APROXIMAÇÃO','MOVIMENTO LENTO'];
-function setShot(i){shotIndex=(i+shots.length)%shots.length;const st=$('stage');shots.forEach(k=>st.classList.remove('cam-'+k));st.classList.add('cam-'+shots[shotIndex]);$('cameraStatus').textContent='CÂMARA · '+shotNames[shotIndex]}
-$('camera').onclick=()=>{cameraAuto=!cameraAuto;$('camera').textContent='Câmara: '+(cameraAuto?'AUTO':'MANUAL')};
-$('shot').onclick=()=>{cameraAuto=false;$('camera').textContent='Câmara: MANUAL';setShot(shotIndex+1)};
-setInterval(()=>{if(cameraAuto)setShot(shotIndex+1)},18000);
-function lisbon(){let parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Lisbon',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date());return {h:Number(parts.find(p=>p.type==='hour').value),m:Number(parts.find(p=>p.type==='minute').value)}}
-// Grelha 24 horas: madrugada e manhã utilizam os mesmos 11 espaços,
-// mantendo a edição da tarde e da noite nos horários originais.
-function scheduleIndex(hour){
- if(hour>=14&&hour<=23)return hour-14;
- const morning=[8,10,5,8,10,0,2,3,0,6,1,2,3,6];
- return morning[hour];
-}
-const bootTime=Date.now();
-function two(n){return String(n).padStart(2,'0')}
-function updateOperations(t){
- const now=new Date();let seconds=Math.floor((Date.now()-bootTime)/1000);
- $('uptime').textContent='TEMPO ATIVO · '+two(Math.floor(seconds/3600))+':'+two(Math.floor(seconds/60)%60)+':'+two(seconds%60);
- $('onair').textContent=(automatic?'AUTO':'MANUAL')+' · '+(programmes[Math.max(0,selected)]?.[0]||'A INICIAR');
- let nextHour=(t.h+1)%24;let nextIdx=scheduleIndex(nextHour);
- $('nextShow').textContent='ÀS '+two(nextHour)+':00 · '+programmes[nextIdx][0];
-}
-$('fullscreen').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await $('stage').requestFullscreen()}catch(e){console.warn('Ecrã completo indisponível',e)}};
-$('restartAuto').onclick=()=>{automatic=true;autoUI();tick()};
-function tick(){let t=lisbon();$('clock').textContent=String(t.h).padStart(2,'0')+':'+String(t.m).padStart(2,'0')+' · LISBOA';if(automatic){let idx=scheduleIndex(t.h);if(idx!==selected)render(idx)}updateOperations(t)}function autoUI(){$('auto').textContent='Automático: '+(automatic?'ON':'OFF')}
-sel.onchange=()=>{automatic=false;autoUI();render(Number(sel.value))};$('auto').onclick=()=>{automatic=!automatic;autoUI();tick()};$('next').onclick=()=>{automatic=false;autoUI();render((selected+1)%programmes.length)};$('apply').onclick=()=>{let e={};for(let k of ['headline','category','description','facts','ticker'])e[k]=$('edit'+k[0].toUpperCase()+k.slice(1)).value;e.editorial=$('editEditorial').value;e.source=$('editSource').value.trim();e.verifiedAt=e.editorial==='verified'?new Date().toISOString():'';if(e.editorial==='verified'&&!e.source){alert('Indica a fonte e data antes de assinalar como verificado.');return}edits[selected]=e;persist();render(selected)};function persist(){try{localStorage.setItem(KEY,JSON.stringify(edits))}catch(e){console.warn('Armazenamento local indisponível',e)}}$('save').onclick=()=>{try{persist();$('save').textContent='✓ Guardado';setTimeout(()=>$('save').textContent='Guardar alterações',1600)}catch(e){alert('Erro ao guardar: '+e.message)}};$('reset').onclick=()=>{delete edits[selected];persist();render(selected)};
-$('alertToggle').onclick=()=>{if(!alertOn)$('alertBanner').textContent='ÚLTIMA HORA · ALERTA EDITORIAL';alertOn=!alertOn;$('alertBanner').hidden=!alertOn;$('alertToggle').textContent='Alerta: '+(alertOn?'ON':'OFF')};
-$('export').onclick=()=>{const blob=new Blob([JSON.stringify({version:'3.9',edits},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='lisbon-alive-config-3-9.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000)};
-$('import').onclick=()=>$('importFile').click();
-$('importFile').onchange=async()=>{const f=$('importFile').files?.[0];if(!f)return;if(f.size>1024*1024){alert('Ficheiro demasiado grande (máximo 1 MB).');return}try{const parsed=JSON.parse(await f.text());if(!parsed||typeof parsed!=='object'||!parsed.edits||typeof parsed.edits!=='object'||Array.isArray(parsed.edits))throw Error('Estrutura JSON inválida');const safe={};for(const [key,value] of Object.entries(parsed.edits)){const i=Number(key);if(!Number.isInteger(i)||i<0||i>=programmes.length||!value||typeof value!=='object')continue;safe[i]={};for(const field of ['headline','category','description','facts','ticker','source','verifiedAt'])if(typeof value[field]==='string')safe[i][field]=value[field].slice(0,3000);safe[i].editorial=value.editorial==='verified'?'verified':'demo';if(!safe[i].source||!safe[i].verifiedAt)safe[i].editorial='demo'}if(!confirm('Importar '+Object.keys(safe).length+' programas editados e substituir as edições atuais?'))return;edits=safe;persist();render(selected);alert('Configurações importadas.')}catch(e){alert('Falha na importação: '+e.message)}finally{$('importFile').value=''}};
-let frameCounter=0,lastFpsAt=performance.now(),fps=0;
-function diagnostics(){const ok=!!ctx&&Number.isFinite(fps);const label='SISTEMA · '+(ok?'OK':'AVISO')+' · '+fps+' FPS · '+(automatic?'AUTO':'MANUAL');$('diagnostics').textContent=label;return label}
-$('diagnose').onclick=()=>alert(diagnostics()+'\nPrograma: '+(selected+1)+' de '+programmes.length+'\nHora: Europe/Lisbon\nArmazenamento: '+(()=>{try{return localStorage?'disponível':'indisponível'}catch{return 'indisponível'}})());
-function toggle(){document.body.classList.toggle('broadcast-mode')};$('mode').onclick=toggle;document.addEventListener('keydown',e=>{if(e.key.toLowerCase()==='m'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName))toggle()});if(new URLSearchParams(location.search).get('broadcast')==='1')document.body.classList.add('broadcast-mode');tick();autoUI();setInterval(tick,1000);
-const canvas=$('bg'),ctx=canvas.getContext('2d');let frame=0,lastFrame=0,quality='auto',fpsLimit=30;
-$('quality').onclick=()=>{quality=quality==='auto'?'eco':quality==='eco'?'high':'auto';fpsLimit=quality==='eco'?15:quality==='high'?45:30;$('quality').textContent='Qualidade: '+quality.toUpperCase()};
-function draw(now=0){requestAnimationFrame(draw);if(document.hidden||now-lastFrame<1000/fpsLimit)return;lastFrame=now;frame++;frameCounter++;if(now-lastFpsAt>=3000){fps=Math.round(frameCounter*1000/(now-lastFpsAt));frameCounter=0;lastFpsAt=now;diagnostics()}let w=1920,h=1080,scene=programmes[Math.max(0,selected)][5];let palette={city:['#0b3464','#071329'],news:['#154783','#030d27'],faith:['#49366d','#100c29'],night:['#172d66','#020615']}[scene];let g=ctx.createLinearGradient(0,0,w,h);g.addColorStop(0,palette[0]);g.addColorStop(1,palette[1]);ctx.fillStyle=g;ctx.fillRect(0,0,w,h);ctx.globalAlpha=.17;for(let j=0;j<12;j++){ctx.strokeStyle='#78c8ff';ctx.lineWidth=2;ctx.beginPath();ctx.arc(1370,440,110+j*42+(Math.sin(frame/110)*10),0,Math.PI*2);ctx.stroke()}ctx.globalAlpha=1;if(scene==='city'||scene==='night'){for(let i=0;i<33;i++){let x=i*68-10;let v=((i*47)%230);let bh=160+v;ctx.fillStyle=scene==='night'?'#050d26':'#0a284c';ctx.fillRect(x,700-bh,62,bh+260);ctx.fillStyle=scene==='night'?'#ffce6c':'#a2d7ff';for(let a=0;a<4;a++)for(let b=0;b<6;b++)if((i+a+b)%3!==0)ctx.fillRect(x+8+a*12,710-bh+b*24,4,8)}
-// Perspetiva 2.5D: fachadas, cobertura, sombras e linhas de fuga.
-ctx.save();const parallax=Math.sin(frame/130)*12;
-for(let i=0;i<17;i++){
- const x=i*125-45+parallax, depth=35+(i%4)*11, bh=145+(i*79)%220, y=700-bh;
- ctx.fillStyle=scene==='night'?'#0d1b3c':'#16476f';ctx.fillRect(x,y,78,bh+240);
- ctx.fillStyle=scene==='night'?'#172e55':'#27658b';ctx.beginPath();ctx.moveTo(x+78,y);ctx.lineTo(x+78+depth,y-depth*.48);ctx.lineTo(x+78+depth,940-depth*.48);ctx.lineTo(x+78,940);ctx.closePath();ctx.fill();
- ctx.fillStyle=scene==='night'?'#203b64':'#3e7899';ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+depth,y-depth*.48);ctx.lineTo(x+78+depth,y-depth*.48);ctx.lineTo(x+78,y);ctx.closePath();ctx.fill();
-}
-// Ponte suspensa estilizada e horizonte do Tejo.
-ctx.globalAlpha=.72;ctx.strokeStyle=scene==='night'?'#b34e62':'#db6072';ctx.lineWidth=8;
-ctx.beginPath();ctx.moveTo(1010,720);ctx.lineTo(1890,720);ctx.stroke();
-for(const tx of [1160,1670]){ctx.beginPath();ctx.moveTo(tx,720);ctx.lineTo(tx,440);ctx.stroke()}
-ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(1010,600);ctx.quadraticCurveTo(1160,780,1330,610);ctx.quadraticCurveTo(1510,780,1670,610);ctx.quadraticCurveTo(1790,700,1890,620);ctx.stroke();
-ctx.restore();
-}else if(scene==='news'){ctx.globalAlpha=.16;ctx.fillStyle='#c0e4ff';ctx.beginPath();ctx.ellipse(1300,500,390,390,0,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1}if(scene==='news'){ctx.strokeStyle='#9bcfff';ctx.lineWidth=5;ctx.globalAlpha=.4;for(let i=0;i<9;i++){let yy=170+i*85;ctx.beginPath();ctx.moveTo(1050,yy);ctx.lineTo(1750,yy);ctx.stroke()}ctx.globalAlpha=1}
-if(scene==='news'){
-// Estúdio de notícias com chão em perspetiva e painel luminoso.
-ctx.save();ctx.globalAlpha=.32;ctx.fillStyle='#2463a1';ctx.beginPath();ctx.moveTo(900,770);ctx.lineTo(1920,650);ctx.lineTo(1920,1080);ctx.lineTo(800,1080);ctx.closePath();ctx.fill();
-ctx.strokeStyle='#a3d7ff';ctx.lineWidth=2;for(let i=0;i<8;i++){ctx.beginPath();ctx.moveTo(1140+i*90,750);ctx.lineTo(880+i*180,1080);ctx.stroke()}
-ctx.globalAlpha=.6;ctx.strokeStyle='#ec385b';ctx.lineWidth=12;ctx.strokeRect(1160,240,510,345);ctx.restore();
-}
-
-if(scene==='faith'){ctx.globalAlpha=.23;ctx.fillStyle='#ffe4b5';ctx.beginPath();ctx.arc(1450,390,175,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1}}requestAnimationFrame(draw);
-
-// EUROPA EM ALERTA: extensão editorial sem alterar os índices nem a grelha originais.
-const europeIndex=programmes.length-1;
-const europeSections={
- europe:{headline:'EUROPA SOB VIGILÂNCIA',description:'Acompanhe os acontecimentos europeus com informação verificada, fontes identificadas e contexto para Portugal.',facts:'PAINEL EDITORIAL\n• Guerra e diplomacia\n• Segurança e NATO\n• Economia e energia\n• Impacto em Portugal\n• Cobertura mediática\n\nDEMONSTRAÇÃO: atualizar e verificar antes de emitir.',ticker:'EUROPA EM ALERTA · CONTEÚDO DE DEMONSTRAÇÃO · VERIFICAR FONTES'},
- europeSecurity:{headline:'RADAR SEGURANÇA EUROPEIA',description:'Análise de riscos e acontecimentos confirmados, distinguindo declarações oficiais de cenários e rumores.',facts:'VERIFICAR: NATO · autoridades nacionais · comunicados oficiais\nSem classificação automática de risco nem alertas em tempo real.',ticker:'SEGURANÇA · FONTES OFICIAIS · VERIFICAÇÃO EDITORIAL'},
- europeEconomy:{headline:'ECONOMIA REAL EUROPEIA',description:'Inflação, preços da energia, taxas de juro e efeitos potenciais sobre as famílias portuguesas.',facts:'FONTES A CONSULTAR\nEurostat · BCE · INE · ERSE\nInserir números e datas apenas depois de os confirmar.',ticker:'ECONOMIA · ENERGIA · CUSTO DE VIDA'},
- europePortugal:{headline:'O IMPACTO EM PORTUGAL',description:'Explicar com rigor as consequências nacionais das decisões tomadas na Europa.',facts:'ÁREAS A ACOMPANHAR\n• Habitação\n• Transportes\n• Preços e energia\n• Serviços públicos\n• Segurança',ticker:'PORTUGAL · CONSEQUÊNCIAS PARA OS CIDADÃOS'},
- europeMedia:{headline:'TOMATE MEDIA WATCH™',description:'Auditoria verificável à cobertura noticiosa: comparar fontes, datas, destaque e contexto, sem presumir ocultação deliberada.',facts:'MÉTODO\n1. Identificar acontecimento\n2. Reunir fontes primárias\n3. Comparar meios e horários\n4. Registar cobertura e lacunas\n5. Publicar correções e limites',ticker:'MEDIA WATCH · PROVAS · TRANSPARÊNCIA · CONTRADITÓRIO'}
-};
-function openEurope(section){automatic=false;autoUI();render(europeIndex);const x=europeSections[section];for(const k of ['headline','description','facts','ticker'])$('edit'+k[0].toUpperCase()+k.slice(1)).value=x[k];$('editCategory').value='TOMATE NEWS 24™ · EUROPA';$('editEditorial').value='demo';$('editSource').value='';$('apply').click();}
-Object.keys(europeSections).forEach(id=>$(id).addEventListener('click',()=>openEurope(id)));
-document.addEventListener('keydown',e=>{if(e.key.toLowerCase()==='e'&&!e.altKey&&!e.ctrlKey&&!e.metaKey&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName))openEurope('europe')});
-
-// Consulta RSS: fonte externa não verificada; nunca é publicada sem ação do operador.
-let feedItems=[];
-const feedStatus=$('feedStatus'), feedResults=$('feedResults');
-function validHttpUrl(raw){try{const u=new URL(raw);return ['http:','https:'].includes(u.protocol)?u.href:null}catch{return null}}
-function showFeed(){feedResults.replaceChildren();feedItems.forEach((item,i)=>{const card=document.createElement('article');card.className='feeditem';const meta=document.createElement('small');meta.textContent=(item.date||'Data não indicada')+' · RSS externo · POR VERIFICAR';const title=document.createElement('h3');title.textContent=item.title;const link=document.createElement('a');link.textContent='Abrir fonte original';link.href=item.url;link.target='_blank';link.rel='noopener noreferrer';const btn=document.createElement('button');btn.textContent='Preparar rascunho para emissão';btn.onclick=()=>{openEurope('europe');$('editHeadline').value=item.title.slice(0,140);$('editDescription').value='Título recebido por RSS. Consultar o artigo original e confirmar os factos antes da emissão.';$('editFacts').value='FONTE RSS: '+item.source+'\nDATA: '+item.date+'\nLIGAÇÃO: '+item.url+'\nESTADO: POR VERIFICAR';$('editTicker').value='EUROPA EM ALERTA · INFORMAÇÃO POR VERIFICAR';$('editEditorial').value='demo';$('editSource').value='';feedStatus.textContent='Rascunho preparado no editor. Revê e confirma antes de aplicar. Não foi emitido.';document.querySelector('.panel').scrollIntoView({behavior:'smooth'})};card.append(meta,title,link,document.createElement('br'),btn);feedResults.append(card)})}
-async function loadRSS(){const url=validHttpUrl($('rssSource').value);if(!url){feedStatus.textContent='URL inválido';return}feedStatus.textContent='A consultar a fonte RSS...';$('loadFeed').disabled=true;try{const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),12000);let res;try{res=await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(url),{signal:controller.signal})}finally{clearTimeout(timeout)}if(!res.ok)throw Error('HTTP '+res.status);const xml=new DOMParser().parseFromString(await res.text(),'application/xml');if(xml.querySelector('parsererror'))throw Error('XML inválido');const nodes=[...xml.querySelectorAll('item, entry')].slice(0,18);feedItems=nodes.map(n=>{const val=k=>n.querySelector(k)?.textContent?.trim()||'';const atom=n.querySelector('link[href]');return {title:val('title').slice(0,250),date:val('pubDate')||val('updated')||val('published'),url:validHttpUrl(atom?.getAttribute('href')||val('link')),source:new URL(url).hostname}}).filter(x=>x.title&&x.url);showFeed();feedStatus.textContent=feedItems.length+' títulos recebidos. Todos por verificar; consulta a fonte original.';if(!feedItems.length)feedStatus.textContent='Não foram encontrados títulos válidos nesta fonte.'}catch(e){feedStatus.textContent='Não foi possível consultar o RSS ('+e.message+'). A fonte ou o intermediário pode estar indisponível. Podes continuar a usar o editor manual.'}finally{$('loadFeed').disabled=false}}
-$('loadFeed').onclick=loadRSS;$('refreshFeed').onclick=loadRSS;$('clearFeed').onclick=()=>{feedItems=[];showFeed();feedStatus.textContent='Fila limpa.'};
-
-// Mesa editorial 4.2: dados locais, sem publicação automática de RSS.
-const QUEUE42='lisbon-alive-editorial-42';let queue42=[];let onlyPending42=false;
-try{const q=JSON.parse(localStorage.getItem(QUEUE42)||'[]');if(Array.isArray(q))queue42=q.slice(0,300)}catch{}
-function persist42(){try{localStorage.setItem(QUEUE42,JSON.stringify(queue42))}catch(e){$('queueStatus').textContent='Não foi possível guardar localmente: '+e.message}}
-function status42(s){$('queueStatus').textContent=s}
-function render42(){const list=$('queueList');list.replaceChildren();queue42.forEach((it,index)=>{if(onlyPending42&&it.state!=='pending'&&it.state!=='review')return;const a=document.createElement('article');a.className='story42';const h=document.createElement('h3');h.textContent=it.title;const meta=document.createElement('small');meta.textContent=(it.created||'')+' · '+({pending:'POR VERIFICAR',review:'EM ANÁLISE',confirmed:'CONFIRMADA PELO OPERADOR',rejected:'REJEITADA'}[it.state]||'POR VERIFICAR');a.append(h,meta);if(it.url){const link=document.createElement('a');link.href=it.url;link.textContent='Fonte original';link.target='_blank';link.rel='noopener noreferrer';a.append(document.createElement('br'),link)}const info=document.createElement('p');info.textContent='Provas: '+(it.evidence||'não registadas')+' | Media Watch: '+(it.coverage||'sem avaliação');a.append(info);const actions=document.createElement('div');actions.className='tools42';const edit=document.createElement('button');edit.textContent='Editar registo';edit.onclick=()=>{$('queueTitle').value=it.title;$('queueUrl').value=it.url||'';$('queueState').value=it.state;$('queueEvidence').value=it.evidence||'';$('queueCoverage').value=it.coverage||'';$('queueAdd').dataset.edit=String(index);$('editor42').scrollIntoView({behavior:'smooth'});status42('A editar registo '+(index+1))};actions.append(edit);const draft=document.createElement('button');draft.textContent='Preparar para emissão';draft.disabled=it.state!=='confirmed';draft.onclick=()=>{openEurope('europe');$('editHeadline').value=it.title;$('editDescription').value='Notícia preparada pelo operador. Rever conteúdo, fontes e contexto antes de aplicar.';$('editFacts').value='FONTES: '+it.url+'\nPROVAS: '+it.evidence+'\nMEDIA WATCH: '+it.coverage;$('editEditorial').value='demo';$('editSource').value='';status42('Rascunho colocado no editor principal, sem emissão automática.');document.querySelector('.panel').scrollIntoView({behavior:'smooth'})};actions.append(draft);const alertBtn=document.createElement('button');alertBtn.textContent='Ativar alerta no ecrã';alertBtn.disabled=it.state!=='confirmed';alertBtn.onclick=()=>{if(!confirm('Ativar alerta visual manual? Confirma que verificaste as fontes e que o título é adequado à emissão.'))return;$('alertBanner').textContent='ÚLTIMA HORA · '+it.title.slice(0,90);alertOn=true;$('alertBanner').hidden=false;$('alertToggle').textContent='Alerta: ON';status42('Alerta visual ativado manualmente.')};actions.append(alertBtn);const del=document.createElement('button');del.textContent='Eliminar';del.onclick=()=>{if(!confirm('Eliminar este registo?'))return;queue42.splice(index,1);persist42();render42()};actions.append(del);a.append(actions);list.append(a)});if(!list.childElementCount){const p=document.createElement('p');p.textContent='Sem registos nesta vista.';list.append(p)}}
-$('queueAdd').onclick=()=>{const title=$('queueTitle').value.trim();if(!title){status42('Indica um título.');return}const url=$('queueUrl').value.trim();if(url&&!validHttpUrl(url)){status42('URL inválido.');return}const state=$('queueState').value,evidence=$('queueEvidence').value.trim();if(state==='confirmed'&&!evidence){status42('Para confirmar, regista as provas e fontes.');return}const item={title:title.slice(0,250),url:url?validHttpUrl(url):'',state,evidence,coverage:$('queueCoverage').value.trim(),created:new Date().toLocaleString('pt-PT',{timeZone:'Europe/Lisbon'})};const idx=Number($('queueAdd').dataset.edit);if($('queueAdd').dataset.edit!==undefined&&queue42[idx])queue42[idx]=item;else queue42.unshift(item);delete $('queueAdd').dataset.edit;for(const id of ['queueTitle','queueUrl','queueEvidence','queueCoverage'])$(id).value='';$('queueState').value='pending';persist42();render42();status42('Registo guardado localmente.')};
-$('queueFromRSS').onclick=()=>{if(!feedItems.length){status42('Consulta primeiro uma fonte RSS na central acima.');return}let added=0;for(const it of feedItems){if(queue42.some(x=>x.url===it.url))continue;queue42.unshift({title:it.title,url:it.url,state:'pending',evidence:'',coverage:'',created:new Date().toLocaleString('pt-PT',{timeZone:'Europe/Lisbon'})});added++}queue42=queue42.slice(0,300);persist42();render42();status42(added+' títulos importados como POR VERIFICAR.')};
-$('queueFilter').onclick=()=>{onlyPending42=!onlyPending42;render42();status42(onlyPending42?'A mostrar pendentes e em análise.':'A mostrar todos os estados.')};
-$('queueMedia').onclick=()=>{openEurope('europeMedia');$('editor42').scrollIntoView({behavior:'smooth'});status42('Rubrica MEDIA WATCH preparada. Regista aqui as provas e comparações.')};
-$('queueClear').onclick=()=>{if(!confirm('Eliminar todos os registos editoriais locais?'))return;queue42=[];persist42();render42();status42('Fila editorial limpa.')};
-$('queueExport').onclick=()=>{const blob=new Blob([JSON.stringify({version:'4.2',exportedAt:new Date().toISOString(),items:queue42},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='tomate-editorial-4-2.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
-render42();
-</script><section id="desk43"><h2>📺 MASTER CONTROL 4.3 · REALIZAÇÃO DE ÚLTIMA HORA</h2><p class="status43">Os títulos RSS são externos e permanecem por verificar. Só os registos marcados como confirmados pelo operador podem ser selecionados para alerta. O grafismo não comprova a veracidade da notícia.</p><div class="tools43"><select id="story43" aria-label="Notícia confirmada"><option value="">Selecionar notícia confirmada</option></select><button id="reload43">Atualizar lista</button><button id="preview43">Pré-visualizar</button><button id="air43">Emitir alerta</button><button id="stop43">Retirar alerta</button><button id="check43">Testar sistema</button></div><p id="status43" class="status43" role="status">Central de realização pronta.</p></section><script>
-(()=>{'use strict';const el=id=>document.getElementById(id);const sel=el('story43');const status=msg=>el('status43').textContent=msg;
-function refresh(){const prior=sel.value;sel.replaceChildren();const first=document.createElement('option');first.value='';first.textContent='Selecionar notícia confirmada';sel.append(first);(typeof queue42!=='undefined'?queue42:[]).forEach((item,i)=>{if(item.state!=='confirmed')return;const opt=document.createElement('option');opt.value=String(i);opt.textContent=item.title.slice(0,100);sel.append(opt)});if([...sel.options].some(o=>o.value===prior))sel.value=prior;status((sel.options.length-1)+' notícia(s) confirmada(s) disponíveis.');}
-function chosen(){const i=Number(sel.value);if(!sel.value||!Number.isInteger(i)||typeof queue42==='undefined')return null;const item=queue42[i];return item&&item.state==='confirmed'?item:null}
-function stop(){el('breaking43').hidden=true;el('breaking43').textContent='';status('Alerta 4.3 retirado do ecrã.');}
-el('reload43').onclick=refresh;
-el('preview43').onclick=()=>{const it=chosen();if(!it){status('Seleciona uma notícia confirmada.');return}status('PRÉ-VISUALIZAÇÃO (não emitida): ÚLTIMA HORA · '+it.title.slice(0,150))};
-el('air43').onclick=()=>{const it=chosen();if(!it){status('Não é possível emitir sem notícia confirmada.');return}if(!confirm('Confirmas a emissão do alerta? A verificação editorial é da responsabilidade do operador.'))return;el('breaking43').textContent='ÚLTIMA HORA · '+it.title.slice(0,140);el('breaking43').hidden=false;status('Alerta 4.3 no ecrã. Usa Retirar alerta para terminar.')};
-el('stop43').onclick=stop;
-el('check43').onclick=()=>{const checks={stage:!!el('stage'),rss:!!el('loadFeed'),fila:typeof queue42!=='undefined',relogio:!!el('clock'),alerta:!!el('breaking43')};status(Object.entries(checks).map(([k,v])=>k+': '+(v?'OK':'FALHA')).join(' · ')+' · Não testa conectividade RSS externa.')};
-function clock(){el('time43').textContent=new Intl.DateTimeFormat('pt-PT',{timeZone:'Europe/Lisbon',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(new Date())}clock();setInterval(clock,1000);refresh();
-document.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName))return;if(e.key.toLowerCase()==='r'&&new URLSearchParams(location.search).get('broadcast')!=='1'){document.body.classList.toggle('broadcast-mode')}});
-})();
-</script><style>
-#schedule60{max-width:1250px;margin:18px auto 35px;padding:22px;border:1px solid #416f9f;border-radius:14px;background:#081b34;color:#edf5ff}#schedule60 h2{margin:0 0 8px}#schedule60 .stats60{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}#schedule60 .stats60 span{background:#12365c;padding:11px;border:1px solid #37638f;border-radius:8px}#schedule60 .grid60{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:9px;max-height:510px;overflow:auto}#schedule60 .slot60{padding:10px;border:1px solid #35577a;border-radius:8px;background:#102741}#schedule60 .slot60.playing{border:2px solid #ff4b6b;background:#19375b}#schedule60 select,#schedule60 button{background:#174572;color:#fff;border:1px solid #5887b6;padding:9px;border-radius:7px}#schedule60 select{width:100%;margin-top:6px}#schedule60 button{cursor:pointer;margin:5px 5px 5px 0}#schedule60 p{color:#c5d7eb;line-height:1.5}.broadcast-mode #schedule60{display:none}
-</style>
-<section id="schedule60"><h2>📺 LISBON ALIVE™ | MASTER CONTROL 6.0 · GRELHA EM TEMPO REAL</h2><p>Programação contínua local com 48 blocos de 30 minutos por dia. A grelha escolhe automaticamente o programa em emissão.</p><div class="stats60"><span id="now60">Em emissão: a verificar…</span><span id="next60">Próximo: a verificar…</span><span id="count60">Contagem: --:--</span><span id="mode60">Modo: automático</span></div><div><button id="enable60">▶ Ativar grelha completa</button><button id="restore60">↺ Repor grelha de origem</button><button id="export60">↓ Exportar grelha JSON</button><button id="preview60">◉ Pré-visualizar programa atual</button></div><p id="notice60" role="status">As alterações ficam guardadas neste navegador. Não são transmitidas para servidores.</p><div id="grid60" class="grid60"></div><p><strong>Limites:</strong> o navegador tem de permanecer aberto, o dispositivo ligado e o relógio correto. Não há streaming público, atualização jornalística automática nem emissão independente num servidor. Os conteúdos de demonstração continuam identificados como tal.</p></section>
-<script>
-(()=>{'use strict';
-const slots=48, key='lisbonAliveSchedule60';const isPublic=new URLSearchParams(location.search).has('broadcast');const original=Array.from({length:slots},(_,i)=>scheduleIndex(Math.floor(i/2)));let grid;
-try{const saved=isPublic?null:JSON.parse(localStorage.getItem(key)||'null');grid=Array.isArray(saved)&&saved.length===slots&&saved.every(n=>Number.isInteger(n)&&n>=0&&n<programmes.length)?saved:original.slice()}catch{grid=original.slice()}
-const el=id=>document.getElementById(id),two=n=>String(n).padStart(2,'0');
-const oldIndex=scheduleIndex;scheduleIndex=function(hour){const t=lisbon();return grid[(hour*2+(hour===t.h&&t.m>=30?1:0))%48]};
-function current(){const t=lisbon(),slot=t.h*2+Math.floor(t.m/30),idx=grid[slot],next=grid[(slot+1)%48],remaining=1800-(t.m%30)*60-new Date().toLocaleTimeString('en-GB',{timeZone:'Europe/Lisbon',second:'2-digit'}).split(':').pop()*1;return {t,slot,idx,next,remaining}}
-function redraw(){const area=el('grid60');area.replaceChildren();for(let i=0;i<48;i++){const cell=document.createElement('div');cell.className='slot60';cell.dataset.slot=i;const label=document.createElement('strong');label.textContent=two(Math.floor(i/2))+':'+(i%2?'30':'00')+'–'+two(Math.floor(((i+1)*30)/60)%24)+':'+((i+1)%2?'30':'00');const sel=document.createElement('select');sel.setAttribute('aria-label','Programa das '+label.textContent);programmes.forEach((p,j)=>{const o=document.createElement('option');o.value=j;o.textContent=p[0]+' · '+p[1];sel.append(o)});sel.value=grid[i];sel.onchange=()=>{grid[i]=Number(sel.value);try{localStorage.setItem(key,JSON.stringify(grid))}catch{}el('notice60').textContent='Alteração guardada para '+label.textContent+'.';update()};cell.append(label,sel);area.append(cell)}update()}
-function update(){const {t,slot,idx,next,remaining}=current();document.querySelectorAll('.slot60').forEach((c,i)=>c.classList.toggle('playing',i===slot));const isFriday=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Lisbon',weekday:'short'}).format(new Date())==='Fri';el('now60').textContent='NO AR · '+programmes[idx][0];el('next60').textContent='A SEGUIR · '+programmes[next][0];el('count60').textContent='MUDA EM · '+two(Math.floor(remaining/60))+':'+two(remaining%60);el('mode60').textContent='GRELHA · '+(automatic?'AUTO':'MANUAL');if(automatic&&selected!==idx)render(idx);}
-el('enable60').onclick=()=>{automatic=true;autoUI();tick();update();el('notice60').textContent='Grelha automática ligada.'};el('restore60').onclick=()=>{if(!confirm('Repor os 48 blocos de origem?'))return;grid=original.slice();try{localStorage.removeItem(key)}catch{}redraw();tick()};el('preview60').onclick=()=>{const {idx}=current();automatic=false;autoUI();render(idx);el('stage').scrollIntoView({behavior:'smooth'})};el('export60').onclick=()=>{const b=new Blob([JSON.stringify({version:'6.0',timezone:'Europe/Lisbon',durationMinutes:30,slots:grid.map((program,i)=>({start:two(Math.floor(i/2))+':'+(i%2?'30':'00'),program,show:programmes[program][0]}))},null,2)],{type:'application/json'});const a=document.createElement('a'),u=URL.createObjectURL(b);a.href=u;a.download='lisbon-alive-grelha-6-0.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1500)};
-function validPublished(data){return data&&data.timezone==='Europe/Lisbon'&&Array.isArray(data.programs)&&data.programs.length===48&&data.programs.every(n=>Number.isInteger(n)&&n>=0&&n<programmes.length)}
-async function loadPublished(){try{const r=await fetch('schedule.json?ts='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);const d=await r.json();if(!validPublished(d))throw Error('Formato de grelha inválido');if(isPublic){grid=d.programs.slice();redraw();tick();}else{el('publish80status').textContent='Grelha publicada encontrada: '+(d.publishedAt||'sem data')+'. Para atualizar o site, exporta e publica novo schedule.json.'}}catch(e){if(!isPublic)el('publish80status').textContent='Ainda sem grelha publicada no servidor. '+e.message;}}
-if(isPublic){loadPublished();setInterval(loadPublished,60000)}else{loadPublished();if(el('publish80'))el('publish80').onclick=()=>{const payload={version:'8.0',timezone:'Europe/Lisbon',publishedAt:new Date().toISOString(),programs:grid.slice()};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='schedule.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1500);el('publish80status').textContent='Ficheiro schedule.json exportado. Substitui-o no alojamento para publicar a grelha a todos os espectadores.'};if(el('import80'))el('import80').onchange=async ev=>{const file=ev.target.files?.[0];if(!file)return;try{const d=JSON.parse(await file.text());if(!validPublished(d))throw Error('Ficheiro inválido');grid=d.programs.slice();localStorage.setItem(key,JSON.stringify(grid));redraw();tick();el('publish80status').textContent='Grelha importada no editor. Exporta schedule.json e publica para partilhar.'}catch(e){el('publish80status').textContent='Erro: '+e.message}ev.target.value=''}}
-redraw();setInterval(update,1000);document.addEventListener('visibilitychange',update);
-})();
-</script>
-
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>24 NOTÍCIAS™ — DIRETO</title>
 <style>
-#web70{max-width:1250px;margin:18px auto 30px;padding:20px;border:1px solid #487ab0;border-radius:14px;background:#091c36;color:#e9f3ff}#web70 a,#web70 button{display:inline-block;background:#b81438;color:white;border:0;border-radius:7px;padding:11px 14px;margin:5px;text-decoration:none;font-weight:700;cursor:pointer}#web70 code{color:#a9d7ff}#web70 .webhint{font-size:13px;color:#b6cce8}.broadcast-mode #web70{display:none}
-</style>
-<style>#publish80panel{max-width:1250px;margin:18px auto;padding:20px;background:#102c4d;border:1px solid #4a80ba;border-radius:14px;color:white}#publish80panel button,#publish80panel label{display:inline-block;margin:6px;padding:12px;border:0;border-radius:7px;background:#e01e4c;color:white;cursor:pointer;font-weight:700}#publish80panel input{display:none}#publish80panel p{line-height:1.5}.broadcast-mode #publish80panel{display:none}</style><section id="publish80panel"><h2>🌐 MASTER CONTROL 8.0 | PUBLICAÇÃO DA GRELHA</h2><p>Publica a mesma grelha para todos os espectadores sem base de dados. Exporta o ficheiro <code>schedule.json</code> e substitui-o no alojamento. Os espectadores recebem a atualização automaticamente até 60 segundos depois de o novo ficheiro estar disponível.</p><button id="publish80">↓ Exportar schedule.json para publicar</button><label for="import80">↑ Importar grelha JSON</label><input id="import80" type="file" accept="application/json,.json"><p id="publish80status" role="status">A verificar a grelha publicada…</p><p><small>Não publica automaticamente no servidor. Não há autenticação editorial nem notícias verificadas em direto. Usa um alojamento HTTPS com acesso restrito à publicação de ficheiros.</small></p></section>
-<section id="web70"><h2>🌍 MASTER CONTROL 8.0 | CANAL WEB</h2><p>Modo espectador e publicação estática preparados. A grelha usa a hora de Lisboa em cada navegador e muda de programa automaticamente, mesmo que o editor não esteja ligado. <strong>Isto não constitui um fluxo de vídeo em direto nem um servidor de emissão.</strong></p><a href="viewer.html" target="_blank" rel="noopener">▶ Abrir canal para espectadores</a><a href="viewer.html?test=1" target="_blank" rel="noopener">◉ Testar ecrã de emissão</a><button id="copy70">Copiar endereço público do canal</button><p id="web70status" class="webhint">Para partilhar com espectadores, publica a pasta completa num alojamento estático HTTPS. As alterações feitas no editor local não são sincronizadas automaticamente com outros dispositivos.</p></section>
-<script>
-(()=>{const b=document.getElementById('copy70');b.addEventListener('click',async()=>{const url=new URL('viewer.html',location.href).href;if(location.protocol==='file:'){document.getElementById('web70status').textContent='Primeiro publica o projeto num alojamento HTTPS. O endereço file:// não é público.';return}try{await navigator.clipboard.writeText(url);document.getElementById('web70status').textContent='Endereço copiado: '+url}catch{document.getElementById('web70status').textContent='Endereço do canal: '+url}})})();
-</script>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,700;0,900;1,700&family=Inter:wght@500;700;800;900&display=swap');
 
-<script id="commercialBreakEngine">
-(()=>{'use strict';
-const screen=document.getElementById('commercialBreak');if(!screen)return;
-const $=id=>document.getElementById(id),params=new URLSearchParams(location.search);
-const preview=params.get('adPreview')==='1',campaignKey='lisbonAliveAdCampaigns20',logKey='lisbonAliveAdReport20';
-const defaultCampaign={id:'official-promo',name:'LISBON ALIVE™ | Promo oficial',format:'html',duration:30,headline:'PORTUGAL NO ECRÃ',copy:'Lisboa, cultura, informação e histórias. LISBON ALIVE™.',enabled:true,mediaName:''};
-const socialTemplates=[{"id":"social-burlas","name":"SOCIAL IMPACT | BURLAS DIGITAIS","format":"html","duration":30,"type":"social","headline":"BURLAS DIGITAIS","copy":"Desconfia de mensagens urgentes. Nunca partilhes códigos ou palavras-passe.","help":"Em caso de suspeita, contacta o teu banco pelos canais oficiais.","url":"https://www.cncs.gov.pt/","enabled":false,"mediaName":""},{"id":"social-bullying","name":"SOCIAL IMPACT | BULLYING E CYBERBULLYING","format":"html","duration":30,"type":"social","headline":"BULLYING E CYBERBULLYING","copy":"Não partilhes humilhações. Guarda provas e pede ajuda a alguém de confiança.","help":"Fala com a escola, familiares ou serviços de apoio.","url":"https://www.internetsegura.pt/","enabled":false,"mediaName":""},{"id":"social-animais","name":"SOCIAL IMPACT | PROTEÇÃO ANIMAL","format":"html","duration":30,"type":"social","headline":"PROTEÇÃO ANIMAL","copy":"Adotar é um compromisso para a vida. Não abandones.","help":"Procura associações e centros de recolha autorizados.","url":"https://www.dgav.pt/","enabled":false,"mediaName":""},{"id":"social-habitacao","name":"SOCIAL IMPACT | HABITAÇÃO E DIREITOS","format":"html","duration":30,"type":"social","headline":"HABITAÇÃO E DIREITOS","copy":"Conhece os teus direitos e confirma os programas de apoio à habitação.","help":"Consulta condições e candidaturas em canais oficiais.","url":"https://www.portaldahabitacao.pt/","enabled":false,"mediaName":""},{"id":"social-emergencias","name":"SOCIAL IMPACT | PROTEÇÃO CIVIL","format":"html","duration":30,"type":"social","headline":"PROTEÇÃO CIVIL","copy":"Prepara um plano familiar. Segue avisos oficiais e evita riscos desnecessários.","help":"Em perigo imediato em Portugal, liga 112.","url":"https://www.prociv.gov.pt/","enabled":false,"mediaName":""},{"id":"social-mental","name":"SOCIAL IMPACT | SAÚDE MENTAL","format":"html","duration":30,"type":"social","headline":"SAÚDE MENTAL","copy":"Pedir ajuda é um passo importante. Escuta sem julgar.","help":"Procura um profissional de saúde ou serviço de apoio local.","url":"https://www.sns24.gov.pt/","enabled":false,"mediaName":""},{"id":"social-solidariedade","name":"SOCIAL IMPACT | SOLIDARIEDADE","format":"html","duration":30,"type":"social","headline":"SOLIDARIEDADE","copy":"Um gesto pode transformar um dia. Ajuda com responsabilidade.","help":"Confirma a identidade das organizações antes de doar.","url":"https://www.bancoalimentar.pt/","enabled":false,"mediaName":""},{"id":"social-cultura","name":"SOCIAL IMPACT | CULTURA PARA TODOS","format":"html","duration":30,"type":"social","headline":"CULTURA PARA TODOS","copy":"Descobre exposições, concertos e iniciativas culturais na tua cidade.","help":"Confirma datas, bilhetes e acessibilidade com o organizador.","url":"https://www.agendalx.pt/","enabled":false,"mediaName":""},{"id":"social-comercio","name":"SOCIAL IMPACT | COMÉRCIO LOCAL","format":"html","duration":30,"type":"social","headline":"COMÉRCIO LOCAL","copy":"Descobre os negócios da tua comunidade. Compra de forma informada.","help":"Espaço promocional demonstrativo. Nenhum anunciante contratado.","url":"","enabled":false,"mediaName":""}];
-const pkCampaign={id:'pk-promo-demo',name:'LISBON ALIVE™ | PK PROMO (demonstração)',format:'html',duration:30,headline:'BATALHA LIVE · VS',copy:'Exemplo de anúncio. Criadores e horário fictícios.',enabled:false,type:'pk',creatorA:'CRIADOR A',creatorB:'CRIADOR B',handleA:'@criadorA',handleB:'@criadorB',eventAt:'2026-11-14T21:00:00+00:00',mediaName:''};
-function fmtTime(iso,zone){try{return new Intl.DateTimeFormat('pt-PT',{timeZone:zone,hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date(iso))}catch{return '--:--'}}
-function socialText(c){return {head:c.headline,copy:c.copy,status:'MENSAGEM DE SERVIÇO PÚBLICO · '+(c.help||'')+' · '+(c.url||'SEM PATROCÍNIO')}}
-function pkText(c){const a=c.creatorA||'CRIADOR A',b=c.creatorB||'CRIADOR B';return {head:a+'  VS  '+b,copy:'🇵🇹 '+fmtTime(c.eventAt,'Europe/Lisbon')+' PORTUGAL   |   🇧🇷 '+fmtTime(c.eventAt,'America/Sao_Paulo')+' BRASÍLIA · '+(c.handleA||'')+' / '+(c.handleB||''),status:'PUBLICIDADE · BATALHA TIKTOK · '+c.name}}
-
-let campaigns=[defaultCampaign,pkCampaign,...socialTemplates],shown=false,lastPhase='',lastImpression='',lastCampaign=defaultCampaign;
-function safeLoad(){try{const stored=JSON.parse(localStorage.getItem(campaignKey)||'null');if(Array.isArray(stored)&&stored.length){campaigns=stored.filter(x=>x&&typeof x.id==='string'&&typeof x.name==='string'&&x.format==='html'&&x.duration===30).slice(0,30);if(!campaigns.length)campaigns=[defaultCampaign]}}catch(e){console.warn('Campanhas locais indisponíveis',e)}}
-safeLoad();
-function report(event){try{const data=JSON.parse(localStorage.getItem(logKey)||'[]');const rows=Array.isArray(data)?data:[];rows.push(event);localStorage.setItem(logKey,JSON.stringify(rows.slice(-500)))}catch(e){console.warn('Relatório local indisponível',e)}}
-function clock(){const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Lisbon',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(new Date());const n=t=>Number(parts.find(x=>x.type===t).value);return {year:n('year'),month:n('month'),day:n('day'),hour:n('hour'),minute:n('minute'),second:n('second')}}
-function update(){
- const t=clock(),seconds=t.minute*60+t.second,remaining=1800-(seconds%1800);
- const auto=$('auto')?.textContent.includes('ON');
- const active=preview|| (!!auto&&remaining<=45);
- if(active){
-  const elapsed=preview?(Math.floor(Date.now()/1000)%45):45-remaining;
-  const phase=elapsed<5?'ident':elapsed<35?'ad':'next';
-  const slotKey=t.year+'-'+t.month+'-'+t.day+'-'+t.hour+'-'+Math.floor(t.minute/30);
-  const enabled=campaigns.filter(c=>c.enabled);
-  const requested=preview?params.get('adCampaign'):null;
-  const previewSelected=requested?campaigns.find(c=>c.id===requested):null;
-  const selected=previewSelected||(enabled.length?enabled[(t.day*48+t.hour*2+Math.floor(t.minute/30))%enabled.length]:defaultCampaign);
-  const nextHour=t.minute>=30?(t.hour+1)%24:t.hour;
-  const nextIndex=typeof scheduleIndex==='function'?scheduleIndex(nextHour):0;
-  const next=typeof programmes!=='undefined'?programmes[nextIndex]?.[0]||'PRÓXIMO PROGRAMA':'PRÓXIMO PROGRAMA';
-  const impressionKey=slotKey+'|'+selected.id;
-  if(phase==='ad'&&lastImpression!==impressionKey&&!preview){report({at:new Date().toISOString(),campaignId:selected.id,campaignName:selected.name,slot:slotKey,type:'display-start'});lastImpression=impressionKey}
-  const phaseKey=slotKey+'|'+phase+'|'+selected.id;
-  if(lastPhase!==phaseKey){
-   const display=phase==='ident'?{head:'INTERVALO PUBLICITÁRIO',copy:'LISBON ALIVE™ · Voltamos já a seguir.',status:'SEPARADOR · 5 SEGUNDOS'}:phase==='ad'?(selected.type==='pk'?pkText(selected):selected.type==='social'?socialText(selected):{head:selected.headline||selected.name,copy:selected.copy||'Uma produção LISBON ALIVE™.',status:'AUTOPROMOÇÃO · '+selected.name}):{head:'A SEGUIR',copy:next,status:'CONTINUIDADE · 10 SEGUNDOS'};
-   $('cbKicker').textContent=phase==='ad'?(selected.type==='social'?'MENSAGEM DE SERVIÇO PÚBLICO':selected.type==='pk'?'PROMOÇÃO · BATALHA LIVE':'MENSAGEM COMERCIAL'):phase==='next'?'CONTINUIDADE DE EMISSÃO':'LISBON ALIVE™';
-   $('cbHeadline').textContent=display.head;$('cbCopy').textContent=display.copy;$('cbStatus').textContent=display.status;
-   $('cbNext').textContent='A SEGUIR · '+next;lastPhase=phaseKey;lastCampaign=selected;
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #050505;
+    color: #ffffff;
+    font-family: 'Inter', Arial, Helvetica, sans-serif;
   }
- }
- if(active!==shown){shown=active;screen.classList.toggle('cb-visible',shown);screen.setAttribute('aria-hidden',String(!shown))}
+
+  .screen {
+    width: 1920px;
+    height: 1080px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform-origin: top left;
+    overflow: hidden;
+    background: #0a0a0a;
+  }
+
+  .hero {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 40% 40%, #1c1c1c, #080808 80%);
+    overflow: hidden;
+  }
+
+  .hero .img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+    animation: slowZoom 22s ease-in-out infinite alternate;
+  }
+
+  @keyframes slowZoom {
+    from { transform: scale(1); }
+    to { transform: scale(1.06); }
+  }
+
+  .topbar {
+    position: absolute;
+    top: 40px;
+    left: 48px;
+    display: flex;
+    align-items: stretch;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.65);
+    z-index: 5;
+  }
+
+  .cnn-logo {
+    background: #CC0000;
+    color: #ffffff;
+    font-family: 'Roboto Condensed', Arial, sans-serif;
+    font-size: 58px;
+    font-weight: 900;
+    letter-spacing: -3px;
+    padding: 4px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 0.95;
+  }
+
+  .live-badge {
+    background: #ffffff;
+    color: #0b0b0b;
+    font-family: 'Roboto Condensed', Arial, sans-serif;
+    font-size: 25px;
+    font-weight: 900;
+    padding: 0 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .live-dot {
+    width: 12px;
+    height: 12px;
+    background: #CC0000;
+    border-radius: 50%;
+    animation: pulse 1.3s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.3; transform: scale(0.8); }
+  }
+
+  .status {
+    position: absolute;
+    right: 48px;
+    top: 40px;
+    background: rgba(12, 12, 12, 0.9);
+    color: #e0e0e0;
+    padding: 10px 16px;
+    font-family: 'Roboto Condensed', Arial, sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    z-index: 10;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .status.ok { color: #b8f2c2; }
+  .status.err { color: #ff8a8a; }
+
+  .sidebar {
+    position: absolute;
+    right: 48px;
+    top: 112px;
+    width: 430px;
+    background: rgba(12, 12, 12, 0.92);
+    backdrop-filter: blur(8px);
+    padding: 20px 22px;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.75);
+    z-index: 4;
+  }
+
+  .sidehead {
+    font-family: 'Roboto Condensed', Arial, sans-serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .sidehead span {
+    background: #CC0000;
+    font-size: 13px;
+    padding: 3px 8px;
+    letter-spacing: 1px;
+  }
+
+  .sideitem {
+    padding: 12px 0;
+  }
+  .sideitem:last-child { padding-bottom: 4px; }
+
+  .sidecat {
+    font-family: 'Roboto Condensed', Arial, sans-serif;
+    font-size: 14px;
+    color: #CC0000;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .sidetitle {
+    font-family: 'Roboto Condensed', Arial, sans-serif;
+    font-size: 20px;
+    line-height: 1.2;
+    font-weight: 700;
+    color: #f4f4f4;
+    margin-top: 4px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* =========================================
+     LOWER THIRD CLÁSSICO CNN (LARGURA TOTAL)
+     ========================================= */
+  .lower {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 54px;
+    z-index: 6;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .lower-top-row {
+    display: flex;
+    align-items: stretch;
+    padding-left: 170px;
+  }
+
+  .breaking-tag {
+    background: #CC0000;
+    color: #ffffff;
+    font-family: 'Roboto Condensed', Arial, sans-serif;
+    font-size: 24px;
+    font-weight: 900;
+    padding: 6px 22px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+  }
+
+  .cat-tag {
+    background: #0d0d0d;
+    color: #ffffff;
+    font-family: 'Roboto Condensed', Arial, sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    padding: 6px 20px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+  }
+
+  .lower-main {
+    display: flex;
+    align-items: stretch;
+    background: #ffffff;
+    min-height: 118px;
+  }
+
+  .cnn-lower-box {
+    width: 170px;
+    background: #CC0000;
+    color: #ffffff;
+    font-family: 'Roboto Condensed', Arial, sans-serif;
+    font-size: 62px;
+    font-weight: 900;
+    letter-spacing: -3px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 0.9;
+    flex-shrink: 0;
+  }
+
+  .cnn-lower-sub {
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    margin-top: 4px;
+    text-transform: uppercase;
+  }
+
+  .lower-texts {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .headline {
+    background: #ffffff;
+    color: #0b0b0b;
+    font-family: 'Roboto Condensed', Arial, sans-serif;
+    font-size: 56px;
+    font-weight: 900;
+    line-height: 1.05;
+    padding: 12px 28px 8px 28px;
+    text-transform: uppercase;
+    letter-spacing: -0.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .sub-bar {
+    background: #f2f2f2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 28px;
+    gap: 24px;
+  }
+
+  .summary {
+    font-family: 'Roboto Condensed', Arial, sans-serif;
+    font-size: 23px;
+    font-weight: 700;
+    color: #222222;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    text-transform: uppercase;
+  }
+
+  .source {
+    font-family: 'Roboto Condensed', Arial, sans-serif;
+    font-size: 19px;
+    font-weight: 900;
+    color: #CC0000;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+
+  .ticker {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 54px;
+    background: #0a0a0a;
+    display: flex;
+    align-items: center;
+    z-index: 8;
+  }
+
+  .ticker-clock {
+    width: 170px;
+    height: 100%;
+    background: #1a1a1a;
+    color: #ffffff;
+    font-family: 'Roboto Condensed', Arial, sans-serif;
+    font-weight: 900;
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .ticker-brand {
+    height: 100%;
+    background: #CC0000;
+    color: #ffffff;
+    font-family: 'Roboto Condensed', Arial, sans-serif;
+    font-weight: 900;
+    font-size: 22px;
+    padding: 0 22px;
+    display: flex;
+    align-items: center;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+
+  .tickerbody {
+    overflow: hidden;
+    white-space: nowrap;
+    flex: 1;
+    font-family: 'Roboto Condensed', Arial, sans-serif;
+    font-size: 23px;
+    font-weight: 700;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .tickertext {
+    display: inline-block;
+    padding-left: 100%;
+    animation: move 60s linear infinite;
+  }
+
+  @keyframes move {
+    to { transform: translateX(-100%); }
+  }
+  /* LIVE 19.0: ajustar textos sem alterar dimensões */
+  .headline, .summary, .sidetitle { text-overflow: clip; }
+</style>
+</head>
+<body>
+<main class="screen">
+  <section class="hero">
+    <img class="img" id="heroImg" referrerpolicy="no-referrer" alt="">
+  </section>
+
+  <header class="topbar">
+    <div class="cnn-logo">24N</div>
+    <div class="live-badge"><span class="live-dot"></span>DIRETO</div>
+  </header>
+
+  <div class="status" id="status">A ligar à redação…</div>
+
+  <aside class="sidebar">
+    <div class="sidehead">ÚLTIMAS NOTÍCIAS <span>AO MINUTO</span></div>
+    <div id="other"></div>
+  </aside>
+
+  <section class="lower">
+    <div class="lower-top-row">
+      <div class="breaking-tag">ÚLTIMA HORA</div>
+      <div class="cat-tag" id="category">ATUALIDADE</div>
+    </div>
+    <div class="lower-main">
+      <div class="cnn-lower-box">
+        <span>24N</span>
+        <span class="cnn-lower-sub">DIRETO</span>
+      </div>
+      <div class="lower-texts">
+        <div class="headline" id="headline">A CARREGAR NOTÍCIAS EM DIRETO…</div>
+        <div class="sub-bar">
+          <div class="summary" id="summary">A recolher os principais destaques dos órgãos de comunicação social.</div>
+          <div class="source" id="source">REDAÇÃO 24N</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="ticker">
+    <div class="ticker-clock" id="clock">--:--:--</div>
+    <div class="ticker-brand">ÚLTIMAS</div>
+    <div class="tickerbody">
+      <span class="tickertext" id="ticker">A CARREGAR ÚLTIMAS NOTÍCIAS…</span>
+    </div>
+  </footer>
+</main>
+
+<script>
+/* 24 NOTÍCIAS™ | Emissão em direto */
+const $ = id => document.getElementById(id);
+const MAX_AGE_MS = 48 * 60 * 60 * 1000;
+const REFRESH_MS = 60 * 1000;
+const ROTATION_MS = 18 * 1000;
+let news = [], idx = 0, last = '', busy = false, seq = 0;
+
+const FEEDS = [
+  { url: 'https://www.publico.pt/rss',            source: 'Público',            category: 'Portugal' },
+  { url: 'https://expresso.pt/rss',               source: 'Expresso',           category: 'Portugal' },
+  { url: 'https://eco.sapo.pt/feed/',             source: 'ECO',                category: 'Economia' },
+  { url: 'https://www.dn.pt/rss',                 source: 'Diário de Notícias', category: 'Portugal' },
+  { url: 'https://www.jn.pt/rss',                 source: 'Jornal de Notícias', category: 'Portugal' },
+  { url: 'https://www.noticiasaominuto.com/rss/ultima-hora', source: 'Notícias ao Minuto', category: 'Portugal' },
+  { url: 'https://feeds.bbci.co.uk/news/world/rss.xml', source: 'BBC World', category: 'Mundo' },
+  { url: 'https://pt.euronews.com/rss',           source: 'Euronews',           category: 'Mundo' },
+  { url: 'https://news.google.com/rss/search?q=world&hl=pt-PT&gl=PT&ceid=PT:pt', source: 'Google News', category: 'Mundo' }
+];
+
+const PROXY_CORSDEV    = 'https://proxy.cors.dev/';
+const PROXY_ALLORIGINS = 'https://api.allorigins.win/raw?url=';
+
+function fit() {
+  const scale = Math.min(innerWidth / 1920, innerHeight / 1080);
+  const e = document.querySelector('.screen');
+  e.style.transform = 'scale(' + scale + ')';
+  e.style.left = (innerWidth - 1920 * scale) / 2 + 'px';
+  e.style.top = (innerHeight - 1080 * scale) / 2 + 'px';
 }
-window.LisbonAdManager={getCampaigns:()=>campaigns.map(c=>({...c})),save(list){if(!Array.isArray(list))throw Error('Lista inválida');const cleaned=list.filter(c=>c&&typeof c.id==='string'&&typeof c.name==='string'&&c.format==='html'&&c.duration===30).slice(0,30);if(!cleaned.length)throw Error('É necessária uma campanha HTML de 30 segundos');campaigns=cleaned;localStorage.setItem(campaignKey,JSON.stringify(cleaned));lastPhase='';},getReport(){try{const x=JSON.parse(localStorage.getItem(logKey)||'[]');return Array.isArray(x)?x:[]}catch{return []}},clearReport(){localStorage.removeItem(logKey)}};
-update();setInterval(update,250);
+addEventListener('resize', fit);
+fit();
+
+function clock() {
+  $('clock').textContent = new Intl.DateTimeFormat('pt-PT', { timeZone: 'Europe/Lisbon', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).format(new Date());
+}
+clock();
+setInterval(clock, 1000);
+
+function status(t, k = '') {
+  const e = $('status');
+  e.textContent = t;
+  e.className = 'status' + (k ? ' ' + k : '');
+}
+
+function fitText(el, max, min, lines) {
+  el.style.fontSize = max + 'px';
+  el.style.whiteSpace = 'nowrap';
+  el.style.overflow = 'hidden';
+  el.style.textOverflow = 'clip';
+  el.style.display = 'block';
+  el.style.webkitLineClamp = '';
+  for (let px = max; px >= min; px--) {
+    el.style.fontSize = px + 'px';
+    if (el.scrollWidth <= el.clientWidth + 1) return;
+  }
+  if (lines > 1) {
+    el.style.fontSize = min + 'px';
+    el.style.whiteSpace = 'normal';
+    el.style.display = '-webkit-box';
+    el.style.webkitBoxOrient = 'vertical';
+    el.style.webkitLineClamp = String(lines);
+  }
+}
+
+function adjust() {
+  fitText($('headline'), 56, 26, 2);
+  fitText($('summary'), 23, 16, 1);
+  document.querySelectorAll('.sidetitle').forEach(e => fitText(e, 20, 15, 2));
+}
+addEventListener('resize', adjust);
+if (document.fonts?.ready) document.fonts.ready.then(adjust);
+
+function stripHtml(s) {
+  if (!s) return '';
+  const d = document.createElement('div');
+  d.innerHTML = s;
+  return (d.textContent || d.innerText || '').replace(/\s+/g, ' ').trim();
+}
+function truncar(s, n) {
+  if (!s) return '';
+  if (s.length <= n) return s;
+  const c = s.slice(0, n);
+  const u = c.lastIndexOf(' ');
+  return (u > 40 ? c.slice(0, u) : c) + '…';
+}
+function safeImage(u) {
+  if (!u) return '';
+  let url = String(u).trim();
+  if (url.startsWith('//')) url = 'https:' + url;
+  if (url.startsWith('http://')) url = 'https://' + url.slice(7);
+  return /^https:\/\//i.test(url) ? url : '';
+}
+function parseDate(s) {
+  if (!s) return new Date();
+  let iso = String(s).trim();
+  if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(iso)) {
+    iso = iso.replace(' ', 'T') + 'Z';
+  }
+  const d = new Date(iso);
+  return isNaN(d.getTime()) ? new Date() : d;
+}
+function getDynamicFallbackImage(category) {
+  const cat = (category || '').toLowerCase();
+  let kw = 'news,press';
+  if (cat.includes('portugal')) kw = 'lisbon,portugal';
+  else if (cat.includes('mundo') || cat.includes('internacional')) kw = 'globe,world';
+  else if (cat.includes('economia')) kw = 'finance,business';
+  else if (cat.includes('desporto')) kw = 'sports,stadium';
+  
+  return 'https://loremflickr.com/1920/1080/' + kw + '?lock=' + Math.floor(Math.random() * 9999);
+}
+
+function normalizar(item, feed) {
+  const titulo = stripHtml(item.title || '');
+  const descricao = stripHtml(item.description || item.content || item.summary || '');
+  const data = parseDate(item.pubDate || item.published || item.date || item.updated);
+  
+  let img = safeImage(item.thumbnail);
+  if (!img && item.description) {
+    const m = item.description.match(/<img[^>]+src=["']([^"']+)["']/i);
+    if (m) img = safeImage(m[1]);
+  }
+
+  return {
+    id: Math.random().toString(36).substr(2, 9),
+    title: titulo,
+    summary: truncar(descricao, 260) || 'Consulte a fonte original para mais detalhes.',
+    source: feed.source,
+    published_at: data.toISOString(),
+    image_url: img,
+    category: feed.category || 'Mundo',
+    editorial_status: 'revisto_manualmente',
+    image_credit: feed.source,
+    link: item.link || ''
+  };
+}
+
+function valid(n, now) {
+  if (!n || n.editorial_status !== 'revisto_manualmente') return false;
+  if (!['title', 'summary', 'source', 'published_at'].every(k => typeof n[k] === 'string' && n[k].trim())) return false;
+  if (typeof n.image_url !== 'string' || !n.image_url.trim()) return false;
+  
+  const pub = Date.parse(n.published_at);
+  return Number.isFinite(pub) && pub <= now + 300000 && now - pub < MAX_AGE_MS;
+}
+
+async function fetchFeed(feed) {
+  async function processarXML(xmlText) {
+    const doc = new DOMParser().parseFromString(xmlText, 'application/xml');
+    const items = Array.from(doc.querySelectorAll('item, entry'));
+    
+    return items.map(it => {
+      const get = sel => (it.querySelector(sel) || {}).textContent || '';
+      const linkEl = it.querySelector('link');
+      const link = linkEl ? (linkEl.getAttribute('href') || linkEl.textContent) : '';
+      const title = get('title');
+      
+      const enc = it.getElementsByTagName('enclosure')[0];
+      const isAudioVideo = enc && (enc.getAttribute('type') || '').match(/^(audio|video)\//i);
+      const isMediaLink = /radio|podcast|\/audio\/|\/video\/|tsf|renascenca|antena/i.test(link);
+      const isMediaTitle = /podcast|episódio|episodio|ouvir|áudio|audio|vídeo|video|rádio|radio|tsf|renascença|antena|emissão/i.test(title);
+
+      if (isAudioVideo || isMediaLink || isMediaTitle) {
+        return null; 
+      }
+      
+      let imgUrl = null;
+      const mediaTags = it.getElementsByTagName('media:content');
+      for (let m of mediaTags) {
+        if (m.getAttribute('url') && (!m.getAttribute('type') || m.getAttribute('type').startsWith('image'))) {
+          imgUrl = m.getAttribute('url'); break;
+        }
+      }
+      if (!imgUrl) {
+        const thumb = it.getElementsByTagName('media:thumbnail')[0];
+        if (thumb) imgUrl = thumb.getAttribute('url');
+      }
+      if (!imgUrl && enc && enc.getAttribute('type') && enc.getAttribute('type').startsWith('image')) {
+        imgUrl = enc.getAttribute('url');
+      }
+      
+      let contentHTML = get('content') || get('encoded') || get('description') || '';
+      if (!imgUrl && contentHTML) {
+        const match = contentHTML.match(/<img[^>]+src=["']([^"']+)["']/i);
+        if (match) imgUrl = match[1];
+      }
+      
+      if (imgUrl) {
+        const txt = document.createElement('textarea');
+        txt.innerHTML = imgUrl;
+        imgUrl = txt.value;
+      }
+
+      return normalizar({
+        title: title,
+        description: contentHTML, 
+        pubDate: get('pubDate') || get('published') || get('updated'),
+        link: link,
+        thumbnail: imgUrl
+      }, feed);
+    }).filter(item => item !== null);
+  }
+
+  try {
+    const r = await fetch(PROXY_CORSDEV + feed.url, { cache: 'no-store' });
+    if (r.ok) {
+      const result = await processarXML(await r.text());
+      if (result.length) return result;
+    }
+  } catch (_) {}
+
+  try {
+    const r = await fetch(PROXY_ALLORIGINS + encodeURIComponent(feed.url), { cache: 'no-store' });
+    if (r.ok) {
+      const result = await processarXML(await r.text());
+      if (result.length) return result;
+    }
+  } catch (_) {}
+
+  return [];
+}
+
+function waiting(msg = 'A AGUARDAR REVISÃO EDITORIAL') {
+  seq++;
+  $('headline').textContent = 'A AGUARDAR NOTÍCIAS VERIFICADAS';
+  $('summary').textContent = 'A redação prepara conteúdos para emissão.';
+  $('source').textContent = 'REDAÇÃO 24N';
+  $('category').textContent = 'REDAÇÃO';
+  $('other').replaceChildren();
+  $('heroImg').style.display = 'none';
+  $('heroImg').removeAttribute('src');
+  $('ticker').textContent = '24 NOTÍCIAS • A AGUARDAR CONTEÚDOS VERIFICADOS •';
+  status(msg);
+  adjust();
+}
+
+function render() {
+  if (!news.length) { waiting(); return; }
+  const n = news[idx % news.length];
+  const current = ++seq;
+  
+  $('category').textContent = (n.category || 'ATUALIDADE').toUpperCase();
+  $('headline').textContent = n.title;
+  $('summary').textContent = n.summary;
+  $('source').textContent = n.source + ' • ' + new Date(n.published_at).toLocaleTimeString('pt-PT', { timeZone: 'Europe/Lisbon', hour: '2-digit', minute: '2-digit' });
+  
+  const img = $('heroImg');
+  let imageURL = safeImage(n.image_url);
+  
+  if (!imageURL) {
+    imageURL = getDynamicFallbackImage(n.category);
+  }
+  
+  if (imageURL) {
+    img.onload = () => { if (current === seq) img.style.display = 'block'; };
+    img.onerror = () => {
+      if (current !== seq) return;
+      if (!img.dataset.fallbackTried) {
+        img.dataset.fallbackTried = "true";
+        img.src = 'https://images.weserv.nl/?url=' + encodeURIComponent(imageURL.replace(/^https?:\/\//, ''));
+      } else {
+        img.style.display = 'none';
+      }
+    };
+    img.dataset.fallbackTried = "";
+    img.src = imageURL;
+    img.style.display = 'none';
+  } else {
+    img.onload = null;
+    img.onerror = null;
+    img.style.display = 'none';
+    img.removeAttribute('src');
+  }
+
+  $('other').replaceChildren();
+  for (const x of news.filter(x => x !== n).slice(0, 4)) {
+    const box = document.createElement('div');
+    const cat = document.createElement('div');
+    const title = document.createElement('div');
+    box.className = 'sideitem';
+    cat.className = 'sidecat';
+    title.className = 'sidetitle';
+    cat.textContent = (x.category || 'ATUALIDADE') + ' • ' + x.source;
+    title.textContent = x.title;
+    box.append(cat, title);
+    $('other').append(box);
+  }
+  
+  const ticker = $('ticker');
+  ticker.textContent = news.slice(0, 15).map(x => '▪ ' + (x.category || 'NOTÍCIAS') + ': ' + x.title).join('     ');
+  ticker.style.animation = 'none';
+  void ticker.offsetWidth;
+  ticker.style.animation = 'move ' + Math.max(20, ticker.scrollWidth / 80) + 's linear infinite';
+  adjust();
+}
+
+async function refresh() {
+  if (busy) return;
+  busy = true;
+  try {
+    const resultados = await Promise.allSettled(FEEDS.map(f => fetchFeed(f)));
+    const todas = [];
+    for (const r of resultados) {
+      if (r.status === 'fulfilled' && Array.isArray(r.value)) todas.push(...r.value);
+    }
+
+    if (!todas.length) throw Error('Sem notícias');
+
+    const now = Date.now();
+    const selected = todas
+      .filter(n => valid(n, now))
+      .sort((a, b) => Date.parse(b.published_at) - Date.parse(a.published_at));
+
+    const key = JSON.stringify(selected.map(n => [n.id, n.title, n.summary, n.published_at, n.image_url]));
+    
+    if (key !== last) {
+      news = selected;
+      idx = 0;
+      last = key;
+      render();
+    } else if (!news.length) {
+      waiting();
+    }
+    
+    status(news.length ? 'REDAÇÃO VERIFICADA • ' + news.length + ' NOTÍCIAS' : 'A AGUARDAR REVISÃO EDITORIAL', news.length ? 'ok' : '');
+  } catch (e) {
+    if (!news.length) waiting('FEED INDISPONÍVEL');
+    else status('FEED TEMPORARIAMENTE INDISPONÍVEL', 'err');
+    console.warn('24N feed:', e);
+  } finally {
+    busy = false;
+  }
+}
+
+waiting();
+refresh();
+setInterval(refresh, REFRESH_MS);
+setInterval(() => { if (news.length > 1) { idx = (idx + 1) % news.length; render(); } }, ROTATION_MS);
+</script>
+
+<!-- 24N AUTO BREAK™ | overlay independente do grafismo noticioso -->
+<iframe id="autoBreak" title="24N SHOP — intervalo comercial" src="./intervalo.html" allow="autoplay" style="position:fixed;inset:0;width:100vw;height:100vh;border:0;display:none;z-index:99999;background:#090909" aria-hidden="true"></iframe>
+<script>
+(() => {
+  const NEWS_MS=15*60*1000, AD_MS=2*60*1000;
+  const frame=document.getElementById('autoBreak');
+  let active=false,started=Date.now(),lastBreak=Date.now(),timeout=null;
+  function finish(){
+    if(!active)return;
+    active=false;frame.style.display='none';frame.setAttribute('aria-hidden','true');
+    lastBreak=Date.now();clearTimeout(timeout);
+  }
+  function start(){
+    if(active)return;
+    active=true;started=Date.now();frame.style.display='block';frame.setAttribute('aria-hidden','false');
+    const send=()=>frame.contentWindow?.postMessage({type:'24n-break-start',duration:AD_MS},location.origin);
+    if(frame.contentDocument?.readyState==='complete')send();
+    else frame.addEventListener('load',send,{once:true});
+    timeout=setTimeout(finish,AD_MS+2000);
+  }
+  window.addEventListener('message',e=>{
+    if(e.origin===location.origin&&e.source===frame.contentWindow&&e.data?.type==='24n-break-finished')finish();
+  });
+  // Atalhos do operador: I inicia intervalo; Escape termina.
+  window.addEventListener('keydown',e=>{
+    if(e.altKey||e.ctrlKey||e.metaKey||e.repeat)return;
+    if(e.key.toLowerCase()==='i')start();
+    if(e.key==='Escape')finish();
+  });
+  // Permite abrir a cena no OBS com ?intervalo=agora para testes manuais.
+  const params=new URLSearchParams(location.search);
+  if(params.get('intervalo')==='agora')setTimeout(start,1200);
+  // O intervalo conta desde o último regresso às notícias.
+  setInterval(()=>{if(!active&&Date.now()-lastBreak>=NEWS_MS)start();},1000);
+  // Comandos opcionais para operador OBS, na consola do navegador.
+  window.N24AutoBreak={start,finish,get active(){return active;}};
 })();
 </script>
-<style id="adManagerStyles">
-#adManager20{max-width:1250px;margin:18px auto 35px;padding:20px;border:1px solid #4976a2;border-radius:14px;background:#0b1d36;color:#eef5ff;font:15px Arial,sans-serif}
-#adManager20 h2{margin:0 0 12px}#adManager20 label{display:block;margin:9px 0 4px;font-weight:bold}
-#adManager20 input,#adManager20 textarea,#adManager20 button{font:inherit;border-radius:6px;padding:9px}
-#adManager20 input,#adManager20 textarea{width:100%;background:#0b2543;color:white;border:1px solid #4976a2}
-#adManager20 button{background:#1e5a90;color:white;border:1px solid #6096c1;cursor:pointer;margin:5px 5px 5px 0}
-#adManager20 .ad-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
-#adManager20 .ad-note{color:#bbd1e6;font-size:13px;line-height:1.5}
-#adManager20 pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:180px;overflow:auto}
-.broadcast-mode #adManager20{display:none}
-</style>
-<style id="socialImpactStyles">
-#commercialBreak.cb-visible .cb-inner{animation:socialFadeIn .75s ease both}
-#commercialBreak.cb-visible .cb-rule{animation:socialPulse 3s ease-in-out infinite}
-@keyframes socialFadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-@keyframes socialPulse{50%{opacity:.45;transform:scaleX(.82)}}
-#socialImpact10{border:1px solid #4976a2;border-radius:10px;padding:14px;margin:16px 0;color:#edf5ff}
-#socialImpact10 select,#socialImpact10 input,#socialImpact10 textarea{width:100%;padding:8px;background:#0b2543;color:white;border:1px solid #4976a2;border-radius:6px}
-#socialImpact10 label{display:block;margin:9px 0 4px}
-#socialImpact10 .social-small{font-size:13px;color:#bbd1e6}
-</style><section id="adManager20">
-<h2>🍅 LISBON ALIVE™ | AD MANAGER 2.0</h2>
-<p class="ad-note">Campanhas HTML animadas de 30 segundos. O intervalo automático tem 5 s de separador, 30 s de anúncio e 10 s de continuidade. A grelha muda de programa a cada 30 minutos.</p>
-<div class="ad-grid">
-<div><label for="adName20">Nome da campanha</label><input id="adName20" value="LISBON ALIVE™ | Promo oficial" maxlength="100"></div>
-<div><label for="adHeadline20">Título no anúncio</label><input id="adHeadline20" value="PORTUGAL NO ECRÃ" maxlength="110"></div>
-<div><label for="adCopy20">Mensagem</label><textarea id="adCopy20" rows="2" maxlength="250">Lisboa, cultura, informação e histórias. LISBON ALIVE™.</textarea></div>
-<div><label for="adAsset20">Ficheiro local de referência (opcional)</label><input id="adAsset20" type="file" accept="image/png,image/jpeg,image/webp,video/mp4,application/json"><p class="ad-note">O ficheiro é identificado localmente; não é enviado nem reproduzido nesta versão HTML. Para vídeo ou imagem em emissão, será necessário integrar os ativos no alojamento.</p></div>
-</div>
-<label><input id="adEnabled20" type="checkbox" checked style="width:auto"> Campanha ativa</label>
-<p><button id="adSave20">Guardar campanha</button><button id="adPreview20">Pré-visualizar intervalo</button><button id="adExport20">Exportar campanhas JSON</button><button id="adImport20">Importar campanhas JSON</button><input id="adImportFile20" type="file" accept=".json,application/json" hidden></p>
-<p id="adStatus20" class="ad-note" role="status">Gestor preparado.</p>
-
-<fieldset style="border:1px solid #4976a2;border-radius:9px;margin:14px 0;padding:12px">
-<legend>🇵🇹🇧🇷 PK PROMO · Batalhas TikTok</legend>
-<p class="ad-note">Exemplo fictício, desativado por defeito. Introduz dados autorizados e uma data real antes de ativar.</p>
-<div class="ad-grid">
-<div><label for="pkA20">Criador A</label><input id="pkA20" value="CRIADOR A"></div>
-<div><label for="pkB20">Criador B</label><input id="pkB20" value="CRIADOR B"></div>
-<div><label for="pkHandleA20">TikTok A</label><input id="pkHandleA20" value="@criadorA"></div>
-<div><label for="pkHandleB20">TikTok B</label><input id="pkHandleB20" value="@criadorB"></div>
-<div><label for="pkDate20">Data e hora em Portugal (Lisboa)</label><input id="pkDate20" type="datetime-local" value="2026-11-14T21:00"></div>
-<div><label>Horários calculados</label><p id="pkTimes20" role="status"></p></div>
-</div>
-<label><input type="checkbox" id="pkEnabled20" style="width:auto"> Ativar campanha PK (apenas com autorização)</label>
-<button id="pkSave20">Guardar campanha PK</button>
-</fieldset>
-<fieldset id="socialImpact10">
-<legend>❤️ SOCIAL IMPACT 1.0 · 9 campanhas HTML de 30 s</legend>
-<p class="social-small">Mensagens genéricas de serviço público, sem afiliação institucional. Desativadas por defeito. Confirmar contactos, legislação e fontes antes da emissão. O link de referência não é uma validação automática.</p>
-<label for="socialSelect10">Campanha</label><select id="socialSelect10"></select>
-<label for="socialHead10">Título</label><input id="socialHead10" maxlength="110">
-<label for="socialCopy10">Mensagem principal</label><textarea id="socialCopy10" maxlength="250" rows="2"></textarea>
-<label for="socialHelp10">Mensagem de apoio / ação</label><textarea id="socialHelp10" maxlength="200" rows="2"></textarea>
-<label for="socialUrl10">Fonte / endereço de referência</label><input id="socialUrl10" type="url">
-<label><input id="socialEnabled10" type="checkbox" style="width:auto"> Autorizar campanha para rotação (após revisão editorial)</label>
-<p><button type="button" id="socialSave10">Guardar campanha social</button><button type="button" id="socialReset10">Repor os 9 modelos</button></p>
-<p class="social-small" id="socialStatus10" role="status">Modelos de demonstração disponíveis para edição.</p>
-</fieldset><h3>Campanhas locais</h3><pre id="adList20"></pre>
-<h3>Relatório de exibições neste navegador</h3>
-<p class="ad-note">Conta inícios de anúncios programados neste navegador. Não mede espectadores, impressões verificadas no TikTok/YouTube nem visualização completa. O OBS pode ter armazenamento isolado.</p>
-<p><button id="adReport20">Atualizar relatório</button><button id="adCsv20">Exportar CSV</button><button id="adClear20">Limpar relatório</button></p><pre id="adLog20"></pre>
-</section>
-<script id="adManagerControls20">
-(()=>{'use strict';const api=window.LisbonAdManager;if(!api)return;const $=id=>document.getElementById(id),status=t=>$('adStatus20').textContent=t;
-const download=(text,name,type)=>{const u=URL.createObjectURL(new Blob([text],{type}));const a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)};
-function refresh(){const c=api.getCampaigns();$('adList20').textContent=c.map(x=>(x.enabled?'● ':'○ ')+x.name+' · HTML · 30 s'+(x.mediaName?' · '+x.mediaName:'')).join('\n');const logs=api.getReport();$('adLog20').textContent='Inícios registados: '+logs.length+'\n'+logs.slice(-8).map(x=>x.at+' · '+x.campaignName).join('\n')}
-$('adSave20').onclick=()=>{try{const c=api.getCampaigns(),name=$('adName20').value.trim(),head=$('adHeadline20').value.trim();if(!name||!head)throw Error('Indica o nome e o título');const id=name==='LISBON ALIVE™ | Promo oficial'?'official-promo':'campaign-'+name.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,30);const obj={id,name,format:'html',duration:30,headline:head,copy:$('adCopy20').value.trim(),enabled:$('adEnabled20').checked,mediaName:$('adAsset20').files[0]?.name||''};const idx=c.findIndex(x=>x.id===id);if(idx>=0)c[idx]=obj;else c.push(obj);api.save(c);status('Campanha guardada neste navegador. Para uso noutro navegador/OBS, exporta e importa o JSON.');refresh()}catch(e){status('Erro: '+e.message)}};
-$('adPreview20').onclick=()=>{const u=new URL(location.href);u.searchParams.set('adPreview','1');u.searchParams.set('broadcast','1');window.open(u.href,'_blank','noopener')};
-$('adExport20').onclick=()=>download(JSON.stringify(api.getCampaigns(),null,2),'lisbon-alive-campanhas.json','application/json');
-$('adImport20').onclick=()=>$('adImportFile20').click();
-$('adImportFile20').onchange=async()=>{try{const file=$('adImportFile20').files[0];if(!file)return;if(file.size>100000)throw Error('JSON demasiado grande');api.save(JSON.parse(await file.text()));status('Campanhas importadas.');refresh()}catch(e){status('Importação falhou: '+e.message)}};
-$('adReport20').onclick=refresh;
-$('adCsv20').onclick=()=>{const rows=api.getReport(),quote=x=>'"'+String(x??'').replace(/"/g,'""')+'"';download(['data_utc,campanha_id,campanha,bloco,tipo',...rows.map(x=>[x.at,x.campaignId,x.campaignName,x.slot,x.type].map(quote).join(','))].join('\r\n'),'lisbon-alive-relatorio.csv','text/csv;charset=utf-8')};
-$('adClear20').onclick=()=>{if(confirm('Apagar os registos locais de exibições?')){api.clearReport();refresh()}};
-
-function pkIso(){const raw=$('pkDate20').value;if(!raw)return '';const [date,time]=raw.split('T');if(!date||!time)return '';const target=date+' '+time;const base=new Date(raw+':00Z');if(!Number.isFinite(base.getTime()))return '';for(let delta=-2;delta<=2;delta++){const candidate=new Date(base.getTime()+delta*3600000);const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Lisbon',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(candidate);const v=t=>parts.find(p=>p.type===t)?.value;const formatted=v('year')+'-'+v('month')+'-'+v('day')+' '+v('hour')+':'+v('minute');if(formatted===target)return candidate.toISOString()}return ''}
-function updatePkTimes(){const iso=pkIso();$('pkTimes20').textContent=iso?'🇵🇹 '+new Intl.DateTimeFormat('pt-PT',{timeZone:'Europe/Lisbon',hour:'2-digit',minute:'2-digit'}).format(new Date(iso))+'  |  🇧🇷 '+new Intl.DateTimeFormat('pt-PT',{timeZone:'America/Sao_Paulo',hour:'2-digit',minute:'2-digit'}).format(new Date(iso)):'Escolhe uma data e hora válida'}
-$('pkDate20').addEventListener('input',updatePkTimes);updatePkTimes();
-$('pkSave20').onclick=()=>{try{const iso=pkIso();if(!iso)throw Error('Data inválida ou hora inexistente na mudança de horário');const a=$('pkA20').value.trim(),b=$('pkB20').value.trim();if(!a||!b)throw Error('Indica os dois criadores');const c=api.getCampaigns(),obj={id:'pk-promo-demo',name:'LISBON ALIVE™ | PK PROMO',format:'html',duration:30,headline:'BATALHA LIVE · VS',copy:'',enabled:$('pkEnabled20').checked,type:'pk',creatorA:a,creatorB:b,handleA:$('pkHandleA20').value.trim(),handleB:$('pkHandleB20').value.trim(),eventAt:iso,mediaName:''};const i=c.findIndex(x=>x.id===obj.id);if(i<0)c.push(obj);else c[i]=obj;api.save(c);status('Campanha PK guardada. Horários calculados para Lisboa e Brasília.');refresh()}catch(e){status('Erro: '+e.message)}};
-refresh();
-})();
-</script><script id="socialImpactControls10">
-(()=>{'use strict';const api=window.LisbonAdManager;if(!api)return;const $=id=>document.getElementById(id);
-const templates=[{"id":"social-burlas","name":"SOCIAL IMPACT | BURLAS DIGITAIS","format":"html","duration":30,"type":"social","headline":"BURLAS DIGITAIS","copy":"Desconfia de mensagens urgentes. Nunca partilhes códigos ou palavras-passe.","help":"Em caso de suspeita, contacta o teu banco pelos canais oficiais.","url":"https://www.cncs.gov.pt/","enabled":false,"mediaName":""},{"id":"social-bullying","name":"SOCIAL IMPACT | BULLYING E CYBERBULLYING","format":"html","duration":30,"type":"social","headline":"BULLYING E CYBERBULLYING","copy":"Não partilhes humilhações. Guarda provas e pede ajuda a alguém de confiança.","help":"Fala com a escola, familiares ou serviços de apoio.","url":"https://www.internetsegura.pt/","enabled":false,"mediaName":""},{"id":"social-animais","name":"SOCIAL IMPACT | PROTEÇÃO ANIMAL","format":"html","duration":30,"type":"social","headline":"PROTEÇÃO ANIMAL","copy":"Adotar é um compromisso para a vida. Não abandones.","help":"Procura associações e centros de recolha autorizados.","url":"https://www.dgav.pt/","enabled":false,"mediaName":""},{"id":"social-habitacao","name":"SOCIAL IMPACT | HABITAÇÃO E DIREITOS","format":"html","duration":30,"type":"social","headline":"HABITAÇÃO E DIREITOS","copy":"Conhece os teus direitos e confirma os programas de apoio à habitação.","help":"Consulta condições e candidaturas em canais oficiais.","url":"https://www.portaldahabitacao.pt/","enabled":false,"mediaName":""},{"id":"social-emergencias","name":"SOCIAL IMPACT | PROTEÇÃO CIVIL","format":"html","duration":30,"type":"social","headline":"PROTEÇÃO CIVIL","copy":"Prepara um plano familiar. Segue avisos oficiais e evita riscos desnecessários.","help":"Em perigo imediato em Portugal, liga 112.","url":"https://www.prociv.gov.pt/","enabled":false,"mediaName":""},{"id":"social-mental","name":"SOCIAL IMPACT | SAÚDE MENTAL","format":"html","duration":30,"type":"social","headline":"SAÚDE MENTAL","copy":"Pedir ajuda é um passo importante. Escuta sem julgar.","help":"Procura um profissional de saúde ou serviço de apoio local.","url":"https://www.sns24.gov.pt/","enabled":false,"mediaName":""},{"id":"social-solidariedade","name":"SOCIAL IMPACT | SOLIDARIEDADE","format":"html","duration":30,"type":"social","headline":"SOLIDARIEDADE","copy":"Um gesto pode transformar um dia. Ajuda com responsabilidade.","help":"Confirma a identidade das organizações antes de doar.","url":"https://www.bancoalimentar.pt/","enabled":false,"mediaName":""},{"id":"social-cultura","name":"SOCIAL IMPACT | CULTURA PARA TODOS","format":"html","duration":30,"type":"social","headline":"CULTURA PARA TODOS","copy":"Descobre exposições, concertos e iniciativas culturais na tua cidade.","help":"Confirma datas, bilhetes e acessibilidade com o organizador.","url":"https://www.agendalx.pt/","enabled":false,"mediaName":""},{"id":"social-comercio","name":"SOCIAL IMPACT | COMÉRCIO LOCAL","format":"html","duration":30,"type":"social","headline":"COMÉRCIO LOCAL","copy":"Descobre os negócios da tua comunidade. Compra de forma informada.","help":"Espaço promocional demonstrativo. Nenhum anunciante contratado.","url":"","enabled":false,"mediaName":""}];
-const current=()=>api.getCampaigns(),items=()=>current().filter(c=>c.type==='social');
-const select=$('socialSelect10');function populate(){select.replaceChildren();for(const c of items()){const o=document.createElement('option');o.value=c.id;o.textContent=c.name;select.append(o)}load()}
-function load(){const c=items().find(x=>x.id===select.value);if(!c)return;$('socialHead10').value=c.headline||'';$('socialCopy10').value=c.copy||'';$('socialHelp10').value=c.help||'';$('socialUrl10').value=c.url||'';$('socialEnabled10').checked=!!c.enabled}
-select.addEventListener('change',load);
-$('socialSave10').onclick=()=>{try{const all=current(),idx=all.findIndex(x=>x.id===select.value);if(idx<0)throw Error('Campanha não encontrada');const headline=$('socialHead10').value.trim(),copy=$('socialCopy10').value.trim(),url=$('socialUrl10').value.trim();if(!headline||!copy)throw Error('Preenche o título e a mensagem');if(url&&!/^https:\/\/[^ ]+$/i.test(url))throw Error('Utiliza um endereço HTTPS válido');all[idx]={...all[idx],headline,copy,help:$('socialHelp10').value.trim(),url,enabled:$('socialEnabled10').checked};api.save(all);$('socialStatus10').textContent='Campanha guardada localmente. A publicação exige revisão e testes.'}catch(e){$('socialStatus10').textContent='Erro: '+e.message}};
-$('socialReset10').onclick=()=>{if(!confirm('Repor os 9 modelos sociais?'))return;const other=current().filter(x=>x.type!=='social');api.save([...other,...templates]);populate();$('socialStatus10').textContent='Modelos repostos, todos desativados.'};
-const all=current();if(!all.some(x=>x.type==='social')){api.save([...all,...templates])}populate();
-})();
-</script></body></html>
+</body>
+</html>
