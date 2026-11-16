@@ -83,3 +83,18 @@ test('Escape termina e o temporizador antigo não fecha um novo intervalo',()=>{
  t.advance(1000);
  assert.equal(t.window.N24AutoBreak.active,false);
 });
+
+test('iframe confirma que está pronto e recebe ordem de início',()=>{
+ const t=setup();t.window.N24AutoBreak.start();
+ const before=t.sent.length;
+ t.events.get('message')({origin:'https://example.test',source:t.frame.contentWindow,data:{type:'24n-break-ready'}});
+ assert.equal(t.sent.length,before+1);
+ assert.equal(t.sent.at(-1).msg.type,'24n-break-start');
+});
+test('a montra embebida aguarda comando, sem temporizador autónomo',()=>{
+ const ad=fs.readFileSync(path.join(__dirname,'..','intervalo.html'),'utf8');
+ assert.match(ad,/standalone=window\.parent===window/);
+ assert.match(ad,/if\(!playing\)return/);
+ assert.match(ad,/if\(standalone\)begin\(120000\)/);
+ assert.match(ad,/24n-break-ready/);
+});
