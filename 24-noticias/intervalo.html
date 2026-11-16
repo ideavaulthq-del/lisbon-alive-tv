@@ -39,7 +39,7 @@ const demo=[
  {name:'Música sem fios',category:'ÁUDIO',description:'Explora acessórios e tecnologia de áudio.',emoji:'🎧'},
  {name:'Vida ativa',category:'DESPORTO',description:'Ideias e artigos para movimento e bem-estar.',emoji:'⌚'}
 ];
-let products=demo,idx=0,phase='commercial',start=Date.now(),duration=120000,standalone=true,cycle;
+let products=demo,idx=0,phase='commercial',start=Date.now(),duration=120000,standalone=window.parent===window,cycle=null,playing=false;
 function validProduct(p){return p&&typeof p.name==='string'&&p.name.trim()&&typeof p.category==='string'&&typeof p.description==='string'&&(!p.image_url||/^https:\/\//.test(p.image_url))&&(!p.link||/^https:\/\//.test(p.link));}
 async function load(){
  try{const r=await fetch('./products.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error('sem catálogo');const data=await r.json();const verified=(Array.isArray(data.products)?data.products:[]).filter(p=>p.approved===true&&validProduct(p)&&typeof p.store==='string'&&p.store.trim()&&/^https:\/\//.test(p.link||'')&&/^\d{4}-\d{2}-\d{2}$/.test(p.reviewed_at||'')&&(()=>{const age=(Date.now()-Date.parse(p.reviewed_at+'T00:00:00Z'))/86400000;return Number.isFinite(age)&&age>=0&&age<=30;})());if(verified.length)products=verified;}catch(e){console.info('24N SHOP: catálogo indisponível; demonstração local');}
@@ -67,12 +67,15 @@ function render(){
 }
 function setPhase(p){phase=p;$('bumper').style.display=p==='commercial'?'none':'flex';$('bumperText').textContent=p==='intro'?'INTERVALO COMERCIAL':'ESTAMOS DE VOLTA';$('bumperSub').textContent=p==='intro'?'Voltamos dentro de momentos':'A informação continua';}
 function tick(){
+ if(!playing)return;
  const elapsed=Date.now()-start,remaining=Math.max(0,duration-elapsed),m=Math.floor(remaining/60000),s=Math.floor(remaining%60000/1000);
  $('remain').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
  $('progress').style.width=Math.min(100,100*elapsed/duration)+'%';
  if(elapsed<5000)setPhase('intro');else if(remaining<=5000)setPhase('outro');else setPhase('commercial');
- if(remaining<=0){clearInterval(cycle);if(window.parent!==window)window.parent.postMessage({type:'24n-break-finished'},location.origin);else{start=Date.now();cycle=setInterval(tick,250);}}
+ if(remaining<=0){clearInterval(cycle);cycle=null;playing=false;if(window.parent!==window)window.parent.postMessage({type:'24n-break-finished'},location.origin);else begin(120000);}
 }
-addEventListener('message',e=>{if(e.origin!==location.origin||e.source!==window.parent)return;if(e.data?.type==='24n-break-start'){start=Date.now();duration=Math.max(15000,Math.min(600000,Number(e.data.duration)||120000));tick();}});
-load();cycle=setInterval(tick,250);setInterval(()=>{idx=(idx+1)%products.length;render();},8000);
+function begin(ms){duration=Math.max(15000,Math.min(600000,Number(ms)||120000));start=Date.now();idx=0;playing=true;render();clearInterval(cycle);cycle=setInterval(tick,250);tick();}
+addEventListener('message',e=>{if(e.origin!==location.origin||e.source!==window.parent)return;if(e.data?.type==='24n-break-start')begin(e.data.duration);});
+if(!standalone)window.parent.postMessage({type:'24n-break-ready'},location.origin);
+load();if(standalone)begin(120000);setInterval(()=>{if(!playing)return;idx=(idx+1)%products.length;render();},8000);
 </script></body></html>
