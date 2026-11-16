@@ -433,12 +433,10 @@ let news = [], idx = 0, last = '', busy = false, seq = 0;
 const FEEDS = [
   { url: 'https://www.publico.pt/rss',            source: 'Público',            category: 'Portugal' },
   { url: 'https://expresso.pt/rss',               source: 'Expresso',           category: 'Portugal' },
+  { url: 'https://eco.sapo.pt/feed/',             source: 'ECO',                category: 'Economia' },
   { url: 'https://www.dn.pt/rss',                 source: 'Diário de Notícias', category: 'Portugal' },
   { url: 'https://www.jn.pt/rss',                 source: 'Jornal de Notícias', category: 'Portugal' },
   { url: 'https://www.noticiasaominuto.com/rss/ultima-hora', source: 'Notícias ao Minuto', category: 'Portugal' },
-  { url: 'https://cnnportugal.iol.pt/rss.xml',    source: 'CNN Portugal',       category: 'Portugal' },
-  { url: 'https://rss.impresa.pt/feed/latest/sicnot.rss?type=ARTICLE,VIDEO,GALLERY,STREAM,PLAYLIST,EVENT,NEWSLETTER&limit=20&pubsubhub=true', source: 'SIC Notícias', category: 'Portugal' },
-  { url: 'https://www.cmjornal.pt/rss',           source: 'Correio da Manhã (CMTV)', category: 'Portugal' },
   { url: 'https://feeds.bbci.co.uk/news/world/rss.xml', source: 'BBC World', category: 'Mundo' },
   { url: 'https://pt.euronews.com/rss',           source: 'Euronews',           category: 'Mundo' },
   { url: 'https://news.google.com/rss/search?q=world&hl=pt-PT&gl=PT&ceid=PT:pt', source: 'Google News', category: 'Mundo' }
